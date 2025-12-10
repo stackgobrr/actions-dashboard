@@ -37,6 +37,7 @@ function App() {
   const [showTokenInput, setShowTokenInput] = useState(!localStorage.getItem('github_token'))
   const [autoRefresh, setAutoRefresh] = useState(true)
   const [refreshInterval, setRefreshInterval] = useState(10) // seconds
+  const [sortBy, setSortBy] = useState('last-run-desc') // last-run-desc, last-run-asc, group, status
 
   const fetchRepoStatus = async (repoName, token) => {
     try {
@@ -144,6 +145,53 @@ function App() {
     return 'unknown'
   }
 
+  const sortRepos = (repos) => {
+    const entries = Object.entries(repos)
+    
+    switch (sortBy) {
+      case 'last-run-desc':
+        return entries.sort(([, a], [, b]) => {
+          if (!a.updatedAt) return 1
+          if (!b.updatedAt) return -1
+          return new Date(b.updatedAt) - new Date(a.updatedAt)
+        })
+      
+      case 'last-run-asc':
+        return entries.sort(([, a], [, b]) => {
+          if (!a.updatedAt) return 1
+          if (!b.updatedAt) return -1
+          return new Date(a.updatedAt) - new Date(b.updatedAt)
+        })
+      
+      case 'group':
+        return entries.sort(([, a], [, b]) => {
+          if (a.category !== b.category) {
+            return a.category.localeCompare(b.category)
+          }
+          // Within same group, sort by name
+          return a.name || 0
+        })
+      
+      case 'status':
+        const statusOrder = {
+          'failure': 0,
+          'in-progress': 1,
+          'warning': 2,
+          'success': 3,
+          'unknown': 4,
+          'error': 5
+        }
+        return entries.sort(([, a], [, b]) => {
+          const statusA = getStatusClass(a)
+          const statusB = getStatusClass(b)
+          return statusOrder[statusA] - statusOrder[statusB]
+        })
+      
+      default:
+        return entries
+    }
+  }
+
   if (showTokenInput) {
     return (
       <div className="app">
@@ -178,6 +226,22 @@ function App() {
           <p>Real-time GitHub Actions status for all repositories</p>
         </div>
         <div className="header-actions">
+          <div className="sort-controls">
+            <label htmlFor="sort-select" style={{ color: '#8b949e', fontSize: '0.85rem', marginRight: '0.5rem' }}>
+              Sort by:
+            </label>
+            <select 
+              id="sort-select"
+              value={sortBy} 
+              onChange={(e) => setSortBy(e.target.value)}
+              className="sort-select"
+            >
+              <option value="last-run-desc">Last Run (Newest)</option>
+              <option value="last-run-asc">Last Run (Oldest)</option>
+              <option value="group">Category</option>
+              <option value="status">Status</option>
+            </select>
+          </div>
           <div className="auto-refresh-controls">
             <label className="refresh-toggle">
               <input
@@ -220,14 +284,7 @@ function App() {
         <div className="loading">Loading repository statuses...</div>
       ) : (
         <div className="repo-grid">
-          {Object.entries(repoStatuses)
-            .sort(([, a], [, b]) => {
-              // Sort by most recent update
-              if (!a.updatedAt) return 1
-              if (!b.updatedAt) return -1
-              return new Date(b.updatedAt) - new Date(a.updatedAt)
-            })
-            .map(([repoName, status]) => (
+          {sortRepos(repoStatuses).map(([repoName, status]) => (
               <div key={repoName} className={`repo-card ${getStatusClass(status)}`}>
                 <div className="repo-header">
                   <div>

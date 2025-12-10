@@ -30,6 +30,35 @@
   flex-wrap: wrap;
 }
 
+.sort-controls {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+}
+
+.sort-select {
+  padding: 0.25rem 0.5rem;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+  min-width: 150px;
+}
+
+.sort-select:hover {
+  border-color: #8b949e;
+}
+
+.sort-select:focus {
+  border-color: #58a6ff;
+}
+
 .auto-refresh-controls {
   display: flex;
   gap: 0.5rem;
