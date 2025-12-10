@@ -211,6 +211,8 @@
   border-radius: 8px;
   padding: 1.5rem;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 
 .repo-card:hover {
@@ -239,16 +241,32 @@
 }
 
 .repo-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   margin-bottom: 1rem;
 }
 
 .repo-header h3 {
   font-size: 1.1rem;
   color: var(--text-primary);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.card-footer-left {
+  display: flex;
+  align-items: center;
+}
+
+.card-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .category-badge {
@@ -525,11 +543,17 @@
 
 :fullscreen .repo-header {
   margin-bottom: 0.5rem;
+  flex-shrink: 0;
 }
 
 :fullscreen .repo-header h3 {
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
+}
+
+:fullscreen .card-footer {
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 :fullscreen .category-badge {

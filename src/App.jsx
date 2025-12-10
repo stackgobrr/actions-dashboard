@@ -360,16 +360,8 @@ function App() {
           {sortRepos(repoStatuses).map(([repoName, status]) => (
               <div key={repoName} className={`repo-card ${getStatusClass(status)}`}>
                 <div className="repo-header">
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                      <h3>{repoName}</h3>
-                      <span className={`category-badge ${status.category}`}>
-                        {status.category}
-                      </span>
-                    </div>
-                    <p className="repo-description">{status.description}</p>
-                  </div>
-                  {getStatusIcon(status)}
+                  <h3>{repoName}</h3>
+                  <p className="repo-description">{status.description}</p>
                 </div>
                 
                 {status.error ? (
@@ -393,19 +385,44 @@ function App() {
                       <span className="label">Commit:</span>
                       <span className="commit-message">{status.commitMessage}</span>
                     </div>
+                  </div>
+                ) : (
+                  <div className="status-details">
+                    <div className="status-row">
+                      <span className="label">Workflow:</span>
+                      <span>N/A</span>
+                    </div>
+                    <div className="status-row">
+                      <span className="label">Branch:</span>
+                      <span>
+                        <GitBranch size={14} style={{ marginRight: '4px' }} />
+                        N/A
+                      </span>
+                    </div>
+                    <div className="status-row">
+                      <span className="label">Commit:</span>
+                      <span>N/A</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="card-footer">
+                  <div className="card-footer-left">
                     {status.url && (
                       <a href={status.url} target="_blank" rel="noopener noreferrer" className="view-run">
                         View Run <ExternalLink size={12} style={{display: 'inline', marginLeft: '4px'}} />
                       </a>
                     )}
                   </div>
-                ) : (
-                  <div className="status-details">
-                    <p>No workflow runs found</p>
+                  <div className="card-footer-right">
+                    <span className={`category-badge ${status.category}`}>
+                      {status.category}
+                    </span>
+                    {getStatusIcon(status)}
                   </div>
-                )}
+                </div>
               </div>
-            ))}
+          ))}
         </div>
       )}
       
