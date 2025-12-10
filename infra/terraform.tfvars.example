@@ -14,9 +14,10 @@ project_name = "h3ow3d-actions-dashboard"
 cloudfront_price_class = "PriceClass_100"
 
 # Optional: Custom domain configuration
-# domain_name     = "dashboard.example.com"
-# certificate_arn = "arn:aws:acm:us-east-1:123456789:certificate/xxx"
-# Note: ACM certificate MUST be in us-east-1 for CloudFront
+# Uncomment and set these to use a custom domain
+# domain_name     = "actions.dashboard.h3ow3d.com"
+# hosted_zone_id  = "Z07170922H7CK1PCDM6NG"
+# Note: ACM certificate will be automatically created and validated via DNS
 
 # Optional: Store GitHub token in SSM Parameter Store
 # github_token_parameter_name = "/github/actions-dashboard/token"

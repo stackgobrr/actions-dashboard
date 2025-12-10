@@ -10,6 +10,12 @@ resource "aws_s3_bucket" "dashboard" {
 # Get current AWS account ID
 data "aws_caller_identity" "current" {}
 
+# Get Route53 hosted zone
+data "aws_route53_zone" "main" {
+  count   = var.hosted_zone_id != "" ? 1 : 0
+  zone_id = var.hosted_zone_id
+}
+
 # Block all public access (CloudFront will access via OAC)
 resource "aws_s3_bucket_public_access_block" "dashboard" {
   bucket = aws_s3_bucket.dashboard.id
@@ -113,10 +119,10 @@ resource "aws_cloudfront_distribution" "dashboard" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = var.certificate_arn == ""
-    acm_certificate_arn            = var.certificate_arn != "" ? var.certificate_arn : null
-    ssl_support_method             = var.certificate_arn != "" ? "sni-only" : null
-    minimum_protocol_version       = var.certificate_arn != "" ? "TLSv1.2_2021" : null
+    cloudfront_default_certificate = var.domain_name == ""
+    acm_certificate_arn            = var.domain_name != "" ? aws_acm_certificate_validation.dashboard[0].certificate_arn : null
+    ssl_support_method             = var.domain_name != "" ? "sni-only" : null
+    minimum_protocol_version       = var.domain_name != "" ? "TLSv1.2_2021" : null
   }
 
   tags = {
@@ -147,4 +153,59 @@ resource "aws_s3_bucket_policy" "dashboard" {
       }
     ]
   })
+}
+
+# ACM Certificate for CloudFront (must be in us-east-1)
+resource "aws_acm_certificate" "dashboard" {
+  count             = var.domain_name != "" ? 1 : 0
+  provider          = aws.us_east_1
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}"
+  }
+}
+
+# DNS validation records for ACM certificate
+resource "aws_route53_record" "cert_validation" {
+  for_each = var.domain_name != "" ? {
+    for dvo in aws_acm_certificate.dashboard[0].domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  } : {}
+
+  zone_id = var.hosted_zone_id
+  name    = each.value.name
+  type    = each.value.type
+  records = [each.value.record]
+  ttl     = 60
+}
+
+# Wait for certificate validation
+resource "aws_acm_certificate_validation" "dashboard" {
+  count                   = var.domain_name != "" ? 1 : 0
+  provider                = aws.us_east_1
+  certificate_arn         = aws_acm_certificate.dashboard[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+}
+
+# Route53 A record pointing to CloudFront
+resource "aws_route53_record" "dashboard" {
+  count   = var.domain_name != "" ? 1 : 0
+  zone_id = var.hosted_zone_id
+  name    = var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.dashboard.domain_name
+    zone_id                = aws_cloudfront_distribution.dashboard.hosted_zone_id
+    evaluate_target_health = false
+  }
 }

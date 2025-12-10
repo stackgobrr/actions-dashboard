@@ -143,7 +143,7 @@ gh secret set AWS_SECRET_ACCESS_KEY
 | `project_name` | Project name | `h3ow3d-actions-dashboard` |
 | `cloudfront_price_class` | Edge location distribution | `PriceClass_100` |
 | `domain_name` | Custom domain (optional) | `""` |
-| `certificate_arn` | ACM cert ARN in us-east-1 (optional) | `""` |
+| `hosted_zone_id` | Route53 hosted zone ID (required if domain_name set) | `""` |
 
 ### CloudFront Price Classes
 
@@ -206,40 +206,63 @@ Monitor storage and requests in S3 console or CloudWatch.
 
 Expected: **$0.10-2/month** (mostly CloudFront, S3 is negligible)
 
-## Custom Domain (Optional)
+## Custom Domain Setup
 
-To use a custom domain:
+The infrastructure now supports automatic custom domain setup with ACM certificate and Route53 DNS.
 
-1. **Request ACM certificate in us-east-1** (CloudFront requires this region):
-   ```bash
-   aws acm request-certificate \
-     --domain-name dashboard.yourdomain.com \
-     --validation-method DNS \
-     --region us-east-1
-   ```
+### Prerequisites
 
-2. **Validate certificate** by adding DNS records shown in ACM console
+1. **Route53 Hosted Zone**: Domain registered in Route53 or hosted zone created
+2. **Hosted Zone ID**: Get from Route53 console or AWS CLI
 
-3. **Update terraform.tfvars**:
+### Configuration Steps
+
+1. **Update terraform.tfvars**:
    ```hcl
-   domain_name     = "dashboard.yourdomain.com"
-   certificate_arn = "arn:aws:acm:us-east-1:...:certificate/..."
+   domain_name    = "actions.dashboard.h3ow3d.com"
+   hosted_zone_id = "Z07170922H7CK1PCDM6NG"
    ```
 
-4. **Apply changes**:
+2. **Apply Terraform**:
    ```bash
    cd infra
    terraform apply
    ```
 
-5. **Update DNS** to point to CloudFront:
+This will automatically:
+- Create ACM certificate in us-east-1 (required for CloudFront)
+- Add DNS validation records to Route53
+- Wait for certificate validation
+- Update CloudFront distribution with custom domain and SSL certificate
+- Create Route53 A record (alias) pointing to CloudFront
+
+3. **Wait for propagation** (usually 5-15 minutes for DNS, up to 20 minutes for certificate validation)
+
+4. **Access your dashboard**:
    ```bash
-   # Get CloudFront domain
-   terraform output cloudfront_domain_name
-   
-   # Create CNAME or A (alias) record:
-   # dashboard.yourdomain.com -> d1234abcd.cloudfront.net
+   terraform output website_url
+   # https://actions.dashboard.h3ow3d.com
    ```
+
+### What Gets Created
+
+- **ACM Certificate** (us-east-1): Free SSL/TLS certificate for your domain
+- **DNS Validation Records**: Automatically added to Route53 for certificate validation
+- **CloudFront Alias**: Custom domain added to CloudFront distribution
+- **Route53 A Record**: Points your domain to CloudFront using alias record
+
+### Troubleshooting
+
+If the domain doesn't work immediately:
+1. Check certificate status: `aws acm describe-certificate --certificate-arn <arn> --region us-east-1`
+2. Verify DNS propagation: `dig actions.dashboard.h3ow3d.com`
+3. Check CloudFront status: Distribution must be "Deployed" (not "In Progress")
+
+### Costs
+
+- **Route53**: $0.50/hosted zone/month + $0.40 per million queries
+- **ACM Certificate**: **FREE**
+- **CloudFront custom domain**: No additional cost
 
 ## Security
 

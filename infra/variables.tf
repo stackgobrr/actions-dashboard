@@ -22,8 +22,8 @@ variable "domain_name" {
   default     = ""
 }
 
-variable "certificate_arn" {
-  description = "ACM certificate ARN for custom domain in us-east-1 (required if domain_name is set)"
+variable "hosted_zone_id" {
+  description = "Route53 hosted zone ID (required if domain_name is set)"
   type        = string
   default     = ""
 }
