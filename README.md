@@ -4,17 +4,46 @@ Real-time GitHub Actions status dashboard for all h3ow3d repositories.
 
 ## Features
 
-- 🔄 **Auto-refresh**: Updates every minute
+- 🔄 **Auto-refresh**: Configurable refresh intervals (5s to 5m)
 - 🎨 **Visual Status**: Color-coded status indicators
 - 📊 **Categorized View**: Organized by repository type (common, modules, infra, services)
 - 🔗 **Quick Links**: Direct links to workflow runs
 - 🔐 **Secure**: GitHub token stored locally in browser
 - ⚡ **Fast**: Built with React + Vite
-- 🐳 **Docker Ready**: Run in a container with one command
+- 🐳 **Docker Ready**: Run locally or deploy to AWS
+- ☁️ **AWS S3 + CloudFront**: Serverless static hosting with global CDN
 
-## Quick Start (Docker - Recommended)
+## Deployment Options
 
-The easiest way to run the dashboard:
+### Option 1: AWS S3 + CloudFront (Production) ☁️
+
+Deploy as a static website with S3 storage and CloudFront CDN:
+
+```bash
+# Deploy infrastructure
+make infra-init
+make infra-apply
+
+# Build and deploy website
+make deploy
+
+# Get your dashboard URL
+make infra-output
+```
+
+**Benefits**:
+- True serverless - just static files
+- Global CDN with edge caching
+- Extremely low cost (~$0.10-2/month)
+- No cold starts - instant loading
+- HTTPS included
+- GitHub Actions auto-deployment
+
+📖 **[Full Deployment Guide →](./DEPLOYMENT.md)**
+
+### Option 2: Local Docker 🐳
+
+Run locally in a container:
 
 ```bash
 # Build and run
@@ -25,14 +54,32 @@ make docker-run
 docker-compose up -d
 ```
 
-Dashboard will be available at http://localhost:8080
+Dashboard available at http://localhost:8080
+
+### Option 3: Development 💻
+
+Run local development server:
+
+```bash
+make dev
+# or
+npm run dev
+```
+
+Dashboard available at http://localhost:3000
 
 ### Makefile Commands
 
+**Development**:
 ```bash
-make help              # Show all available commands
 make install           # Install dependencies
 make dev               # Run development server
+make build             # Build for production
+make preview           # Preview production build
+```
+
+**Docker (Local)**:
+```bash
 make docker-build      # Build Docker image
 make docker-run        # Run Docker container
 make docker-stop       # Stop container
@@ -40,6 +87,23 @@ make docker-logs       # View container logs
 make docker-rebuild    # Rebuild and restart
 make up                # Quick rebuild and run
 make down              # Quick stop
+```
+
+**AWS S3/CloudFront (Production)**:
+```bash
+make infra-init        # Initialize Terraform
+make infra-plan        # Preview infrastructure changes
+make infra-apply       # Deploy infrastructure
+make build             # Build React app
+make sync              # Sync files to S3
+make invalidate        # Invalidate CloudFront cache
+make deploy            # Build + sync + invalidate (full deploy)
+make infra-destroy     # Remove all AWS resources
+```
+
+**Utilities**:
+```bash
+make help              # Show all available commands
 make clean             # Clean build artifacts
 ```
 
@@ -101,6 +165,95 @@ docker-compose down
 ```bash
 # Build
 docker build -t h3ow3d-actions-dashboard .
+
+# Run
+docker run -d --name h3ow3d-dashboard -p 8080:80 h3ow3d-actions-dashboard
+```
+
+## AWS S3/CloudFront Deployment
+
+Deploy the dashboard as a static website with global CDN.
+
+### Quick Start
+
+```bash
+# 1. Configure backend (one time)
+cd infra
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your settings
+
+# 2. Deploy infrastructure
+make infra-init
+make infra-apply
+
+# 3. Build and deploy website
+make deploy
+
+# 4. Get your dashboard URL
+make infra-output
+```
+
+### Features
+
+- **S3 Static Hosting**: Secure, private S3 bucket
+- **CloudFront CDN**: Global edge caching for fast delivery
+- **Cost-effective**: ~$0.10-2/month for typical usage
+- **HTTPS included**: Via CloudFront with optional custom domain
+- **Auto-deploy**: GitHub Actions on push to main
+- **No cold starts**: Static files load instantly
+
+### Architecture
+
+```
+GitHub Actions (CI/CD)
+       ↓
+   S3 Bucket (Private)
+       ↓
+CloudFront CDN (Global)
+       ↓
+   HTTPS Website
+```
+
+### Detailed Guide
+
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for:
+- Complete setup instructions
+- Infrastructure configuration
+- Custom domain setup
+- Monitoring and optimization
+- Troubleshooting
+- Security best practices
+
+### Monitoring
+
+```bash
+# View Terraform outputs
+make infra-output
+
+# Invalidate CloudFront cache
+make invalidate
+
+# Deploy updates
+make deploy
+```
+
+## Development Setup
+
+1. **Install dependencies**:
+   ```bash
+   make install
+   # or
+   npm install
+   ```
+
+2. **Run development server**:
+   ```bash
+   make dev
+   # or
+   npm run dev
+   ```
+
+3. **Open in browser**: http://localhost:3000
 
 # Run
 docker run -d \

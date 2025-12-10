@@ -61,3 +61,53 @@ lint: ## Run linter
 up: docker-rebuild ## Quick rebuild and run (alias)
 down: docker-stop ## Quick stop (alias)
 logs: docker-logs ## Quick logs (alias)
+
+# AWS S3/CloudFront deployment commands
+.PHONY: infra-init infra-plan infra-apply infra-destroy infra-output deploy sync invalidate aws-deploy
+
+AWS_REGION := eu-west-2
+S3_BUCKET := $(shell cd infra && terraform output -raw s3_bucket_name 2>/dev/null)
+DISTRIBUTION_ID := $(shell cd infra && terraform output -raw cloudfront_distribution_id 2>/dev/null)
+
+infra-init: ## Initialize Terraform
+	cd infra && terraform init
+
+infra-plan: ## Plan Terraform changes
+	cd infra && terraform plan
+
+infra-apply: ## Apply Terraform changes
+	cd infra && terraform apply
+
+infra-destroy: ## Destroy Terraform infrastructure
+	cd infra && terraform destroy
+
+infra-output: ## Show Terraform outputs
+	cd infra && terraform output
+
+sync: build ## Sync built files to S3
+	@echo "Syncing files to S3..."
+	@aws s3 sync dist/ s3://$(S3_BUCKET)/ \
+		--delete \
+		--cache-control "public, max-age=31536000, immutable" \
+		--exclude "index.html" \
+		--exclude "*.map"
+	@echo "Uploading index.html with no-cache..."
+	@aws s3 cp dist/index.html s3://$(S3_BUCKET)/index.html \
+		--cache-control "public, max-age=0, must-revalidate"
+	@echo "✓ Files synced to S3"
+
+invalidate: ## Invalidate CloudFront cache
+	@echo "Invalidating CloudFront cache..."
+	@aws cloudfront create-invalidation \
+		--distribution-id $(DISTRIBUTION_ID) \
+		--paths "/*" \
+		--query 'Invalidation.Id' \
+		--output text
+	@echo "✓ Cache invalidation started"
+
+deploy: sync invalidate ## Build, sync to S3, and invalidate CloudFront (full deploy)
+	@echo "✓ Deployment complete!"
+	@echo "Website URL:"
+	@cd infra && terraform output -raw website_url
+
+aws-deploy: deploy ## Alias for deploy

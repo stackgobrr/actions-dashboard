@@ -1,0 +1,22 @@
+# AWS region where resources will be deployed
+aws_region = "eu-west-2"
+
+# Environment name
+environment = "prod"
+
+# Project name (used for resource naming)
+project_name = "h3ow3d-actions-dashboard"
+
+# CloudFront price class (controls edge location distribution)
+# PriceClass_All: All edge locations (most expensive)
+# PriceClass_200: US, Canada, Europe, Asia, Middle East, Africa
+# PriceClass_100: US, Canada, Europe (cheapest)
+cloudfront_price_class = "PriceClass_100"
+
+# Optional: Custom domain configuration
+# domain_name     = "dashboard.example.com"
+# certificate_arn = "arn:aws:acm:us-east-1:123456789:certificate/xxx"
+# Note: ACM certificate MUST be in us-east-1 for CloudFront
+
+# Optional: Store GitHub token in SSM Parameter Store
+# github_token_parameter_name = "/github/actions-dashboard/token"

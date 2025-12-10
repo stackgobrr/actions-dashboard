@@ -24,6 +24,9 @@ const REPOSITORIES = {
     { name: 'h3ow3d-auth', description: 'Authentication service' },
     { name: 'h3ow3d-frontend', description: 'Frontend application' },
   ],
+  utils: [
+    { name: 'h3ow3d-actions-dashboard', description: 'GitHub Actions status dashboard' },
+  ]
 }
 
 function App() {

@@ -1,0 +1,84 @@
+name: Deploy to AWS S3/CloudFront
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AWS_REGION: eu-west-2
+  NODE_VERSION: '20'
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get S3 bucket name
+        id: get-bucket
+        run: |
+          cd infra
+          BUCKET_NAME=$(terraform output -raw s3_bucket_name 2>/dev/null || echo "")
+          if [ -z "$BUCKET_NAME" ]; then
+            echo "Error: Could not get S3 bucket name. Has infrastructure been deployed?"
+            exit 1
+          fi
+          echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
+          
+          DISTRIBUTION_ID=$(terraform output -raw cloudfront_distribution_id 2>/dev/null || echo "")
+          echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
+
+      - name: Sync files to S3
+        run: |
+          aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/ \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "index.html" \
+            --exclude "*.map"
+          
+          # Upload index.html separately with no-cache
+          aws s3 cp dist/index.html s3://${{ steps.get-bucket.outputs.bucket_name }}/index.html \
+            --cache-control "public, max-age=0, must-revalidate"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.get-bucket.outputs.distribution_id }} \
+            --paths "/*"
+
+      - name: Get website URL
+        run: |
+          cd infra
+          WEBSITE_URL=$(terraform output -raw website_url)
+          
+          echo "🚀 Dashboard deployed successfully!"
+          echo "📍 Website URL: $WEBSITE_URL"
+          echo ""
+          echo "::notice title=Deployment Complete::Dashboard is live at $WEBSITE_URL"
