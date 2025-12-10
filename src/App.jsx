@@ -85,6 +85,7 @@ function App() {
       ...REPOSITORIES.modules,
       ...REPOSITORIES.infra,
       ...REPOSITORIES.services,
+      ...REPOSITORIES.utils,
     ]
 
     const statuses = {}
