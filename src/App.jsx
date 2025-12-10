@@ -80,6 +80,42 @@ function App() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
   }, [])
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      // Ignore if user is typing in an input field
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return
+      }
+
+      switch(e.key.toLowerCase()) {
+        case 't':
+          // Iterate through themes
+          const themes = ['dark', 'light', 'gruvbox', 'cyberpunk']
+          const currentIndex = themes.indexOf(theme)
+          const nextIndex = (currentIndex + 1) % themes.length
+          const nextTheme = themes[nextIndex]
+          setTheme(nextTheme)
+          localStorage.setItem('theme', nextTheme)
+          document.documentElement.setAttribute('data-theme', nextTheme)
+          break
+        case 'r':
+          // Refresh
+          if (!loading) {
+            fetchAllStatuses()
+          }
+          break
+        case 'f':
+          // Toggle fullscreen
+          toggleFullscreen()
+          break
+      }
+    }
+
+    document.addEventListener('keypress', handleKeyPress)
+    return () => document.removeEventListener('keypress', handleKeyPress)
+  }, [theme, loading])
+
   const fetchRepoStatus = async (repoName, token) => {
     try {
       const headers = token ? { 'Authorization': `token ${token}` } : {}
