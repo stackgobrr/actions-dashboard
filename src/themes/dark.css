@@ -1,0 +1,29 @@
+/* Dark Theme (GitHub Style) */
+:root[data-theme="dark"] {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --border-color: #30363d;
+  --border-hover: #8b949e;
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --accent-primary: #58a6ff;
+  --accent-success: #3fb950;
+  --accent-failure: #f85149;
+  --accent-warning: #d29922;
+  --accent-info: #f0883e;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --status-success: #3fb950;
+  --status-failure: #f85149;
+  --status-warning: #f0883e;
+  --category-common: #58a6ff;
+  --category-common-bg: #1f6feb33;
+  --category-modules: #3fb950;
+  --category-modules-bg: #2ea04333;
+  --category-infra: #f0883e;
+  --category-infra-bg: #bc4c0033;
+  --category-services: #a371f7;
+  --category-services-bg: #8957e533;
+  --category-utils: #d29922;
+  --category-utils-bg: #bf8f0033;
+}

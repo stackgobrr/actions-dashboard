@@ -1,0 +1,29 @@
+/* Light Theme (GitHub Light) */
+:root[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f8fa;
+  --bg-tertiary: #eaeef2;
+  --border-color: #d0d7de;
+  --border-hover: #6e7781;
+  --text-primary: #24292f;
+  --text-secondary: #57606a;
+  --accent-primary: #0969da;
+  --accent-success: #1a7f37;
+  --accent-failure: #cf222e;
+  --accent-warning: #bf8700;
+  --accent-info: #bc4c00;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --status-success: #1a7f37;
+  --status-failure: #cf222e;
+  --status-warning: #bc4c00;
+  --category-common: #0969da;
+  --category-common-bg: #ddf4ff;
+  --category-modules: #1a7f37;
+  --category-modules-bg: #dafbe1;
+  --category-infra: #bc4c00;
+  --category-infra-bg: #fff8c5;
+  --category-services: #8250df;
+  --category-services-bg: #fbefff;
+  --category-utils: #bf8700;
+  --category-utils-bg: #fff8c5;
+}

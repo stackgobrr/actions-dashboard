@@ -1,105 +1,16 @@
-/* Theme Variables */
-:root[data-theme="dark"] {
-  --bg-primary: #0d1117;
-  --bg-secondary: #161b22;
-  --bg-tertiary: #21262d;
-  --border-color: #30363d;
-  --border-hover: #8b949e;
-  --text-primary: #c9d1d9;
-  --text-secondary: #8b949e;
-  --accent-primary: #58a6ff;
-  --accent-success: #3fb950;
-  --accent-failure: #f85149;
-  --accent-warning: #d29922;
-  --accent-info: #f0883e;
-  --shadow: rgba(0, 0, 0, 0.3);
-  --status-success: #3fb950;
-  --status-failure: #f85149;
-  --status-warning: #f0883e;
-  --category-common: #58a6ff;
-  --category-common-bg: #1f6feb33;
-  --category-modules: #3fb950;
-  --category-modules-bg: #2ea04333;
-  --category-infra: #f0883e;
-  --category-infra-bg: #bc4c0033;
-  --category-services: #a371f7;
-  --category-services-bg: #8957e533;
-  --category-utils: #d29922;
-  --category-utils-bg: #bf8f0033;
-}
+/* Import theme files */
+@import './themes/dark.css';
+@import './themes/light.css';
+@import './themes/gruvbox.css';
+@import './themes/cyberpunk.css';
 
-:root[data-theme="light"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f6f8fa;
-  --bg-tertiary: #eaeef2;
-  --border-color: #d0d7de;
-  --border-hover: #6e7781;
-  --text-primary: #24292f;
-  --text-secondary: #57606a;
-  --accent-primary: #0969da;
-  --accent-success: #1a7f37;
-  --accent-failure: #cf222e;
-  --accent-warning: #bf8700;
-  --accent-info: #bc4c00;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --status-success: #1a7f37;
-  --status-failure: #cf222e;
-  --status-warning: #bc4c00;
-  --category-common: #0969da;
-  --category-common-bg: #ddf4ff;
-  --category-modules: #1a7f37;
-  --category-modules-bg: #dafbe1;
-  --category-infra: #bc4c00;
-  --category-infra-bg: #fff8c5;
-  --category-services: #8250df;
-  --category-services-bg: #fbefff;
-  --category-utils: #bf8700;
-  --category-utils-bg: #fff8c5;
-}
-
-:root[data-theme="gruvbox"] {
-  --bg-primary: #282828;
-  --bg-secondary: #3c3836;
-  --bg-tertiary: #504945;
-  --border-color: #504945;
-  --border-hover: #7c6f64;
-  --text-primary: #ebdbb2;
-  --text-secondary: #a89984;
-  --accent-primary: #83a598;
-  --accent-success: #b8bb26;
-  --accent-failure: #fb4934;
-  --accent-warning: #fabd2f;
-  --accent-info: #fe8019;
-  --shadow: rgba(0, 0, 0, 0.4);
-  --status-success: #b8bb26;
-  --status-failure: #fb4934;
-  --status-warning: #fe8019;
-  --category-common: #83a598;
-  --category-common-bg: #45858833;
-  --category-modules: #b8bb26;
-  --category-modules-bg: #98971a33;
-  --category-infra: #fe8019;
-  --category-infra-bg: #d6510133;
-  --category-services: #d3869b;
-  --category-services-bg: #b1628533;
-  --category-utils: #fabd2f;
-  --category-utils-bg: #d79a2133;
-  --terminal-font: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
-  --border-radius: 0px;
-}
-
+/* Base App Styles */
 .app {
   min-height: 100vh;
   padding: 2rem;
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: background 0.3s, color 0.3s;
-}
-
-[data-theme="gruvbox"] .app {
-  font-family: var(--terminal-font);
-  padding: 1rem;
-  letter-spacing: 0.02em;
 }
 
 .header {
@@ -111,33 +22,15 @@
   border-bottom: 1px solid var(--border-color);
 }
 
-[data-theme="gruvbox"] .header {
-  border-bottom: 2px solid var(--border-color);
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-}
-
 .header h1 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
   color: var(--accent-primary);
 }
 
-[data-theme="gruvbox"] .header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .header p {
   color: var(--text-secondary);
   font-size: 0.95rem;
-}
-
-[data-theme="gruvbox"] .header p {
-  font-size: 0.85rem;
-  font-family: var(--terminal-font);
 }
 
 .header-actions {
@@ -156,11 +49,6 @@
   border-radius: 6px;
 }
 
-[data-theme="gruvbox"] .theme-controls {
-  border-radius: var(--border-radius);
-  padding: 0.4rem 0.6rem;
-}
-
 .theme-select {
   padding: 0.25rem 0.5rem;
   background: var(--bg-primary);
@@ -171,12 +59,6 @@
   cursor: pointer;
   outline: none;
   min-width: 110px;
-}
-
-[data-theme="gruvbox"] .theme-select {
-  border-radius: var(--border-radius);
-  font-family: var(--terminal-font);
-  font-size: 0.8rem;
 }
 
 .theme-select:hover {
@@ -196,11 +78,6 @@
   border-radius: 6px;
 }
 
-[data-theme="gruvbox"] .sort-controls {
-  border-radius: var(--border-radius);
-  padding: 0.4rem 0.6rem;
-}
-
 .sort-select {
   padding: 0.25rem 0.5rem;
   background: var(--bg-primary);
@@ -211,12 +88,6 @@
   cursor: pointer;
   outline: none;
   min-width: 150px;
-}
-
-[data-theme="gruvbox"] .sort-select {
-  border-radius: var(--border-radius);
-  font-family: var(--terminal-font);
-  font-size: 0.8rem;
 }
 
 .sort-select:hover {
@@ -237,11 +108,6 @@
   border-radius: 6px;
 }
 
-[data-theme="gruvbox"] .auto-refresh-controls {
-  border-radius: var(--border-radius);
-  padding: 0.4rem 0.6rem;
-}
-
 .refresh-toggle {
   display: flex;
   align-items: center;
@@ -250,11 +116,6 @@
   font-size: 0.9rem;
   color: var(--text-primary);
   user-select: none;
-}
-
-[data-theme="gruvbox"] .refresh-toggle {
-  font-size: 0.8rem;
-  font-family: var(--terminal-font);
 }
 
 .refresh-toggle input[type="checkbox"] {
@@ -275,12 +136,6 @@
   outline: none;
 }
 
-[data-theme="gruvbox"] .refresh-interval {
-  border-radius: var(--border-radius);
-  font-family: var(--terminal-font);
-  font-size: 0.8rem;
-}
-
 .refresh-interval:hover {
   border-color: var(--border-hover);
 }
@@ -292,11 +147,6 @@
 .last-update {
   color: var(--text-secondary);
   font-size: 0.85rem;
-}
-
-[data-theme="gruvbox"] .last-update {
-  font-size: 0.8rem;
-  font-family: var(--terminal-font);
 }
 
 .refresh-btn, .token-btn {
@@ -311,16 +161,6 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s;
-}
-
-[data-theme="gruvbox"] .refresh-btn,
-[data-theme="gruvbox"] .token-btn {
-  border-radius: var(--border-radius);
-  font-family: var(--terminal-font);
-  font-size: 0.8rem;
-  padding: 0.4rem 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .refresh-btn:hover, .token-btn:hover {
@@ -348,11 +188,6 @@
   font-size: 1.1rem;
 }
 
-[data-theme="gruvbox"] .loading {
-  font-family: var(--terminal-font);
-  font-size: 0.9rem;
-}
-
 .category {
   margin-bottom: 3rem;
 }
@@ -370,10 +205,6 @@
   gap: 1.5rem;
 }
 
-[data-theme="gruvbox"] .repo-grid {
-  gap: 1rem;
-}
-
 .repo-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
@@ -382,62 +213,29 @@
   transition: all 0.2s;
 }
 
-[data-theme="gruvbox"] .repo-card {
-  border-radius: var(--border-radius);
-  padding: 1rem;
-  border-width: 2px;
-}
-
 .repo-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="gruvbox"] .repo-card:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: var(--border-hover);
 }
 
 .repo-card.success {
   border-left: 3px solid var(--status-success);
 }
 
-[data-theme="gruvbox"] .repo-card.success {
-  border-left-width: 4px;
-}
-
 .repo-card.failure {
   border-left: 3px solid var(--status-failure);
-}
-
-[data-theme="gruvbox"] .repo-card.failure {
-  border-left-width: 4px;
 }
 
 .repo-card.in-progress {
   border-left: 3px solid var(--status-warning);
 }
 
-[data-theme="gruvbox"] .repo-card.in-progress {
-  border-left-width: 4px;
-}
-
 .repo-card.warning {
   border-left: 3px solid var(--status-warning);
 }
 
-[data-theme="gruvbox"] .repo-card.warning {
-  border-left-width: 4px;
-}
-
 .repo-card.error, .repo-card.unknown {
   border-left: 3px solid var(--text-secondary);
-}
-
-[data-theme="gruvbox"] .repo-card.error,
-[data-theme="gruvbox"] .repo-card.unknown {
-  border-left-width: 4px;
 }
 
 .repo-header {
@@ -447,20 +245,10 @@
   margin-bottom: 1rem;
 }
 
-[data-theme="gruvbox"] .repo-header {
-  margin-bottom: 0.75rem;
-}
-
 .repo-header h3 {
   font-size: 1.1rem;
   color: var(--text-primary);
   margin-bottom: 0.25rem;
-}
-
-[data-theme="gruvbox"] .repo-header h3 {
-  font-size: 0.95rem;
-  font-family: var(--terminal-font);
-  font-weight: 700;
 }
 
 .category-badge {
@@ -471,15 +259,6 @@
   text-transform: uppercase;
   border-radius: 4px;
   letter-spacing: 0.5px;
-}
-
-[data-theme="gruvbox"] .category-badge {
-  border-radius: var(--border-radius);
-  font-family: var(--terminal-font);
-  font-size: 0.65rem;
-  padding: 0.2rem 0.4rem;
-  letter-spacing: 0.08em;
-  font-weight: 700;
 }
 
 .category-badge.common {
@@ -517,20 +296,10 @@
   font-size: 0.85rem;
 }
 
-[data-theme="gruvbox"] .repo-description {
-  font-size: 0.75rem;
-  font-family: var(--terminal-font);
-}
-
 .status-icon {
   flex-shrink: 0;
   width: 24px;
   height: 24px;
-}
-
-[data-theme="gruvbox"] .status-icon {
-  width: 20px;
-  height: 20px;
 }
 
 .status-icon.success {
@@ -566,12 +335,6 @@
   font-size: 0.85rem;
 }
 
-[data-theme="gruvbox"] .status-details {
-  font-size: 0.75rem;
-  font-family: var(--terminal-font);
-  gap: 0.4rem;
-}
-
 .status-row {
   display: flex;
   justify-content: space-between;
@@ -584,14 +347,6 @@
   font-weight: 500;
 }
 
-[data-theme="gruvbox"] .label {
-  font-family: var(--terminal-font);
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
-}
-
 .commit-message {
   color: var(--text-primary);
   white-space: nowrap;
@@ -600,16 +355,8 @@
   max-width: 200px;
 }
 
-[data-theme="gruvbox"] .commit-message {
-  font-family: var(--terminal-font);
-}
-
 .error-message {
   color: var(--status-failure);
-}
-
-[data-theme="gruvbox"] .error-message {
-  font-family: var(--terminal-font);
 }
 
 .view-run {
@@ -619,13 +366,6 @@
   margin-top: 0.5rem;
   display: inline-block;
   transition: color 0.2s;
-}
-
-[data-theme="gruvbox"] .view-run {
-  font-family: var(--terminal-font);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .view-run:hover {
@@ -645,21 +385,9 @@
   border-radius: 8px;
 }
 
-[data-theme="gruvbox"] .token-setup {
-  border-radius: var(--border-radius);
-  border-width: 2px;
-  font-family: var(--terminal-font);
-}
-
 .token-setup h1 {
   color: var(--accent-primary);
   margin-bottom: 1rem;
-}
-
-[data-theme="gruvbox"] .token-setup h1 {
-  font-size: 1.3rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
 }
 
 .token-setup p {
@@ -668,22 +396,11 @@
   line-height: 1.6;
 }
 
-[data-theme="gruvbox"] .token-setup p {
-  font-size: 0.85rem;
-  line-height: 1.5;
-}
-
 .token-setup code {
   background: var(--bg-primary);
   padding: 2px 6px;
   border-radius: 3px;
   color: var(--accent-primary);
-}
-
-[data-theme="gruvbox"] .token-setup code {
-  border-radius: var(--border-radius);
-  padding: 3px 6px;
-  font-family: var(--terminal-font);
 }
 
 .token-setup a {
@@ -706,13 +423,6 @@
   margin: 1rem 0;
 }
 
-[data-theme="gruvbox"] .token-setup input {
-  border-radius: var(--border-radius);
-  font-family: var(--terminal-font);
-  font-size: 0.85rem;
-  border-width: 2px;
-}
-
 .token-setup input:focus {
   outline: none;
   border-color: var(--accent-primary);
@@ -731,15 +441,6 @@
   transition: background 0.2s;
 }
 
-[data-theme="gruvbox"] .token-setup button {
-  border-radius: var(--border-radius);
-  font-family: var(--terminal-font);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--bg-primary);
-}
-
 .token-setup button:hover:not(:disabled) {
   background: var(--accent-success);
   opacity: 0.85;
@@ -754,11 +455,6 @@
   margin-top: 1rem;
   font-size: 0.8rem;
   color: var(--text-secondary);
-}
-
-[data-theme="gruvbox"] .token-setup .note {
-  font-size: 0.75rem;
-  font-family: var(--terminal-font);
 }
 
 /* Fullscreen Exit Button */
@@ -778,11 +474,6 @@
   align-items: center;
   justify-content: center;
   opacity: 0.7;
-}
-
-[data-theme="gruvbox"] .fullscreen-exit-btn {
-  border-radius: var(--border-radius);
-  border-width: 2px;
 }
 
 .fullscreen-exit-btn:hover {

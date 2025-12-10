@@ -269,7 +269,7 @@ function App() {
       {!isFullscreen && (
         <header className="header">
           <div>
-            <h1><Github size={28} style={{display: 'inline', marginRight: '0.5rem'}} /> Actions Dashboard</h1>
+            <h1><Github size={28} style={{display: 'inline', marginRight: '0.5rem'}} />Actions Dashboard</h1>
             <p>Real-time GitHub Actions status for all repositories</p>
           </div>
           <div className="header-actions">
@@ -287,6 +287,7 @@ function App() {
               <option value="dark">Dark</option>
               <option value="light">Light</option>
               <option value="gruvbox">Gruvbox</option>
+              <option value="cyberpunk">Cyberpunk</option>
             </select>
           </div>
           <div className="sort-controls">
