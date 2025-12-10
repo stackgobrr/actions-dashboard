@@ -1,0 +1,301 @@
+.app {
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #30363d;
+}
+
+.header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #58a6ff;
+}
+
+.header p {
+  color: #8b949e;
+  font-size: 0.95rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.last-update {
+  color: #8b949e;
+  font-size: 0.85rem;
+}
+
+.refresh-btn, .token-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover, .token-btn:hover {
+  background: #30363d;
+  border-color: #8b949e;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #8b949e;
+  font-size: 1.1rem;
+}
+
+.category {
+  margin-bottom: 3rem;
+}
+
+.category h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #58a6ff;
+  text-transform: capitalize;
+}
+
+.repo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.repo-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s;
+}
+
+.repo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.repo-card.success {
+  border-left: 3px solid #3fb950;
+}
+
+.repo-card.failure {
+  border-left: 3px solid #f85149;
+}
+
+.repo-card.in-progress {
+  border-left: 3px solid #f0883e;
+}
+
+.repo-card.warning {
+  border-left: 3px solid #d29922;
+}
+
+.repo-card.error, .repo-card.unknown {
+  border-left: 3px solid #8b949e;
+}
+
+.repo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.repo-header h3 {
+  font-size: 1.1rem;
+  color: #c9d1d9;
+  margin-bottom: 0.25rem;
+}
+
+.repo-description {
+  color: #8b949e;
+  font-size: 0.85rem;
+}
+
+.status-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.status-icon.success {
+  color: #3fb950;
+}
+
+.status-icon.failure {
+  color: #f85149;
+}
+
+.status-icon.in-progress {
+  color: #f0883e;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-icon.warning {
+  color: #d29922;
+}
+
+.status-icon.error, .status-icon.unknown {
+  color: #8b949e;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.label {
+  color: #8b949e;
+  font-weight: 500;
+}
+
+.commit-message {
+  color: #c9d1d9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.error-message {
+  color: #f85149;
+}
+
+.view-run {
+  color: #58a6ff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: inline-block;
+  transition: color 0.2s;
+}
+
+.view-run:hover {
+  color: #79c0ff;
+  text-decoration: underline;
+}
+
+/* Token Setup */
+.token-setup {
+  max-width: 500px;
+  margin: 4rem auto;
+  text-align: center;
+  padding: 2rem;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+}
+
+.token-setup h1 {
+  color: #58a6ff;
+  margin-bottom: 1rem;
+}
+
+.token-setup p {
+  color: #8b949e;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.token-setup code {
+  background: #0d1117;
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #79c0ff;
+}
+
+.token-setup a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.token-setup a:hover {
+  text-decoration: underline;
+}
+
+.token-setup input {
+  width: 100%;
+  padding: 0.75rem;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-size: 0.95rem;
+  margin: 1rem 0;
+}
+
+.token-setup input:focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+
+.token-setup button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #238636;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.token-setup button:hover:not(:disabled) {
+  background: #2ea043;
+}
+
+.token-setup button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.token-setup .note {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #6e7681;
+}
