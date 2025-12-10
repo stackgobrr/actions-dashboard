@@ -38,6 +38,7 @@ function App() {
   const [autoRefresh, setAutoRefresh] = useState(true)
   const [refreshInterval, setRefreshInterval] = useState(10) // seconds
   const [sortBy, setSortBy] = useState('last-run-desc') // last-run-desc, last-run-asc, group, status
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark')
 
   const fetchRepoStatus = async (repoName, token) => {
     try {
@@ -111,6 +112,11 @@ function App() {
       }
     }
   }, [showTokenInput, githubToken, autoRefresh, refreshInterval])
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   const saveToken = () => {
     localStorage.setItem('github_token', githubToken)
@@ -226,8 +232,23 @@ function App() {
           <p>Real-time GitHub Actions status for all repositories</p>
         </div>
         <div className="header-actions">
+          <div className="theme-controls">
+            <label htmlFor="theme-select" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginRight: '0.5rem' }}>
+              Theme:
+            </label>
+            <select 
+              id="theme-select"
+              value={theme} 
+              onChange={(e) => setTheme(e.target.value)}
+              className="theme-select"
+            >
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+              <option value="gruvbox">Gruvbox</option>
+            </select>
+          </div>
           <div className="sort-controls">
-            <label htmlFor="sort-select" style={{ color: '#8b949e', fontSize: '0.85rem', marginRight: '0.5rem' }}>
+            <label htmlFor="sort-select" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginRight: '0.5rem' }}>
               Sort by:
             </label>
             <select 
