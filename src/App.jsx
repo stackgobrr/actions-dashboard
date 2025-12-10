@@ -1,5 +1,19 @@
 import { useState, useEffect } from 'react'
-import { RefreshCw, CheckCircle, XCircle, Clock, AlertCircle, GitBranch } from 'lucide-react'
+import { 
+  RefreshCw, 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  AlertCircle, 
+  GitBranch,
+  Key,
+  ExternalLink,
+  Filter,
+  Palette,
+  Timer,
+  Trash2,
+  Github
+} from 'lucide-react'
 import './App.css'
 
 const GITHUB_OWNER = 'h3ow3d'
@@ -202,11 +216,11 @@ function App() {
     return (
       <div className="app">
         <div className="token-setup">
-          <h1>GitHub Token Required</h1>
+          <h1><Key size={32} style={{display: 'inline', marginRight: '0.5rem'}} /> GitHub Token Required</h1>
           <p>To fetch workflow statuses, you need a GitHub Personal Access Token with <code>repo</code> scope.</p>
           <p>
             <a href="https://github.com/settings/tokens/new?scopes=repo&description=h3ow3d-dashboard" target="_blank" rel="noopener noreferrer">
-              Create a new token →
+              Create a new token <ExternalLink size={14} style={{display: 'inline', marginLeft: '4px'}} />
             </a>
           </p>
           <input
@@ -228,11 +242,12 @@ function App() {
     <div className="app">
       <header className="header">
         <div>
-          <h1>🚀 h3ow3d Actions Dashboard</h1>
+          <h1><Github size={28} style={{display: 'inline', marginRight: '0.5rem'}} /> Actions Dashboard</h1>
           <p>Real-time GitHub Actions status for all repositories</p>
         </div>
         <div className="header-actions">
           <div className="theme-controls">
+            <Palette size={16} style={{marginRight: '0.5rem'}} />
             <label htmlFor="theme-select" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginRight: '0.5rem' }}>
               Theme:
             </label>
@@ -248,6 +263,7 @@ function App() {
             </select>
           </div>
           <div className="sort-controls">
+            <Filter size={16} style={{marginRight: '0.5rem'}} />
             <label htmlFor="sort-select" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginRight: '0.5rem' }}>
               Sort by:
             </label>
@@ -264,6 +280,7 @@ function App() {
             </select>
           </div>
           <div className="auto-refresh-controls">
+            <Timer size={16} style={{marginRight: '0.5rem'}} />
             <label className="refresh-toggle">
               <input
                 type="checkbox"
@@ -288,15 +305,17 @@ function App() {
           </div>
           {lastUpdate && (
             <span className="last-update">
+              <Clock size={14} style={{display: 'inline', marginRight: '0.25rem'}} />
               Last updated: {lastUpdate.toLocaleTimeString()}
             </span>
           )}
           <button onClick={fetchAllStatuses} disabled={loading} className="refresh-btn">
-            <RefreshCw className={loading ? 'spinning' : ''} />
+            <RefreshCw size={16} className={loading ? 'spinning' : ''} />
             Refresh
           </button>
           <button onClick={clearToken} className="token-btn">
-            Change Token
+            <Trash2 size={16} />
+            Clear Token
           </button>
         </div>
       </header>
@@ -343,7 +362,7 @@ function App() {
                     </div>
                     {status.url && (
                       <a href={status.url} target="_blank" rel="noopener noreferrer" className="view-run">
-                        View Run →
+                        View Run <ExternalLink size={12} style={{display: 'inline', marginLeft: '4px'}} />
                       </a>
                     )}
                   </div>
