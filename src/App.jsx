@@ -32,6 +32,8 @@ function App() {
   const [lastUpdate, setLastUpdate] = useState(null)
   const [githubToken, setGithubToken] = useState(localStorage.getItem('github_token') || '')
   const [showTokenInput, setShowTokenInput] = useState(!localStorage.getItem('github_token'))
+  const [autoRefresh, setAutoRefresh] = useState(true)
+  const [refreshInterval, setRefreshInterval] = useState(10) // seconds
 
   const fetchRepoStatus = async (repoName, token) => {
     try {
@@ -97,10 +99,13 @@ function App() {
   useEffect(() => {
     if (!showTokenInput) {
       fetchAllStatuses()
-      const interval = setInterval(fetchAllStatuses, 60000) // Refresh every minute
-      return () => clearInterval(interval)
+      
+      if (autoRefresh) {
+        const interval = setInterval(fetchAllStatuses, refreshInterval * 1000)
+        return () => clearInterval(interval)
+      }
     }
-  }, [showTokenInput, githubToken])
+  }, [showTokenInput, githubToken, autoRefresh, refreshInterval])
 
   const saveToken = () => {
     localStorage.setItem('github_token', githubToken)
@@ -169,6 +174,29 @@ function App() {
           <p>Real-time GitHub Actions status for all repositories</p>
         </div>
         <div className="header-actions">
+          <div className="auto-refresh-controls">
+            <label className="refresh-toggle">
+              <input
+                type="checkbox"
+                checked={autoRefresh}
+                onChange={(e) => setAutoRefresh(e.target.checked)}
+              />
+              <span>Auto-refresh</span>
+            </label>
+            {autoRefresh && (
+              <select 
+                value={refreshInterval} 
+                onChange={(e) => setRefreshInterval(Number(e.target.value))}
+                className="refresh-interval"
+              >
+                <option value="5">5s</option>
+                <option value="10">10s</option>
+                <option value="30">30s</option>
+                <option value="60">1m</option>
+                <option value="300">5m</option>
+              </select>
+            )}
+          </div>
           {lastUpdate && (
             <span className="last-update">
               Last updated: {lastUpdate.toLocaleTimeString()}
