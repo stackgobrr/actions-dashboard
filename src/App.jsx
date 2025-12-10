@@ -81,18 +81,18 @@ function App() {
     const token = githubToken || null
     
     const allRepos = [
-      ...REPOSITORIES.common,
-      ...REPOSITORIES.modules,
-      ...REPOSITORIES.infra,
-      ...REPOSITORIES.services,
-      ...REPOSITORIES.utils,
+      ...REPOSITORIES.common.map(r => ({ ...r, category: 'common' })),
+      ...REPOSITORIES.modules.map(r => ({ ...r, category: 'modules' })),
+      ...REPOSITORIES.infra.map(r => ({ ...r, category: 'infra' })),
+      ...REPOSITORIES.services.map(r => ({ ...r, category: 'services' })),
+      ...REPOSITORIES.utils.map(r => ({ ...r, category: 'utils' })),
     ]
 
     const statuses = {}
     
     for (const repo of allRepos) {
       const status = await fetchRepoStatus(repo.name, token)
-      statuses[repo.name] = status
+      statuses[repo.name] = { ...status, category: repo.category, description: repo.description }
     }
 
     setRepoStatuses(statuses)
@@ -219,62 +219,64 @@ function App() {
       {loading && Object.keys(repoStatuses).length === 0 ? (
         <div className="loading">Loading repository statuses...</div>
       ) : (
-        <>
-          {Object.entries(REPOSITORIES).map(([category, repos]) => (
-            <section key={category} className="category">
-              <h2>{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
-              <div className="repo-grid">
-                {repos.map((repo) => {
-                  const status = repoStatuses[repo.name] || {}
-                  return (
-                    <div key={repo.name} className={`repo-card ${getStatusClass(status)}`}>
-                      <div className="repo-header">
-                        <div>
-                          <h3>{repo.name}</h3>
-                          <p className="repo-description">{repo.description}</p>
-                        </div>
-                        {getStatusIcon(status)}
-                      </div>
-                      
-                      {status.error ? (
-                        <div className="status-details">
-                          <p className="error-message">{status.error}</p>
-                        </div>
-                      ) : status.status ? (
-                        <div className="status-details">
-                          <div className="status-row">
-                            <span className="label">Workflow:</span>
-                            <span>{status.workflow || 'N/A'}</span>
-                          </div>
-                          <div className="status-row">
-                            <span className="label">Branch:</span>
-                            <span>
-                              <GitBranch size={14} style={{ marginRight: '4px' }} />
-                              {status.branch || 'N/A'}
-                            </span>
-                          </div>
-                          <div className="status-row">
-                            <span className="label">Commit:</span>
-                            <span className="commit-message">{status.commitMessage}</span>
-                          </div>
-                          {status.url && (
-                            <a href={status.url} target="_blank" rel="noopener noreferrer" className="view-run">
-                              View Run →
-                            </a>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="status-details">
-                          <p>No workflow runs found</p>
-                        </div>
-                      )}
+        <div className="repo-grid">
+          {Object.entries(repoStatuses)
+            .sort(([, a], [, b]) => {
+              // Sort by most recent update
+              if (!a.updatedAt) return 1
+              if (!b.updatedAt) return -1
+              return new Date(b.updatedAt) - new Date(a.updatedAt)
+            })
+            .map(([repoName, status]) => (
+              <div key={repoName} className={`repo-card ${getStatusClass(status)}`}>
+                <div className="repo-header">
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <h3>{repoName}</h3>
+                      <span className={`category-badge ${status.category}`}>
+                        {status.category}
+                      </span>
                     </div>
-                  )
-                })}
+                    <p className="repo-description">{status.description}</p>
+                  </div>
+                  {getStatusIcon(status)}
+                </div>
+                
+                {status.error ? (
+                  <div className="status-details">
+                    <p className="error-message">{status.error}</p>
+                  </div>
+                ) : status.status ? (
+                  <div className="status-details">
+                    <div className="status-row">
+                      <span className="label">Workflow:</span>
+                      <span>{status.workflow || 'N/A'}</span>
+                    </div>
+                    <div className="status-row">
+                      <span className="label">Branch:</span>
+                      <span>
+                        <GitBranch size={14} style={{ marginRight: '4px' }} />
+                        {status.branch || 'N/A'}
+                      </span>
+                    </div>
+                    <div className="status-row">
+                      <span className="label">Commit:</span>
+                      <span className="commit-message">{status.commitMessage}</span>
+                    </div>
+                    {status.url && (
+                      <a href={status.url} target="_blank" rel="noopener noreferrer" className="view-run">
+                        View Run →
+                      </a>
+                    )}
+                  </div>
+                ) : (
+                  <div className="status-details">
+                    <p>No workflow runs found</p>
+                  </div>
+                )}
               </div>
-            </section>
-          ))}
-        </>
+            ))}
+        </div>
       )}
     </div>
   )

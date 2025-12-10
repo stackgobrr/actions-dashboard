@@ -183,6 +183,46 @@
   margin-bottom: 0.25rem;
 }
 
+.category-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.category-badge.common {
+  background: #1f6feb33;
+  color: #58a6ff;
+  border: 1px solid #1f6feb;
+}
+
+.category-badge.modules {
+  background: #2ea04333;
+  color: #3fb950;
+  border: 1px solid #2ea043;
+}
+
+.category-badge.infra {
+  background: #bc4c0033;
+  color: #f0883e;
+  border: 1px solid #bc4c00;
+}
+
+.category-badge.services {
+  background: #8957e533;
+  color: #a371f7;
+  border: 1px solid #8957e5;
+}
+
+.category-badge.utils {
+  background: #bf8f0033;
+  color: #d29922;
+  border: 1px solid #bf8f00;
+}
+
 .repo-description {
   color: #8b949e;
   font-size: 0.85rem;
