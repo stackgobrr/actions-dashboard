@@ -9,8 +9,11 @@ const GITHUB_APP_TOKEN_EXPIRY_KEY = 'github_app_token_expiry'
 
 // Store GitHub App credentials
 export const saveGitHubAppCredentials = (appId, privateKey, installationId) => {
+  // Ensure private key has proper formatting
+  const formattedKey = privateKey.trim()
+  
   localStorage.setItem(GITHUB_APP_ID_KEY, appId)
-  localStorage.setItem(GITHUB_APP_PRIVATE_KEY_KEY, privateKey)
+  localStorage.setItem(GITHUB_APP_PRIVATE_KEY_KEY, formattedKey)
   localStorage.setItem(GITHUB_APP_INSTALLATION_ID_KEY, installationId)
 }
 
@@ -38,9 +41,14 @@ export const generateInstallationToken = async () => {
   }
 
   try {
+    // Validate the private key format
+    if (!privateKey.includes('BEGIN PRIVATE KEY')) {
+      throw new Error('Invalid private key format. Make sure you converted the key to PKCS#8 format (BEGIN PRIVATE KEY, not BEGIN RSA PRIVATE KEY)')
+    }
+
     const auth = createAppAuth({
       appId: parseInt(appId),
-      privateKey: privateKey,
+      privateKey: privateKey.trim(),
       installationId: parseInt(installationId)
     })
 
@@ -54,6 +62,14 @@ export const generateInstallationToken = async () => {
     return token
   } catch (error) {
     console.error('Failed to generate installation token:', error)
+    
+    // Provide more helpful error messages
+    if (error.message.includes('PKCS#1')) {
+      throw new Error('Private key must be in PKCS#8 format. Please convert your key using the setup guide instructions.')
+    } else if (error.message.includes('JSON web token')) {
+      throw new Error('Failed to create JWT token. Check that your App ID, Installation ID, and Private Key are correct.')
+    }
+    
     throw new Error(`Failed to authenticate with GitHub App: ${error.message}`)
   }
 }

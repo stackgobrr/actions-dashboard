@@ -1,29 +1,62 @@
-/* Dark Theme (GitHub Style) */
+/* GitHub Dark Theme (Authentic) */
 :root[data-theme="dark"] {
+  /* GitHub Dark backgrounds */
   --bg-primary: #0d1117;
   --bg-secondary: #161b22;
   --bg-tertiary: #21262d;
+  --bg-overlay: #161b22;
+  --bg-hover: rgba(177, 186, 196, 0.12);
+  
+  /* GitHub Dark borders */
   --border-color: #30363d;
   --border-hover: #8b949e;
-  --text-primary: #c9d1d9;
-  --text-secondary: #8b949e;
-  --accent-primary: #58a6ff;
+  --border-subtle: #21262d;
+  
+  /* GitHub Dark text */
+  --text-primary: #e6edf3;
+  --text-secondary: #7d8590;
+  --text-tertiary: #484f58;
+  --text-link: #58a6ff;
+  
+  /* GitHub primary actions */
+  --accent-primary: #238636;
+  --accent-primary-hover: #2ea043;
+  --accent-primary-text: #ffffff;
+  
+  /* GitHub blue accent (for links, info) */
+  --accent-blue: #58a6ff;
+  --accent-blue-bg: rgba(56, 139, 253, 0.15);
+  
+  /* GitHub status colors */
   --accent-success: #3fb950;
   --accent-failure: #f85149;
   --accent-warning: #d29922;
-  --accent-info: #f0883e;
-  --shadow: rgba(0, 0, 0, 0.3);
+  --accent-info: #79c0ff;
+  
   --status-success: #3fb950;
+  --status-success-bg: rgba(46, 160, 67, 0.15);
   --status-failure: #f85149;
-  --status-warning: #f0883e;
+  --status-failure-bg: rgba(248, 81, 73, 0.15);
+  --status-warning: #d29922;
+  --status-warning-bg: rgba(187, 128, 9, 0.15);
+  --status-pending: #79c0ff;
+  --status-pending-bg: rgba(56, 139, 253, 0.15);
+  
+  /* GitHub category colors */
   --category-common: #58a6ff;
-  --category-common-bg: #1f6feb33;
+  --category-common-bg: rgba(56, 139, 253, 0.15);
   --category-modules: #3fb950;
-  --category-modules-bg: #2ea04333;
-  --category-infra: #f0883e;
-  --category-infra-bg: #bc4c0033;
+  --category-modules-bg: rgba(46, 160, 67, 0.15);
+  --category-infra: #d29922;
+  --category-infra-bg: rgba(187, 128, 9, 0.15);
   --category-services: #a371f7;
-  --category-services-bg: #8957e533;
-  --category-utils: #d29922;
-  --category-utils-bg: #bf8f0033;
+  --category-services-bg: rgba(163, 113, 247, 0.15);
+  --category-utils: #f0883e;
+  --category-utils-bg: rgba(219, 109, 40, 0.15);
+  
+  /* GitHub shadows */
+  --shadow-sm: 0 0 transparent;
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-border: inset 0 0 0 1px var(--border-color);
 }

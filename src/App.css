@@ -4,146 +4,159 @@
 @import './themes/gruvbox.css';
 @import './themes/cyberpunk.css';
 
-/* Base App Styles */
+/* Base App Styles - GitHub UI Style */
 .app {
   min-height: 100vh;
-  padding: 2rem;
+  padding: 24px;
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background 0.3s, color 0.3s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 3rem;
-  padding-bottom: 1.5rem;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .header h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  color: var(--accent-primary);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  color: var(--text-primary);
 }
 
 .header p {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .header-actions {
   display: flex;
-  gap: 1rem;
+  gap: 8px;
   align-items: center;
   flex-wrap: wrap;
 }
 
+/* GitHub-style buttons and controls */
 .user-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  gap: 8px;
+  padding: 5px 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .user-avatar {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  border: 2px solid var(--accent-primary);
+  border: none;
 }
 
 .user-name {
   color: var(--text-primary);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .user-info button {
-  padding: 0.4rem;
+  padding: 4px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
   display: flex;
   align-items: center;
 }
 
 .user-info button:hover {
-  background: var(--bg-tertiary);
+  background: var(--bg-hover);
   color: var(--accent-failure);
 }
-
 
 .theme-controls {
   display: flex;
   align-items: center;
-  padding: 0.5rem 0.75rem;
+  padding: 5px 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
 }
 
 .theme-select {
-  padding: 0.25rem 0.5rem;
+  padding: 5px 12px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  border-radius: 4px;
-  font-size: 0.85rem;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   outline: none;
   min-width: 110px;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .theme-select:hover {
+  background: var(--bg-hover);
   border-color: var(--border-hover);
 }
 
 .theme-select:focus {
-  border-color: var(--accent-primary);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
 }
 
 .sort-controls {
   display: flex;
   align-items: center;
-  padding: 0.5rem 0.75rem;
+  padding: 5px 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
 }
 
 .sort-select {
-  padding: 0.25rem 0.5rem;
+  padding: 5px 12px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  border-radius: 4px;
-  font-size: 0.85rem;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   outline: none;
   min-width: 150px;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .sort-select:hover {
+  background: var(--bg-hover);
   border-color: var(--border-hover);
 }
 
 .sort-select:focus {
-  border-color: var(--accent-primary);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
 }
 
 .auto-refresh-controls {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
   align-items: center;
-  padding: 0.5rem 0.75rem;
+  padding: 5px 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -152,9 +165,9 @@
 .refresh-toggle {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 14px;
   color: var(--text-primary);
   user-select: none;
 }
@@ -167,50 +180,60 @@
 }
 
 .refresh-interval {
-  padding: 0.25rem 0.5rem;
+  padding: 5px 12px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  border-radius: 4px;
-  font-size: 0.85rem;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   outline: none;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .refresh-interval:hover {
+  background: var(--bg-hover);
   border-color: var(--border-hover);
 }
 
 .refresh-interval:focus {
-  border-color: var(--accent-primary);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
 }
 
 .last-update {
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: 12px;
 }
 
+/* GitHub-style primary button */
 .refresh-btn, .token-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  gap: 8px;
+  padding: 5px 16px;
+  background: var(--accent-primary);
+  border: 1px solid rgba(27, 31, 36, 0.15);
+  color: var(--accent-primary-text);
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  transition: background 0.2s;
 }
 
 .refresh-btn:hover, .token-btn:hover {
-  background: var(--bg-secondary);
-  border-color: var(--border-hover);
+  background: var(--accent-primary-hover);
+}
+
+.refresh-btn:active, .token-btn:active {
+  background: var(--accent-primary);
 }
 
 .refresh-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -224,43 +247,52 @@
 
 .loading {
   text-align: center;
-  padding: 3rem;
+  padding: 48px;
   color: var(--text-secondary);
-  font-size: 1.1rem;
+  font-size: 16px;
 }
 
 .category {
-  margin-bottom: 3rem;
+  margin-bottom: 32px;
 }
 
 .category h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: var(--accent-primary);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: 16px;
+  color: var(--text-primary);
   text-transform: capitalize;
+  display: flex;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .repo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 16px;
 }
 
+/* GitHub-style repository cards */
 .repo-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1.5rem;
-  transition: all 0.2s;
+  border-radius: 6px;
+  padding: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .repo-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
 }
 
+/* Status indicators with GitHub colors */
 .repo-card.success {
   border-left: 3px solid var(--status-success);
 }
@@ -278,17 +310,19 @@
 }
 
 .repo-card.error, .repo-card.unknown {
-  border-left: 3px solid var(--text-secondary);
+  border-left: 3px solid var(--text-tertiary);
 }
 
 .repo-header {
-  margin-bottom: 1rem;
+  margin-bottom: 12px;
 }
 
 .repo-header h3 {
-  font-size: 1.1rem;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 4px;
 }
 
 .card-footer {
@@ -296,7 +330,7 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding-top: 1rem;
+  padding-top: 12px;
 }
 
 .card-footer-left {
@@ -307,58 +341,62 @@
 .card-footer-right {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
+/* GitHub-style labels/badges */
 .category-badge {
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  border-radius: 4px;
-  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 7px;
+  height: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  border-radius: 2em;
+  border: 1px solid transparent;
 }
 
 .category-badge.common {
   background: var(--category-common-bg);
   color: var(--category-common);
-  border: 1px solid var(--category-common);
+  border-color: rgba(88, 166, 255, 0.4);
 }
 
 .category-badge.modules {
   background: var(--category-modules-bg);
   color: var(--category-modules);
-  border: 1px solid var(--category-modules);
+  border-color: rgba(63, 185, 80, 0.4);
 }
 
 .category-badge.infra {
   background: var(--category-infra-bg);
   color: var(--category-infra);
-  border: 1px solid var(--category-infra);
+  border-color: rgba(210, 153, 34, 0.4);
 }
 
 .category-badge.services {
   background: var(--category-services-bg);
   color: var(--category-services);
-  border: 1px solid var(--category-services);
+  border-color: rgba(163, 113, 247, 0.4);
 }
 
 .category-badge.utils {
   background: var(--category-utils-bg);
   color: var(--category-utils);
-  border: 1px solid var(--category-utils);
+  border-color: rgba(240, 136, 62, 0.4);
 }
 
 .repo-description {
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .status-icon {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .status-icon.success {
@@ -384,26 +422,27 @@
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.4; }
 }
 
 .status-details {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.85rem;
+  gap: 8px;
+  font-size: 14px;
 }
 
 .status-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .label {
   color: var(--text-secondary);
   font-weight: 500;
+  font-size: 12px;
 }
 
 .commit-message {
@@ -412,58 +451,70 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 200px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .error-message {
   color: var(--status-failure);
+  font-size: 12px;
 }
 
+/* GitHub-style links */
 .view-run {
-  color: var(--accent-primary);
+  color: var(--accent-blue);
   text-decoration: none;
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
-  display: inline-block;
-  transition: color 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: text-decoration 0.2s;
 }
 
 .view-run:hover {
-  color: var(--accent-primary);
   text-decoration: underline;
-  opacity: 0.8;
 }
 
-/* Token Setup */
+/* Token Setup - GitHub style */
 .token-setup {
-  max-width: 500px;
-  margin: 4rem auto;
+  max-width: 480px;
+  margin: 64px auto;
   text-align: center;
-  padding: 2rem;
+  padding: 32px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
 }
 
 .token-setup h1 {
-  color: var(--accent-primary);
-  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  line-height: 1.25;
 }
 
 .token-setup p {
   color: var(--text-secondary);
-  margin-bottom: 1rem;
-  line-height: 1.6;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  font-size: 14px;
 }
 
 .token-setup code {
-  background: var(--bg-primary);
+  background: var(--bg-tertiary);
   padding: 2px 6px;
   border-radius: 3px;
-  color: var(--accent-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 .token-setup a {
-  color: var(--accent-primary);
+  color: var(--accent-blue);
   text-decoration: none;
 }
 
@@ -473,39 +524,52 @@
 
 .token-setup input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 5px 12px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   color: var(--text-primary);
-  font-size: 0.95rem;
-  margin: 1rem 0;
+  font-size: 14px;
+  margin: 16px 0;
+  line-height: 20px;
+  transition: border-color 0.2s;
 }
 
 .token-setup input:focus {
   outline: none;
-  border-color: var(--accent-primary);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
 }
 
 .token-setup button {
   width: 100%;
-  padding: 0.75rem;
-  background: var(--accent-success);
-  border: none;
+  padding: 5px 16px;
+  background: var(--accent-primary);
+  border: 1px solid rgba(27, 31, 36, 0.15);
   border-radius: 6px;
-  color: white;
-  font-size: 0.95rem;
-  font-weight: 600;
+  color: var(--accent-primary-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
   cursor: pointer;
   transition: background 0.2s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+}
+
+.token-setup button:hover {
+  background: var(--accent-primary-hover);
 }
 
 .token-setup .oauth-btn {
-  background: var(--accent-primary);
-  margin-bottom: 1rem;
+  background: var(--accent-blue);
+  margin-bottom: 16px;
+}
+
+.token-setup .oauth-btn:hover {
+  background: #388bfd;
 }
 
 .token-setup .oauth-btn:hover:not(:disabled) {
@@ -517,7 +581,7 @@
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 1.5rem 0;
+  margin: 24px 0;
   color: var(--text-secondary);
 }
 
@@ -529,34 +593,35 @@
 }
 
 .token-setup .divider span {
-  padding: 0 1rem;
-  font-size: 0.85rem;
+  padding: 0 16px;
+  font-size: 14px;
 }
 
 .token-setup button:hover:not(:disabled) {
-  background: var(--accent-success);
-  opacity: 0.85;
+  background: var(--accent-primary-hover);
 }
 
 .token-setup button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .token-setup .note {
-  margin-top: 1rem;
-  font-size: 0.8rem;
+  margin-top: 16px;
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
 .token-setup .auth-method {
-  margin: 2rem 0;
+  margin: 32px 0;
 }
 
 .token-setup .auth-method h2 {
   color: var(--text-primary);
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.25;
 }
 
 /* GitHub App Form */
@@ -566,159 +631,182 @@
 
 .github-app-form h2 {
   color: var(--text-primary);
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  line-height: 1.25;
 }
 
 .github-app-form h3 {
   color: var(--text-primary);
-  font-size: 1.1rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  line-height: 1.25;
 }
 
 .setup-instructions {
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 }
 
+/* GitHub-style link button */
 .setup-link {
   display: inline-flex;
   align-items: center;
-  padding: 0.5rem 1rem;
-  background: var(--accent-primary);
+  gap: 8px;
+  padding: 5px 16px;
+  background: var(--accent-blue);
   color: white;
   text-decoration: none;
   border-radius: 6px;
+  font-size: 14px;
   font-weight: 500;
-  transition: opacity 0.2s;
+  line-height: 20px;
+  transition: background 0.2s;
+  border: 1px solid rgba(27, 31, 36, 0.15);
 }
 
 .setup-link:hover {
-  opacity: 0.9;
+  background: #388bfd;
 }
 
 .instruction-box {
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  padding: 1rem;
-  margin: 0.75rem 0;
+  padding: 16px;
+  margin: 12px 0;
 }
 
 .instruction-box ul {
-  margin: 0.5rem 0;
-  padding-left: 1.5rem;
+  margin: 8px 0;
+  padding-left: 24px;
 }
 
 .instruction-box li {
-  margin: 0.5rem 0;
+  margin: 8px 0;
   color: var(--text-primary);
-  line-height: 1.6;
+  line-height: 1.5;
+  font-size: 14px;
 }
 
 .instruction-box ul ul {
-  margin-top: 0.25rem;
+  margin-top: 4px;
 }
 
 .instruction-box code {
-  background: var(--bg-tertiary);
-  padding: 0.2rem 0.4rem;
+  background: var(--bg-primary);
+  padding: 2px 6px;
   border-radius: 3px;
-  font-size: 0.9em;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 .instruction-box strong {
-  color: var(--accent-primary);
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 16px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
   color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 0.75rem;
-  background: var(--bg-secondary);
+  padding: 5px 12px;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   color: var(--text-primary);
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 0.9rem;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 14px;
+  line-height: 20px;
+  transition: border-color 0.2s;
 }
 
 .form-group textarea {
   resize: vertical;
   min-height: 150px;
-  font-size: 0.85rem;
+  font-size: 12px;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-primary-alpha);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
 }
 
+/* GitHub-style secondary button */
 .back-btn {
-  margin-bottom: 1.5rem;
-  padding: 0.5rem 1rem !important;
-  background: var(--bg-tertiary) !important;
+  margin-bottom: 16px;
+  padding: 5px 16px !important;
+  background: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
-  color: var(--text-secondary) !important;
-  font-size: 0.9rem !important;
+  color: var(--text-primary) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 20px !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s !important;
 }
 
 .back-btn:hover {
-  background: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
+  background: var(--bg-hover) !important;
+  border-color: var(--border-hover) !important;
 }
 
 .error-message {
-  margin: 1rem 0;
-  padding: 1rem;
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--status-failure-bg);
+  border: 1px solid var(--status-failure);
   border-radius: 6px;
   color: var(--accent-failure);
-  font-size: 0.9rem;
+  font-size: 14px;
 }
 
 /* Fullscreen Exit Button */
 .fullscreen-exit-btn {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.75rem;
-  background: var(--bg-tertiary);
+  top: 16px;
+  right: 16px;
+  padding: 8px;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s, border-color 0.2s;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.7;
+  opacity: 0.8;
+  box-shadow: var(--shadow-md);
 }
 
 .fullscreen-exit-btn:hover {
-  background: var(--bg-secondary);
+  background: var(--bg-hover);
   border-color: var(--border-hover);
   opacity: 1;
 }
 
 /* Fullscreen Mode Adjustments */
 :fullscreen .app {
-  padding: 0.5rem;
+  padding: 8px;
   height: 100vh;
   overflow: hidden;
   display: flex;

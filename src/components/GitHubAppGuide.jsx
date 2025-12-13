@@ -78,13 +78,29 @@ function GitHubAppGuide({ onClose }) {
                   <li>On your GitHub App settings page, scroll down to the "Private keys" section</li>
                   <li>Click the <strong>"Generate a private key"</strong> button</li>
                   <li>A <code>.pem</code> file will be automatically downloaded</li>
-                  <li>Open the file with any text editor (Notepad, TextEdit, VS Code, etc.)</li>
+                  <li><strong>Convert the key format</strong> (GitHub generates PKCS#1, but we need PKCS#8):
+                    <ul>
+                      <li>Open Terminal (Mac/Linux) or PowerShell (Windows)</li>
+                      <li>Run this command (replace the filename with yours):</li>
+                      <code style={{display: 'block', margin: '8px 0', padding: '8px', background: 'var(--bg-primary)', borderRadius: '3px'}}>
+                        openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in your-app.pem -out your-app-pkcs8.pem
+                      </code>
+                      <li>This creates a new file ending in <code>-pkcs8.pem</code></li>
+                    </ul>
+                  </li>
+                  <li>Open the <strong>converted</strong> file (<code>-pkcs8.pem</code>) with any text editor</li>
                   <li>Copy the entire contents including the BEGIN and END lines</li>
+                  <li>The key should start with <code>-----BEGIN PRIVATE KEY-----</code> (not "RSA PRIVATE KEY")</li>
                 </ol>
                 
                 <div className="warning-box">
                   <strong>⚠️ Security Note:</strong>
                   <p>Keep this private key secure! It's like a password for your GitHub App. Never commit it to version control or share it publicly.</p>
+                </div>
+                
+                <div className="info-box">
+                  <strong>Why convert?</strong>
+                  <p>GitHub generates keys in PKCS#1 format (<code>BEGIN RSA PRIVATE KEY</code>), but the authentication library requires PKCS#8 format (<code>BEGIN PRIVATE KEY</code>) for better security and compatibility.</p>
                 </div>
               </div>
             </details>
