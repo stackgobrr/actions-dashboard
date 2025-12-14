@@ -1,16 +1,16 @@
 import { ScreenFullIcon, ScreenNormalIcon } from '@primer/octicons-react'
+import { IconButton } from '@primer/react'
 
 export function FullscreenToggle({ isFullscreen, onToggle }) {
   const label = isFullscreen ? "Exit Fullscreen" : "Fullscreen"
   
   return (
-    <button 
+    <IconButton 
       onClick={onToggle}
-      className="btn btn-sm" 
+      size="small"
       title={isFullscreen ? "Exit Fullscreen" : "Fullscreen (F)"}
       aria-label={label}
-    >
-      {isFullscreen ? <ScreenNormalIcon size={16} /> : <ScreenFullIcon size={16} />}
-    </button>
+      icon={isFullscreen ? ScreenNormalIcon : ScreenFullIcon}
+    />
   )
 }

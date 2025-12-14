@@ -7,6 +7,10 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
-    css: true,
+    server: {
+      deps: {
+        inline: ['@primer/react']
+      }
+    }
   },
 })

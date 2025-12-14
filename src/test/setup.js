@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { expect, afterEach } from 'vitest'
+import { expect, afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
 // Cleanup after each test
@@ -18,3 +18,17 @@ global.localStorage = localStorageMock
 
 // Mock fetch
 global.fetch = vi.fn()
+
+// Mock adoptedStyleSheets for Primer React components
+Object.defineProperty(document, 'adoptedStyleSheets', {
+  writable: true,
+  value: []
+})
+
+// Mock ShadowRoot adoptedStyleSheets
+if (typeof ShadowRoot !== 'undefined') {
+  Object.defineProperty(ShadowRoot.prototype, 'adoptedStyleSheets', {
+    get() { return [] },
+    set() {}
+  })
+}

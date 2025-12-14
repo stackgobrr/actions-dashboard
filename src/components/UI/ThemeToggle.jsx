@@ -1,13 +1,14 @@
 import { SunIcon, MoonIcon } from '@primer/octicons-react'
+import { IconButton } from '@primer/react'
 
 export function ThemeToggle({ theme, onToggle }) {
   return (
-    <button 
+    <IconButton 
       onClick={onToggle}
-      className="btn btn-sm" 
+      size="small"
+      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
       title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme (T)`}
-    >
-      {theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} />}
-    </button>
+      icon={theme === 'dark' ? SunIcon : MoonIcon}
+    />
   )
 }
