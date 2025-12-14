@@ -1,5 +1,5 @@
 import { KeyIcon, LinkExternalIcon } from '@primer/octicons-react'
-import { Button } from '@primer/react'
+import { Button, TextInput } from '@primer/react'
 
 export function PatForm({
   githubToken,
@@ -27,12 +27,12 @@ export function PatForm({
             <LinkExternalIcon size={14} style={{display: 'inline', marginLeft: '4px', verticalAlign: 'text-bottom'}} />
           </a>
         </p>
-        <input
+        <TextInput
           type="password"
           placeholder="ghp_xxxxxxxxxxxx"
           value={githubToken}
           onChange={(e) => setGithubToken(e.target.value)}
-          className="form-control input-block"
+          block
         />
         <Button 
           onClick={onSubmit} 

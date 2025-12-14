@@ -1,5 +1,5 @@
 import { GearIcon } from '@primer/octicons-react'
-import { Button } from '@primer/react'
+import { Button, TextInput, Textarea, FormControl } from '@primer/react'
 
 export function GitHubAppForm({
   appId,
@@ -36,41 +36,38 @@ export function GitHubAppForm({
           </Button>
         </p>
         
-        <div className="form-group">
-          <label htmlFor="app-id" className="form-label">App ID</label>
-          <input
-            id="app-id"
+        <FormControl id="app-id">
+          <FormControl.Label>App ID</FormControl.Label>
+          <TextInput
             type="text"
             placeholder="123456"
             value={appId}
             onChange={(e) => setAppId(e.target.value)}
-            className="form-control input-block"
+            block
           />
-        </div>
+        </FormControl>
         
-        <div className="form-group">
-          <label htmlFor="installation-id" className="form-label">Installation ID</label>
-          <input
-            id="installation-id"
+        <FormControl id="installation-id" sx={{ mt: 3 }}>
+          <FormControl.Label>Installation ID</FormControl.Label>
+          <TextInput
             type="text"
             placeholder="12345678"
             value={installationId}
             onChange={(e) => setInstallationId(e.target.value)}
-            className="form-control input-block"
+            block
           />
-        </div>
+        </FormControl>
         
-        <div className="form-group">
-          <label htmlFor="private-key" className="form-label">Private Key (PEM)</label>
-          <textarea
-            id="private-key"
+        <FormControl id="private-key" sx={{ mt: 3 }}>
+          <FormControl.Label>Private Key (PEM)</FormControl.Label>
+          <Textarea
             placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;...&#10;-----END RSA PRIVATE KEY-----"
             value={privateKey}
             onChange={(e) => setPrivateKey(e.target.value)}
             rows={8}
-            className="form-control input-block"
+            block
           />
-        </div>
+        </FormControl>
         
         {appFormError && (
           <div className="flash flash-error">

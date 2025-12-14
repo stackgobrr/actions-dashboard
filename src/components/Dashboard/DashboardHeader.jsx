@@ -7,7 +7,7 @@ import {
   FilterIcon,
   ClockIcon
 } from '@primer/octicons-react'
-import { Button, IconButton } from '@primer/react'
+import { Button, IconButton, Select, Checkbox } from '@primer/react'
 import { ThemeToggle } from '../UI/ThemeToggle'
 import { RefreshButton } from '../UI/RefreshButton'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
@@ -81,15 +81,15 @@ export function DashboardHeader({
           <label htmlFor="theme-select" className="f6 color-fg-muted">
             Theme:
           </label>
-          <select 
+          <Select 
             id="theme-select"
             value={theme} 
             onChange={(e) => setTheme(e.target.value)}
-            className="form-select form-select-sm"
+            size="small"
           >
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-          </select>
+            <Select.Option value="dark">Dark</Select.Option>
+            <Select.Option value="light">Light</Select.Option>
+          </Select>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
         
@@ -98,41 +98,40 @@ export function DashboardHeader({
           <label htmlFor="sort-select" className="f6 color-fg-muted">
             Sort:
           </label>
-          <select 
+          <Select 
             id="sort-select"
             value={sortBy} 
             onChange={(e) => setSortBy(e.target.value)}
-            className="form-select form-select-sm"
+            size="small"
           >
-            <option value="last-run-desc">Last Run (Newest)</option>
-            <option value="last-run-asc">Last Run (Oldest)</option>
-            <option value="group">Category</option>
-            <option value="status">Status</option>
-          </select>
+            <Select.Option value="last-run-desc">Last Run (Newest)</Select.Option>
+            <Select.Option value="last-run-asc">Last Run (Oldest)</Select.Option>
+            <Select.Option value="group">Category</Select.Option>
+            <Select.Option value="status">Status</Select.Option>
+          </Select>
         </div>
         
         <div className="d-flex flex-items-center gap-2">
           <ClockIcon size={16} className="color-fg-muted" />
           <label className="d-flex flex-items-center gap-1 f6">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
             />
             <span>Auto-refresh</span>
           </label>
           {autoRefresh && (
-            <select 
+            <Select 
               value={refreshInterval} 
               onChange={(e) => setRefreshInterval(Number(e.target.value))}
-              className="form-select form-select-sm"
+              size="small"
             >
-              <option value="5">5s</option>
-              <option value="10">10s</option>
-              <option value="30">30s</option>
-              <option value="60">1m</option>
-              <option value="300">5m</option>
-            </select>
+              <Select.Option value="5">5s</Select.Option>
+              <Select.Option value="10">10s</Select.Option>
+              <Select.Option value="30">30s</Select.Option>
+              <Select.Option value="60">1m</Select.Option>
+              <Select.Option value="300">5m</Select.Option>
+            </Select>
           )}
         </div>
         
