@@ -12,7 +12,7 @@ env:
 
 jobs:
   build:
-    name: Test and Build
+    name: Build and Test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,8 +22,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Run Node Tests
-        uses: ./.github/actions/node-test
+      - name: Run Component Tests
+        uses: ./.github/actions/react-component-test
       
       - name: Build application
         run: npm run build

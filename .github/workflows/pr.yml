@@ -7,7 +7,7 @@ on:
 
 jobs:
   validate:
-    name: Run Tests
+    name: Build and Test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -18,5 +18,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Run Node Tests
-        uses: ./.github/actions/node-test
+      - name: Run Component Tests
+        uses: ./.github/actions/react-component-test
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-build-${{ github.event.pull_request.number }}
+          path: dist/
+          retention-days: 7
