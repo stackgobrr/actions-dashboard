@@ -7,5 +7,5 @@
   min-height: 0;
   overflow: auto;
   align-content: start;
-  padding: 2px; /* Prevent focus outline clipping */
+  padding: 12px; /* Prevent focus outline and badge clipping */
 }

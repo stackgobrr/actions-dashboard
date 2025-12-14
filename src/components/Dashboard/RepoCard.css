@@ -4,7 +4,7 @@
   border: 1px solid var(--borderColor-default);
   border-radius: 6px;
   background: var(--bgColor-default);
-  overflow: hidden;
+  overflow: visible;
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
   min-width: 280px;
   position: relative;
@@ -12,9 +12,17 @@
 
 .repo-card__pr-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
+  top: -8px;
+  right: -8px;
+  z-index: 100;
+}
+
+.repo-card__pr-badge span[class*="CounterLabel"] {
+  background-color: #cf222e !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
 }
 
 .repo-card:hover {
