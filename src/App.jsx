@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import './App.css'
 import { Dashboard } from './components/Dashboard/Dashboard'
 import { AuthSetup } from './components/Auth/AuthSetup'
@@ -34,15 +34,15 @@ function App() {
 
   const auth = useAuth()
   
-  // Convert selectedRepos to REPOSITORIES format for hook
-  const reposForHook = {
+  // Convert selectedRepos to REPOSITORIES format for hook - memoized to prevent re-renders
+  const reposForHook = useMemo(() => ({
     common: selectedRepos.filter(r => r.category === 'common'),
     modules: selectedRepos.filter(r => r.category === 'modules'),
     infra: selectedRepos.filter(r => r.category === 'infra'),
     services: selectedRepos.filter(r => r.category === 'services'),
     utils: selectedRepos.filter(r => r.category === 'utils'),
     custom: selectedRepos.filter(r => r.category === 'custom')
-  }
+  }), [selectedRepos])
   
   const { repoStatuses, loading, lastUpdate, fetchAllStatuses } = useGitHubStatus(
     reposForHook,

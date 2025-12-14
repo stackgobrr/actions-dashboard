@@ -7,6 +7,14 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
 
+  // Create a stable key from repositories to detect real changes
+  const reposKey = JSON.stringify(
+    Object.values(repositories)
+      .flat()
+      .map(r => r.name)
+      .sort()
+  )
+
   const fetchRepoStatus = async (repoName, token) => {
     try {
       const headers = token ? { 'Authorization': `token ${token}` } : {}
@@ -64,12 +72,20 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       ...repositories.infra.map(r => ({ ...r, category: 'infra' })),
       ...repositories.services.map(r => ({ ...r, category: 'services' })),
       ...repositories.utils.map(r => ({ ...r, category: 'utils' })),
+      ...repositories.custom.map(r => ({ ...r, category: 'custom' })),
     ]
 
     // Fetch all repos in parallel for much faster loading
     const statusPromises = allRepos.map(async (repo) => {
       const status = await fetchRepoStatus(repo.name, token)
-      return { name: repo.name, status: { ...status, category: repo.category } }
+      return { 
+        name: repo.name, 
+        status: { 
+          ...status, 
+          category: repo.category,
+          labels: repo.labels || []
+        } 
+      }
     })
 
     const results = await Promise.all(statusPromises)
@@ -93,7 +109,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
         return () => clearInterval(interval)
       }
     }
-  }, [showAuthSetup, authMethod, autoRefresh, refreshInterval])
+  }, [showAuthSetup, authMethod, autoRefresh, refreshInterval, reposKey])
 
   return {
     repoStatuses,
