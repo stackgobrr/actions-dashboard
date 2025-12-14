@@ -83,7 +83,7 @@ describe('Dashboard Component - Critical Functionality', () => {
       const { container } = render(<Dashboard {...defaultProps} loading={false} repoStatuses={{}} />)
       
       // Should render grid container even if empty
-      const grid = container.querySelector('[style*="display: grid"]')
+      const grid = container.querySelector('.dashboard-grid')
       expect(grid).toBeInTheDocument()
     })
   })

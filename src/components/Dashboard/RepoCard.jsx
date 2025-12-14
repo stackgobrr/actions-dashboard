@@ -2,6 +2,7 @@ import {
   GitBranchIcon,
   LinkExternalIcon
 } from '@primer/octicons-react'
+import { Link, Label } from '@primer/react'
 import { getStatusIcon, getStatusClass, getLabelColor } from '../../utils/statusHelpers.jsx'
 import './RepoCard.css'
 
@@ -60,22 +61,28 @@ export function RepoCard({ repoName, status }) {
       
       <div className="repo-card__footer">
         {status.url ? (
-          <a href={status.url} target="_blank" rel="noopener noreferrer" className="repo-card__link">
+          <Link 
+            href={status.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ fontSize: 0 }}
+          >
             View Run <LinkExternalIcon size={10} />
-          </a>
+          </Link>
         ) : (
           <span className="repo-card__no-runs">No recent runs</span>
         )}
-        <span 
-          className="repo-card__label" 
-          style={{
+        <Label 
+          sx={{
             color: labelColor.text,
             backgroundColor: labelColor.bg,
-            borderColor: labelColor.border
+            borderColor: labelColor.border,
+            borderWidth: 1,
+            borderStyle: 'solid'
           }}
         >
           {status.category}
-        </span>
+        </Label>
       </div>
     </div>
   )

@@ -10,7 +10,7 @@ describe('DashboardGrid Component - Critical Functionality', () => {
       ['repo-three', { status: 'completed', conclusion: 'failure', category: 'Services', description: 'Test' }]
     ]
     
-    render(<DashboardGrid repositories={repositories} columns={2} />)
+    render(<DashboardGrid repositories={repositories} />)
     
     // Critical: All repos must be visible
     expect(screen.getByText('repo-one')).toBeInTheDocument()
@@ -19,10 +19,10 @@ describe('DashboardGrid Component - Critical Functionality', () => {
   })
 
   it('handles empty repository list without crashing', () => {
-    const { container } = render(<DashboardGrid repositories={[]} columns={2} />)
+    const { container } = render(<DashboardGrid repositories={[]} />)
     
     // Should render container but no cards
-    const grid = container.querySelector('[style*="display: grid"]')
+    const grid = container.querySelector('.dashboard-grid')
     expect(grid).toBeInTheDocument()
     expect(grid.children).toHaveLength(0)
   })
@@ -34,7 +34,7 @@ describe('DashboardGrid Component - Critical Functionality', () => {
       ['mike', { status: 'completed', conclusion: 'success', category: 'Test', description: 'Test' }]
     ]
     
-    render(<DashboardGrid repositories={repositories} columns={3} />)
+    render(<DashboardGrid repositories={repositories} />)
     
     const repoNames = screen.getAllByText(/zulu|alpha|mike/)
     expect(repoNames[0]).toHaveTextContent('zulu')

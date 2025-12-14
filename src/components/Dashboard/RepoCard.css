@@ -116,50 +116,34 @@
   border-top: 1px solid var(--borderColor-default);
 }
 
-.repo-card__link {
-  font-size: 12px;
-  color: var(--fgColor-accent);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.repo-card__link:hover {
-  text-decoration: underline;
-}
-
 .repo-card__no-runs {
   font-size: 12px;
   color: var(--fgColor-muted);
 }
 
-.repo-card__label {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 12px;
-  border: 1px solid;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Status stripes */
+/* Status stripes for different workflow states */
 .repo-card.success {
-  border-top: 3px solid var(--borderColor-success-emphasis);
+  border-top: 3px solid var(--borderColor-success-emphasis) !important;
 }
 
 .repo-card.failure {
-  border-top: 3px solid var(--borderColor-danger-emphasis);
+  border-top: 3px solid var(--borderColor-danger-emphasis) !important;
 }
 
-.repo-card.in_progress {
-  border-top: 3px solid var(--borderColor-accent-emphasis);
+.repo-card.in-progress {
+  border-top: 3px solid var(--borderColor-accent-emphasis) !important;
 }
 
+.repo-card.warning {
+  border-top: 3px solid var(--borderColor-attention-emphasis) !important;
+}
+
+.repo-card.error,
+.repo-card.unknown,
 .repo-card.no_runs {
-  border-top: 3px solid var(--borderColor-default);
+  border-top: 3px solid var(--borderColor-default) !important;
 }
+
 
 /* Container Queries - Ultra Compact Mode */
 @container (max-width: 180px) {
