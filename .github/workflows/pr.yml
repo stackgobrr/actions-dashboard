@@ -1,0 +1,15 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Run Node Tests
+        uses: ./.github/actions/node-test
