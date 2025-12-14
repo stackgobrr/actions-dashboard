@@ -11,8 +11,33 @@ env:
   NODE_VERSION: '20'
 
 jobs:
+  build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Node Tests
+        uses: ./.github/actions/node-test
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1
+
   deploy:
-    name: Build and Deploy
+    name: Deploy to AWS
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -21,21 +46,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test -- --run
-
-      - name: Build application
-        run: npm run build
+          name: dist
+          path: dist/
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
