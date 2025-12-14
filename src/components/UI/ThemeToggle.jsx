@@ -1,4 +1,4 @@
-import { Sun, Moon } from 'lucide-react'
+import { SunIcon, MoonIcon } from '@primer/octicons-react'
 
 export function ThemeToggle({ theme, onToggle }) {
   return (
@@ -7,7 +7,7 @@ export function ThemeToggle({ theme, onToggle }) {
       className="btn btn-sm" 
       title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme (T)`}
     >
-      {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+      {theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} />}
     </button>
   )
 }

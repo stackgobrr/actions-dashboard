@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react'
+import { SyncIcon } from '@primer/octicons-react'
 
 export function RefreshButton({ onRefresh, loading, disabled }) {
   return (
@@ -8,7 +8,7 @@ export function RefreshButton({ onRefresh, loading, disabled }) {
       className="btn btn-sm" 
       title="Refresh all repos (R)"
     >
-      <RefreshCw 
+      <SyncIcon 
         size={16} 
         className={loading ? 'spinning' : ''} 
       />

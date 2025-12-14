@@ -1,4 +1,4 @@
-import { Key, ExternalLink } from 'lucide-react'
+import { KeyIcon, LinkExternalIcon } from '@primer/octicons-react'
 
 export function PatForm({
   githubToken,
@@ -9,7 +9,7 @@ export function PatForm({
     <div className="Box">
       <div className="Box-header">
         <h2 className="Box-title">
-          <Key size={20} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
+          <KeyIcon size={20} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
           Personal Access Token
         </h2>
       </div>
@@ -23,7 +23,7 @@ export function PatForm({
             className="Link--primary"
           >
             Create a new token
-            <ExternalLink size={14} style={{display: 'inline', marginLeft: '4px', verticalAlign: 'text-bottom'}} />
+            <LinkExternalIcon size={14} style={{display: 'inline', marginLeft: '4px', verticalAlign: 'text-bottom'}} />
           </a>
         </p>
         <input
@@ -38,7 +38,7 @@ export function PatForm({
           disabled={!githubToken}
           className="btn btn-primary btn-block mt-3"
         >
-          <Key size={16} style={{marginRight: '0.5rem'}} />
+          <KeyIcon size={16} style={{marginRight: '0.5rem'}} />
           Save Token & Continue
         </button>
         <p className="note f6 color-fg-muted mt-2 mb-0">Token is stored locally in your browser.</p>
