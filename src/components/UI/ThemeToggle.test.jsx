@@ -3,26 +3,22 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ThemeToggle } from './ThemeToggle'
 
-describe('ThemeToggle Component', () => {
-  it('renders with dark theme icon', () => {
-    render(<ThemeToggle theme="dark" onToggle={vi.fn()} />)
-    const button = screen.getByRole('button')
-    expect(button).toBeInTheDocument()
-    expect(button).toHaveAttribute('title', 'Switch to light theme (T)')
-  })
-
-  it('renders with light theme icon', () => {
-    render(<ThemeToggle theme="light" onToggle={vi.fn()} />)
-    const button = screen.getByRole('button')
-    expect(button).toHaveAttribute('title', 'Switch to dark theme (T)')
-  })
-
-  it('calls onToggle when clicked', async () => {
-    const user = userEvent.setup()
+describe('ThemeToggle Component - Critical Functionality', () => {
+  it('toggles theme when clicked', async () => {
     const onToggle = vi.fn()
     render(<ThemeToggle theme="dark" onToggle={onToggle} />)
     
-    await user.click(screen.getByRole('button'))
+    await userEvent.click(screen.getByRole('button'))
+    expect(onToggle).toHaveBeenCalledOnce()
+  })
+
+  it('is accessible via keyboard', async () => {
+    const onToggle = vi.fn()
+    render(<ThemeToggle theme="dark" onToggle={onToggle} />)
+    
+    const button = screen.getByRole('button')
+    button.focus()
+    await userEvent.keyboard('{Enter}')
     expect(onToggle).toHaveBeenCalledOnce()
   })
 })

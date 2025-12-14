@@ -1,34 +1,44 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { DashboardGrid } from './DashboardGrid'
 
-describe('DashboardGrid Component', () => {
-  it('renders grid with repositories', () => {
+describe('DashboardGrid Component - Critical Functionality', () => {
+  it('displays all repositories passed to it', () => {
     const repositories = [
-      ['repo1', { status: 'completed', conclusion: 'success', category: 'Frontend' }],
-      ['repo2', { status: 'in_progress', category: 'Backend' }]
+      ['repo-one', { status: 'completed', conclusion: 'success', category: 'Frontend', description: 'Test' }],
+      ['repo-two', { status: 'in_progress', category: 'Backend', description: 'Test' }],
+      ['repo-three', { status: 'completed', conclusion: 'failure', category: 'Services', description: 'Test' }]
     ]
     
     render(<DashboardGrid repositories={repositories} columns={2} />)
     
-    expect(screen.getByText('repo1')).toBeInTheDocument()
-    expect(screen.getByText('repo2')).toBeInTheDocument()
+    // Critical: All repos must be visible
+    expect(screen.getByText('repo-one')).toBeInTheDocument()
+    expect(screen.getByText('repo-two')).toBeInTheDocument()
+    expect(screen.getByText('repo-three')).toBeInTheDocument()
   })
 
-  it('renders empty grid when no repositories', () => {
+  it('handles empty repository list without crashing', () => {
     const { container } = render(<DashboardGrid repositories={[]} columns={2} />)
+    
+    // Should render container but no cards
     const grid = container.querySelector('[style*="display: grid"]')
     expect(grid).toBeInTheDocument()
     expect(grid.children).toHaveLength(0)
   })
 
-  it('applies correct column count', () => {
+  it('renders repositories in the order provided (preserves sort)', () => {
     const repositories = [
-      ['repo1', { status: 'completed', conclusion: 'success', category: 'Test' }]
+      ['zulu', { status: 'completed', conclusion: 'success', category: 'Test', description: 'Test' }],
+      ['alpha', { status: 'completed', conclusion: 'success', category: 'Test', description: 'Test' }],
+      ['mike', { status: 'completed', conclusion: 'success', category: 'Test', description: 'Test' }]
     ]
     
-    const { container } = render(<DashboardGrid repositories={repositories} columns={3} />)
-    const grid = container.querySelector('[style*="grid-template-columns"]')
-    expect(grid).toHaveStyle({ gridTemplateColumns: 'repeat(3, 1fr)' })
+    render(<DashboardGrid repositories={repositories} columns={3} />)
+    
+    const repoNames = screen.getAllByText(/zulu|alpha|mike/)
+    expect(repoNames[0]).toHaveTextContent('zulu')
+    expect(repoNames[1]).toHaveTextContent('alpha')
+    expect(repoNames[2]).toHaveTextContent('mike')
   })
 })

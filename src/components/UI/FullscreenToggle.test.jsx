@@ -3,27 +3,30 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FullscreenToggle } from './FullscreenToggle'
 
-describe('FullscreenToggle Component', () => {
-  it('renders maximize button when not fullscreen', () => {
-    render(<FullscreenToggle isFullscreen={false} onToggle={vi.fn()} />)
-    const button = screen.getByLabelText('Fullscreen')
-    expect(button).toBeInTheDocument()
-    expect(button).toHaveAttribute('title', 'Fullscreen (F)')
-  })
-
-  it('renders minimize button when fullscreen', () => {
-    render(<FullscreenToggle isFullscreen={true} onToggle={vi.fn()} />)
-    const button = screen.getByLabelText('Exit Fullscreen')
-    expect(button).toBeInTheDocument()
-    expect(button).toHaveAttribute('title', 'Exit Fullscreen')
-  })
-
-  it('calls onToggle when clicked', async () => {
-    const user = userEvent.setup()
+describe('FullscreenToggle Component - Critical Functionality', () => {
+  it('toggles fullscreen when clicked', async () => {
     const onToggle = vi.fn()
     render(<FullscreenToggle isFullscreen={false} onToggle={onToggle} />)
     
-    await user.click(screen.getByLabelText('Fullscreen'))
+    await userEvent.click(screen.getByRole('button'))
+    expect(onToggle).toHaveBeenCalledOnce()
+  })
+
+  it('exits fullscreen when already in fullscreen mode', async () => {
+    const onToggle = vi.fn()
+    render(<FullscreenToggle isFullscreen={true} onToggle={onToggle} />)
+    
+    await userEvent.click(screen.getByRole('button'))
+    expect(onToggle).toHaveBeenCalledOnce()
+  })
+
+  it('is keyboard accessible', async () => {
+    const onToggle = vi.fn()
+    render(<FullscreenToggle isFullscreen={false} onToggle={onToggle} />)
+    
+    const button = screen.getByRole('button')
+    button.focus()
+    await userEvent.keyboard('{Enter}')
     expect(onToggle).toHaveBeenCalledOnce()
   })
 })

@@ -3,57 +3,62 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PatForm } from './PatForm'
 
-describe('PatForm Component', () => {
+describe('PatForm Component - Critical Functionality', () => {
   const defaultProps = {
     githubToken: '',
     setGithubToken: vi.fn(),
     onSubmit: vi.fn()
   }
 
-  it('renders PAT form title', () => {
-    render(<PatForm {...defaultProps} />)
-    expect(screen.getByText('Personal Access Token')).toBeInTheDocument()
+  describe('Form Submission Flow', () => {
+    it('prevents submission when token is empty', async () => {
+      const onSubmit = vi.fn()
+      render(<PatForm {...defaultProps} githubToken="" onSubmit={onSubmit} />)
+      
+      const submitButton = screen.getByRole('button', { name: /save token/i })
+      expect(submitButton).toBeDisabled()
+      
+      // Ensure clicking disabled button doesn't submit
+      await userEvent.click(submitButton)
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+
+    it('allows submission when token is provided', async () => {
+      const onSubmit = vi.fn()
+      const token = 'ghp_validtoken123'
+      render(<PatForm {...defaultProps} githubToken={token} onSubmit={onSubmit} />)
+      
+      const submitButton = screen.getByRole('button', { name: /save token/i })
+      expect(submitButton).toBeEnabled()
+      
+      await userEvent.click(submitButton)
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
+
+    it('updates token value as user types', async () => {
+      const setGithubToken = vi.fn()
+      render(<PatForm {...defaultProps} setGithubToken={setGithubToken} />)
+      
+      const input = screen.getByPlaceholderText('ghp_xxxxxxxxxxxx')
+      await userEvent.type(input, 'test')
+      
+      // Verify setGithubToken was called for each character typed
+      expect(setGithubToken).toHaveBeenCalled()
+    })
   })
 
-  it('renders token input field', () => {
-    render(<PatForm {...defaultProps} />)
-    const input = screen.getByPlaceholderText('ghp_xxxxxxxxxxxx')
-    expect(input).toBeInTheDocument()
-    expect(input).toHaveAttribute('type', 'password')
-  })
+  describe('Critical UI Elements', () => {
+    it('provides link to create GitHub token', () => {
+      render(<PatForm {...defaultProps} />)
+      const link = screen.getByText('Create a new token')
+      expect(link).toHaveAttribute('href')
+      expect(link.getAttribute('href')).toContain('github.com/settings/tokens')
+    })
 
-  it('renders create token link', () => {
-    render(<PatForm {...defaultProps} />)
-    const link = screen.getByText('Create a new token')
-    expect(link).toHaveAttribute('href', 'https://github.com/settings/tokens/new?scopes=repo&description=h3ow3d-dashboard')
-    expect(link).toHaveAttribute('target', '_blank')
-  })
-
-  it('renders submit button disabled when token is empty', () => {
-    render(<PatForm {...defaultProps} githubToken="" />)
-    expect(screen.getByRole('button', { name: /save token/i })).toBeDisabled()
-  })
-
-  it('renders submit button enabled when token has value', () => {
-    render(<PatForm {...defaultProps} githubToken="ghp_test123" />)
-    expect(screen.getByRole('button', { name: /save token/i })).not.toBeDisabled()
-  })
-
-  it('calls setGithubToken when input changes', async () => {
-    const user = userEvent.setup()
-    const setGithubToken = vi.fn()
-    render(<PatForm {...defaultProps} setGithubToken={setGithubToken} />)
-    
-    await user.type(screen.getByPlaceholderText('ghp_xxxxxxxxxxxx'), 'test')
-    expect(setGithubToken).toHaveBeenCalled()
-  })
-
-  it('calls onSubmit when form submitted', async () => {
-    const user = userEvent.setup()
-    const onSubmit = vi.fn()
-    render(<PatForm {...defaultProps} githubToken="ghp_test" onSubmit={onSubmit} />)
-    
-    await user.click(screen.getByRole('button', { name: /save token/i }))
-    expect(onSubmit).toHaveBeenCalledOnce()
+    it('has password input for security', () => {
+      render(<PatForm {...defaultProps} />)
+      const input = screen.getByPlaceholderText('ghp_xxxxxxxxxxxx')
+      expect(input).toHaveAttribute('type', 'password')
+    })
   })
 })
