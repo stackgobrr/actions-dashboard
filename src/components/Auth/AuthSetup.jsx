@@ -1,4 +1,4 @@
-import { Github, Settings, ExternalLink } from 'lucide-react'
+import { MarkGithubIcon, GearIcon } from '@primer/octicons-react'
 import GitHubAppGuide from './GitHubAppGuide'
 import { GitHubAppForm } from './GitHubAppForm'
 import { PatForm } from './PatForm'
@@ -26,7 +26,7 @@ export function AuthSetup({
       <div className="p-3" style={{minHeight: '100vh', maxWidth: '480px', margin: '0 auto'}}>
         <div className="pt-6">
           <h1 className="f3 text-normal mb-2">
-            <Github size={32} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
+            <MarkGithubIcon size={32} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
             GitHub Authentication
           </h1>
           <p className="color-fg-muted">Choose an authentication method to access workflow statuses.</p>
@@ -36,14 +36,14 @@ export function AuthSetup({
             <div className="Box mt-4">
               <div className="Box-header">
                 <h2 className="Box-title">
-                  <Settings size={20} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
+                  <GearIcon size={20} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
                   GitHub App (Recommended)
                 </h2>
               </div>
               <div className="Box-body">
                 <p className="color-fg-muted f6">More secure, automatic token refresh, fine-grained permissions.</p>
                 <button onClick={() => setShowGitHubAppForm(true)} className="btn btn-primary btn-block mt-3">
-                  <Github size={16} style={{marginRight: '0.5rem'}} />
+                  <MarkGithubIcon size={16} style={{marginRight: '0.5rem'}} />
                   Configure GitHub App
                 </button>
                 <p className="note f6 color-fg-muted mt-2 mb-0">

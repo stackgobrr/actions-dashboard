@@ -1,13 +1,12 @@
 import { 
-  Github,
-  Settings,
-  LogOut,
-  Trash2,
-  Palette,
-  Filter,
-  Timer,
-  Clock
-} from 'lucide-react'
+  MarkGithubIcon,
+  GearIcon,
+  SignOutIcon,
+  TrashIcon,
+  PaintbrushIcon,
+  FilterIcon,
+  ClockIcon
+} from '@primer/octicons-react'
 import { ThemeToggle } from '../UI/ThemeToggle'
 import { RefreshButton } from '../UI/RefreshButton'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
@@ -41,7 +40,7 @@ export function DashboardHeader({
       <div className="d-flex flex-justify-between flex-items-start mb-3">
         <div>
           <h1 className="f3 text-normal mb-1">
-            <Github size={28} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
+            <MarkGithubIcon size={28} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
             Actions Dashboard
           </h1>
           <p className="f6 color-fg-muted mb-0">Real-time GitHub Actions status for all repositories</p>
@@ -51,7 +50,7 @@ export function DashboardHeader({
           <FullscreenToggle isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
           {authMethod === 'github-app' && appInfo ? (
             <div className="d-flex flex-items-center gap-2 border rounded-2 px-3 py-1">
-              <Settings size={16} className="color-fg-muted" />
+              <GearIcon size={16} className="color-fg-muted" />
               <span className="f6">{appInfo.appName} ({appInfo.account})</span>
               <button 
                 onClick={handleLogout} 
@@ -59,12 +58,12 @@ export function DashboardHeader({
                 title="Sign out"
                 aria-label="Sign out"
               >
-                <LogOut size={16} />
+                <SignOutIcon size={16} />
               </button>
             </div>
           ) : authMethod === 'pat' ? (
             <button onClick={clearToken} className="btn btn-sm btn-danger">
-              <Trash2 size={16} style={{marginRight: '0.25rem'}} />
+              <TrashIcon size={16} style={{marginRight: '0.25rem'}} />
               Clear Token
             </button>
           ) : null}
@@ -73,7 +72,7 @@ export function DashboardHeader({
       
       <div className="d-flex flex-wrap flex-items-center gap-3">
         <div className="d-flex flex-items-center gap-2">
-          <Palette size={16} className="color-fg-muted" />
+          <PaintbrushIcon size={16} className="color-fg-muted" />
           <label htmlFor="theme-select" className="f6 color-fg-muted">
             Theme:
           </label>
@@ -90,7 +89,7 @@ export function DashboardHeader({
         </div>
         
         <div className="d-flex flex-items-center gap-2">
-          <Filter size={16} className="color-fg-muted" />
+          <FilterIcon size={16} className="color-fg-muted" />
           <label htmlFor="sort-select" className="f6 color-fg-muted">
             Sort:
           </label>
@@ -108,7 +107,7 @@ export function DashboardHeader({
         </div>
         
         <div className="d-flex flex-items-center gap-2">
-          <Timer size={16} className="color-fg-muted" />
+          <ClockIcon size={16} className="color-fg-muted" />
           <label className="d-flex flex-items-center gap-1 f6">
             <input
               type="checkbox"
@@ -134,7 +133,7 @@ export function DashboardHeader({
         
         {lastUpdate && (
           <span className="f6 color-fg-muted d-flex flex-items-center gap-1">
-            <Clock size={14} />
+            <ClockIcon size={14} />
             {lastUpdate.toLocaleTimeString()}
           </span>
         )}

@@ -1,9 +1,9 @@
 import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  AlertCircle
-} from 'lucide-react'
+  CheckCircleIcon, 
+  XCircleIcon, 
+  ClockIcon, 
+  AlertIcon
+} from '@primer/octicons-react'
 
 /**
  * Returns the appropriate status icon component based on workflow status
@@ -11,14 +11,14 @@ import {
  * @returns {JSX.Element} Icon component
  */
 export const getStatusIcon = (status) => {
-  if (status.error) return <AlertCircle size={18} className="color-fg-danger" />
+  if (status.error) return <AlertIcon size={18} className="color-fg-danger" />
   if (status.status === 'completed') {
-    if (status.conclusion === 'success') return <CheckCircle size={18} className="color-fg-success" />
-    if (status.conclusion === 'failure') return <XCircle size={18} className="color-fg-danger" />
-    return <AlertCircle size={18} className="color-fg-attention" />
+    if (status.conclusion === 'success') return <CheckCircleIcon size={18} className="color-fg-success" />
+    if (status.conclusion === 'failure') return <XCircleIcon size={18} className="color-fg-danger" />
+    return <AlertIcon size={18} className="color-fg-attention" />
   }
-  if (status.status === 'in_progress') return <Clock size={18} className="color-fg-accent" />
-  return <AlertCircle size={18} className="color-fg-muted" />
+  if (status.status === 'in_progress') return <ClockIcon size={18} className="color-fg-accent" />
+  return <AlertIcon size={18} className="color-fg-muted" />
 }
 
 /**

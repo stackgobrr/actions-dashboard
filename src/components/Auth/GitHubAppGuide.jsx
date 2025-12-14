@@ -1,4 +1,4 @@
-import { ExternalLink, CheckCircle, X } from 'lucide-react'
+import { LinkExternalIcon, CheckCircleIcon, XIcon } from '@primer/octicons-react'
 
 function GitHubAppGuide({ onClose }) {
   const currentUrl = window.location.origin
@@ -31,7 +31,7 @@ function GitHubAppGuide({ onClose }) {
             className="btn-octicon btn-octicon-danger"
             aria-label="Close"
           >
-            <X size={16} />
+            <XIcon size={16} />
           </button>
         </div>
         
@@ -47,7 +47,7 @@ function GitHubAppGuide({ onClose }) {
               <div className="p-3 border-top mt-2">
                 <p className="mb-3">
                   <a href="https://github.com/settings/apps/new" target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
-                    <ExternalLink size={14} style={{marginRight: '0.25rem'}} />
+                    <LinkExternalIcon size={14} style={{marginRight: '0.25rem'}} />
                     Open GitHub App creation form
                   </a>
                 </p>
@@ -76,11 +76,11 @@ function GitHubAppGuide({ onClose }) {
                       <strong className="d-block mb-1">Repository permissions</strong>
                       <ul className="ml-3">
                         <li className="d-flex flex-items-center gap-2 mb-1">
-                          <CheckCircle size={16} className="color-fg-success" />
+                          <CheckCircleIcon size={16} className="color-fg-success" />
                           <span><strong>Actions:</strong> Read-only</span>
                         </li>
                         <li className="d-flex flex-items-center gap-2">
-                          <CheckCircle size={16} className="color-fg-success" />
+                          <CheckCircleIcon size={16} className="color-fg-success" />
                           <span><strong>Metadata:</strong> Read-only (automatically selected)</span>
                         </li>
                       </ul>
@@ -98,7 +98,7 @@ function GitHubAppGuide({ onClose }) {
                 </div>
                 
                 <div className="flash flash-success">
-                  <CheckCircle size={16} style={{marginRight: '0.5rem'}} />
+                  <CheckCircleIcon size={16} style={{marginRight: '0.5rem'}} />
                   <div>
                     <strong>After creating the app:</strong>
                     <p className="mb-0">Note down your <strong>App ID</strong> - it's displayed at the top of your app's settings page</p>
@@ -199,7 +199,7 @@ openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in your-app.pem -out you
                 <div className="mb-3">
                   <div className="Box Box--condensed mb-2">
                     <div className="Box-row d-flex gap-3">
-                      <CheckCircle size={20} className="color-fg-success flex-shrink-0" />
+                      <CheckCircleIcon size={20} className="color-fg-success flex-shrink-0" />
                       <div>
                         <strong className="d-block">App ID</strong>
                         <p className="f6 color-fg-muted mb-0">From your GitHub App settings page (usually 6 digits)</p>
@@ -209,7 +209,7 @@ openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in your-app.pem -out you
                   
                   <div className="Box Box--condensed mb-2">
                     <div className="Box-row d-flex gap-3">
-                      <CheckCircle size={20} className="color-fg-success flex-shrink-0" />
+                      <CheckCircleIcon size={20} className="color-fg-success flex-shrink-0" />
                       <div>
                         <strong className="d-block">Installation ID</strong>
                         <p className="f6 color-fg-muted mb-0">From the installation URL (usually 8 digits)</p>
@@ -219,7 +219,7 @@ openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in your-app.pem -out you
                   
                   <div className="Box Box--condensed">
                     <div className="Box-row d-flex gap-3">
-                      <CheckCircle size={20} className="color-fg-success flex-shrink-0" />
+                      <CheckCircleIcon size={20} className="color-fg-success flex-shrink-0" />
                       <div>
                         <strong className="d-block">Private Key</strong>
                         <p className="f6 color-fg-muted mb-0">Contents of the converted PKCS#8 .pem file</p>

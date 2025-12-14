@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react'
+import { GearIcon } from '@primer/octicons-react'
 
 export function GitHubAppForm({
   appId,
@@ -81,7 +81,7 @@ export function GitHubAppForm({
           disabled={!appId || !privateKey || !installationId}
           className="btn btn-primary btn-block mt-3"
         >
-          <Settings size={16} style={{marginRight: '0.5rem'}} />
+          <GearIcon size={16} style={{marginRight: '0.5rem'}} />
           Save & Authenticate
         </button>
       </div>

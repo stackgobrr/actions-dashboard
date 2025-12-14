@@ -1,4 +1,4 @@
-import { Maximize, Minimize } from 'lucide-react'
+import { ScreenFullIcon, ScreenNormalIcon } from '@primer/octicons-react'
 
 export function FullscreenToggle({ isFullscreen, onToggle }) {
   const label = isFullscreen ? "Exit Fullscreen" : "Fullscreen"
@@ -10,7 +10,7 @@ export function FullscreenToggle({ isFullscreen, onToggle }) {
       title={isFullscreen ? "Exit Fullscreen" : "Fullscreen (F)"}
       aria-label={label}
     >
-      {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+      {isFullscreen ? <ScreenNormalIcon size={16} /> : <ScreenFullIcon size={16} />}
     </button>
   )
 }

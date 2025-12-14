@@ -1,7 +1,7 @@
 import { 
-  GitBranch,
-  ExternalLink
-} from 'lucide-react'
+  GitBranchIcon,
+  LinkExternalIcon
+} from '@primer/octicons-react'
 import { getStatusIcon, getStatusClass, getLabelColor } from '../../utils/statusHelpers.jsx'
 
 export function RepoCard({ repoName, status }) {
@@ -35,7 +35,7 @@ export function RepoCard({ repoName, status }) {
             <div className="metadata-row branch-row d-flex flex-justify-between flex-items-center">
               <span className="color-fg-muted">Branch</span>
               <span className="d-flex flex-items-center gap-1">
-                <GitBranch size={11} />
+                <GitBranchIcon size={11} />
                 {status.branch || 'N/A'}
               </span>
             </div>
@@ -61,7 +61,7 @@ export function RepoCard({ repoName, status }) {
             <div className="metadata-row branch-row d-flex flex-justify-between flex-items-center">
               <span className="color-fg-muted">Branch</span>
               <span className="d-flex flex-items-center gap-1">
-                <GitBranch size={11} />
+                <GitBranchIcon size={11} />
                 N/A
               </span>
             </div>
@@ -78,7 +78,7 @@ export function RepoCard({ repoName, status }) {
           {status.url ? (
             <a href={status.url} target="_blank" rel="noopener noreferrer" className="Link--primary d-inline-flex flex-items-center gap-1" style={{fontSize: '11px'}}>
               <span>View Run</span>
-              <ExternalLink size={10} />
+              <LinkExternalIcon size={10} />
             </a>
           ) : (
             <span className="color-fg-muted" style={{fontSize: '11px'}}>No recent runs</span>
