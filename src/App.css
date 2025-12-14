@@ -17,7 +17,6 @@
   cursor: default;
   display: flex !important;
   flex-direction: column !important;
-  height: 100%;
 }
 
 .Box:hover {

@@ -34,6 +34,7 @@ export const getStatusClass = (status) => {
     return 'warning'
   }
   if (status.status === 'in_progress') return 'in-progress'
+  if (status.status === 'no_runs') return 'no_runs'
   return 'unknown'
 }
 

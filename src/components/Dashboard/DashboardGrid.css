@@ -1,0 +1,11 @@
+.dashboard-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-auto-rows: minmax(min-content, max-content);
+  gap: 16px;
+  min-height: 0;
+  overflow: auto;
+  align-content: start;
+  padding: 2px; /* Prevent focus outline clipping */
+}

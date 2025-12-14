@@ -1,7 +1,7 @@
 import { DashboardHeader } from './DashboardHeader'
 import { DashboardGrid } from './DashboardGrid'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
-import { getOptimalColumns, sortRepositories } from '../../utils/gridHelpers'
+import { sortRepositories } from '../../utils/gridHelpers'
 
 /**
  * Main dashboard container component
@@ -27,15 +27,15 @@ export function Dashboard({
   setRefreshInterval
 }) {
   const sortedRepos = sortRepositories(repoStatuses, sortBy)
-  const columns = getOptimalColumns(Object.keys(repoStatuses).length, isFullscreen)
 
   return (
     <div className="p-4" style={{
-      height: '100%', 
+      height: '100vh',
       maxWidth: isFullscreen ? 'none' : '1600px', 
       margin: '0 auto', 
       display: 'flex', 
-      flexDirection: 'column'
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
       {!isFullscreen && (
         <DashboardHeader
@@ -64,7 +64,7 @@ export function Dashboard({
           <div className="mb-2">Loading repository statuses...</div>
         </div>
       ) : (
-        <DashboardGrid repositories={sortedRepos} columns={columns} />
+        <DashboardGrid repositories={sortedRepos} />
       )}
       
       {isFullscreen && (

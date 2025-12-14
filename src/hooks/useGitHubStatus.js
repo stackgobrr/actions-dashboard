@@ -11,24 +11,30 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     try {
       const headers = token ? { 'Authorization': `token ${token}` } : {}
       
-      // Fetch latest workflow runs
-      const response = await fetch(
-        `https://api.github.com/repos/${GITHUB_OWNER}/${repoName}/actions/runs?per_page=1`,
-        { headers }
-      )
+      // Fetch repository info and latest workflow runs in parallel
+      const [repoResponse, runsResponse] = await Promise.all([
+        fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${repoName}`, { headers }),
+        fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${repoName}/actions/runs?per_page=1`, { headers })
+      ])
       
-      if (!response.ok) {
-        if (response.status === 401) {
+      if (!repoResponse.ok || !runsResponse.ok) {
+        if (repoResponse.status === 401 || runsResponse.status === 401) {
           return { error: 'Authentication required' }
         }
-        return { error: `HTTP ${response.status}` }
+        return { error: `HTTP ${repoResponse.status || runsResponse.status}` }
       }
 
-      const data = await response.json()
+      const repoData = await repoResponse.json()
+      const runsData = await runsResponse.json()
       
-      if (data.workflow_runs && data.workflow_runs.length > 0) {
-        const run = data.workflow_runs[0]
+      const result = {
+        description: repoData.description || null
+      }
+      
+      if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
+        const run = runsData.workflow_runs[0]
         return {
+          ...result,
           status: run.status,
           conclusion: run.conclusion,
           workflow: run.name,
@@ -39,7 +45,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
         }
       }
       
-      return { status: 'no_runs', conclusion: null }
+      return { ...result, status: 'no_runs', conclusion: null }
     } catch (error) {
       return { error: error.message }
     }
@@ -61,7 +67,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     
     for (const repo of allRepos) {
       const status = await fetchRepoStatus(repo.name, token)
-      statuses[repo.name] = { ...status, category: repo.category, description: repo.description }
+      statuses[repo.name] = { ...status, category: repo.category }
     }
 
     setRepoStatuses(statuses)

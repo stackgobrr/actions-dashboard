@@ -1,0 +1,180 @@
+.repo-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--borderColor-default);
+  border-radius: 6px;
+  background: var(--bgColor-default);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  min-width: 280px;
+}
+
+.repo-card:hover {
+  box-shadow: 0 3px 8px var(--color-shadow-medium);
+  transform: translateY(-1px);
+  border-color: var(--borderColor-emphasis);
+}
+
+.repo-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid var(--borderColor-default);
+  min-width: 0;
+}
+
+.repo-card__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fgColor-default);
+  word-break: break-word;
+  min-width: 0;
+  flex: 1;
+}
+
+.repo-card__description {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: var(--fgColor-muted);
+  line-height: 1.4;
+}
+
+.repo-card__status-icon {
+  flex-shrink: 0;
+}
+
+.repo-card__body {
+  flex: 1;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.repo-card__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  overflow: hidden;
+}
+
+.repo-card__label-text {
+  font-size: 12px;
+  color: var(--fgColor-muted);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.repo-card__value {
+  font-size: 12px;
+  color: var(--fgColor-default);
+  text-align: right;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.repo-card__value--bold {
+  font-weight: 600;
+}
+
+.repo-card__value--mono {
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+}
+
+/* Special handling for branch icon */
+.repo-card__value:has(svg) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.repo-card__error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fgColor-danger);
+}
+
+.repo-card__spacer {
+  flex: 1;
+}
+
+.repo-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--borderColor-default);
+}
+
+.repo-card__no-runs {
+  font-size: 12px;
+  color: var(--fgColor-muted);
+}
+
+/* Status stripes for different workflow states */
+.repo-card.success {
+  border-top: 3px solid var(--borderColor-success-emphasis) !important;
+}
+
+.repo-card.failure {
+  border-top: 3px solid var(--borderColor-danger-emphasis) !important;
+}
+
+.repo-card.in-progress {
+  border-top: 3px solid var(--borderColor-accent-emphasis) !important;
+}
+
+.repo-card.warning {
+  border-top: 3px solid var(--borderColor-attention-emphasis) !important;
+}
+
+.repo-card.error,
+.repo-card.unknown,
+.repo-card.no_runs {
+  border-top: 3px solid var(--borderColor-default) !important;
+}
+
+
+/* Container Queries - Ultra Compact Mode */
+@container (max-width: 180px) {
+  /* Hide "View Run" text, show only icon */
+  .repo-card__link {
+    font-size: 0;
+    gap: 0;
+  }
+  
+  .repo-card__link svg {
+    font-size: 12px;
+  }
+  
+  /* Replace "No recent runs" with "N/A" */
+  .repo-card__no-runs {
+    font-size: 0;
+  }
+  
+  .repo-card__no-runs::before {
+    content: 'N/A';
+    font-size: 12px;
+  }
+  
+  /* Truncate title even more aggressively */
+  .repo-card__title {
+    font-size: 12px;
+  }
+  
+  /* Make label text smaller */
+  .repo-card__label {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
