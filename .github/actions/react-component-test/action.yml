@@ -1,5 +1,5 @@
-name: Node Test Action
-description: Run npm tests for the project
+name: React Component Test Action
+description: Run unit and component tests for React application
 
 runs:
   using: composite
