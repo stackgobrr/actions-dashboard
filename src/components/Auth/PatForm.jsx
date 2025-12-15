@@ -58,17 +58,6 @@ export function PatForm({
       </div>
       <div style={{padding: '32px 40px 16px 40px'}}>
         <p className="color-fg-muted f5 mb-3">Simple authentication with your GitHub token, perfect for individual use.</p>
-        <p className="f6 mb-3">
-          <a 
-            href="https://github.com/settings/tokens/new?scopes=repo&description=GitHub-Actions-Dashboard" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="Link--primary"
-          >
-            Create a new token
-            <LinkExternalIcon size={14} style={{display: 'inline', marginLeft: '4px', verticalAlign: 'text-bottom'}} />
-          </a>
-        </p>
         <TextInput
           type="password"
           placeholder="ghp_xxxxxxxxxxxx"
@@ -97,6 +86,17 @@ export function PatForm({
             {isValidatingPat ? 'Validating Token...' : 'Save Token & Continue'}
           </Button>
         </div>
+        <p className="f6 mt-3 mb-0 text-center">
+          <a 
+            href="https://github.com/settings/tokens/new?scopes=repo&description=GitHub-Actions-Dashboard" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="Link--primary"
+          >
+            Create a new token
+            <LinkExternalIcon size={14} style={{display: 'inline', marginLeft: '4px', verticalAlign: 'text-bottom'}} />
+          </a>
+        </p>
       </div>
     </div>
   )
