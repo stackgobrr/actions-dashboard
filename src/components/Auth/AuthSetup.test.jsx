@@ -144,9 +144,14 @@ describe('AuthSetup Component', () => {
       expect(saveToken).toHaveBeenCalledOnce()
     })
 
-    it('shows local storage notice', () => {
+    it('shows security notice with protection measures', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Your credentials are stored locally in your browser. No data is sent to or stored on external servers.')).toBeInTheDocument()
+      expect(screen.getByText('Your data is protected:')).toBeInTheDocument()
+      expect(screen.getByText(/Credentials stored locally in your browser only/i)).toBeInTheDocument()
+      expect(screen.getByText(/Content Security Policy blocks unauthorized scripts/i)).toBeInTheDocument()
+      expect(screen.getByText(/No data transmission to external servers/i)).toBeInTheDocument()
+      expect(screen.getByText(/Same-origin policy prevents access from other sites/i)).toBeInTheDocument()
+      expect(screen.getByText('View our security practices')).toBeInTheDocument()
     })
   })
 
