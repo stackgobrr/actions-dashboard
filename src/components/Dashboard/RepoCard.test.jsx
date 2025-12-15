@@ -29,12 +29,15 @@ describe('RepoCard Component', () => {
     it('renders category label', () => {
       const status = {
         category: 'DevOps',
-        description: 'Infrastructure'
+        description: 'Infrastructure',
+        labels: []
       }
       
       render(<RepoCard repoName="infra" status={status} />)
       
-      expect(screen.getByText('DevOps')).toBeInTheDocument()
+      // Category label no longer displays by default, only when no custom labels are applied
+      // Since we're not showing category labels anymore, this test should check that it's NOT displayed
+      expect(screen.queryByText('DevOps')).not.toBeInTheDocument()
     })
   })
   

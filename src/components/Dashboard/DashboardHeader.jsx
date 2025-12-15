@@ -5,9 +5,12 @@ import {
   TrashIcon,
   PaintbrushIcon,
   FilterIcon,
-  ClockIcon
+  ClockIcon,
+  TagIcon,
+  XIcon,
+  ChevronDownIcon
 } from '@primer/octicons-react'
-import { Button, IconButton, Select, Checkbox } from '@primer/react'
+import { Button, IconButton, Select, Checkbox, Label, ActionMenu, ActionList } from '@primer/react'
 import { ThemeToggle } from '../UI/ThemeToggle'
 import { RefreshButton } from '../UI/RefreshButton'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
@@ -30,11 +33,28 @@ export function DashboardHeader({
   lastUpdate,
   fetchAllStatuses,
   loading,
-  onOpenSettings
+  onOpenSettings,
+  filterByLabels,
+  setFilterByLabels
 }) {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(nextTheme)
+  }
+
+  // Get custom labels from localStorage for the filter dropdown
+  const customLabels = JSON.parse(localStorage.getItem('customLabels') || '[]')
+  
+  const toggleLabelFilter = (labelName) => {
+    if (filterByLabels.includes(labelName)) {
+      setFilterByLabels(filterByLabels.filter(l => l !== labelName))
+    } else {
+      setFilterByLabels([...filterByLabels, labelName])
+    }
+  }
+  
+  const clearLabelFilters = () => {
+    setFilterByLabels([])
   }
 
   return (
@@ -119,6 +139,58 @@ export function DashboardHeader({
             <Select.Option value="status">Status</Select.Option>
           </Select>
         </div>
+        
+        {customLabels.length > 0 && (
+          <div className="d-flex flex-items-center gap-2">
+            <TagIcon size={16} className="color-fg-muted" />
+            <span className="f6 color-fg-muted">Filter:</span>
+            <ActionMenu>
+              <ActionMenu.Anchor>
+                <Button size="small" trailingAction={ChevronDownIcon}>
+                  {filterByLabels.length === 0 
+                    ? 'Select labels...' 
+                    : `${filterByLabels.length} selected`}
+                </Button>
+              </ActionMenu.Anchor>
+              <ActionMenu.Overlay width="medium">
+                <ActionList selectionVariant="multiple">
+                  {customLabels.map(label => (
+                    <ActionList.Item
+                      key={label.name}
+                      selected={filterByLabels.includes(label.name)}
+                      onSelect={() => toggleLabelFilter(label.name)}
+                    >
+                      <ActionList.LeadingVisual>
+                        <div
+                          style={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            backgroundColor: label.color
+                          }}
+                        />
+                      </ActionList.LeadingVisual>
+                      {label.name}
+                    </ActionList.Item>
+                  ))}
+                </ActionList>
+                {filterByLabels.length > 0 && (
+                  <>
+                    <ActionList.Divider />
+                    <ActionList>
+                      <ActionList.Item onSelect={clearLabelFilters}>
+                        <ActionList.LeadingVisual>
+                          <XIcon />
+                        </ActionList.LeadingVisual>
+                        Clear all filters
+                      </ActionList.Item>
+                    </ActionList>
+                  </>
+                )}
+              </ActionMenu.Overlay>
+            </ActionMenu>
+          </div>
+        )}
         
         <div className="d-flex flex-items-center gap-2">
           <ClockIcon size={16} className="color-fg-muted" />

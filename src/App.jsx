@@ -16,6 +16,7 @@ function App() {
   const [refreshInterval, setRefreshInterval] = useState(10)
   const [showGuide, setShowGuide] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [filterByLabels, setFilterByLabels] = useState([])
   const [selectedRepos, setSelectedRepos] = useState(() => {
     // Load from localStorage or use default
     const saved = localStorage.getItem('selectedRepos')
@@ -156,6 +157,8 @@ function App() {
         refreshInterval={refreshInterval}
         setRefreshInterval={setRefreshInterval}
         onOpenSettings={() => setShowSettings(true)}
+        filterByLabels={filterByLabels}
+        setFilterByLabels={setFilterByLabels}
       />
       {showSettings && (
         <Settings
