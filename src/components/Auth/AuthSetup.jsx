@@ -22,7 +22,10 @@ export function AuthSetup({
   handleGitHubAppSetup,
   handleDemoMode,
   handleLogout,
-  authMethod
+  authMethod,
+  patError,
+  isValidatingPat,
+  isValidatingGitHubApp
 }) {
   return (
     <>
@@ -111,6 +114,8 @@ export function AuthSetup({
                 githubToken={githubToken}
                 setGithubToken={setGithubToken}
                 onSubmit={saveToken}
+                patError={patError}
+                isValidatingPat={isValidatingPat}
               />
             </div>
             
@@ -183,6 +188,7 @@ export function AuthSetup({
             onSubmit={handleGitHubAppSetup}
             onBack={() => setShowGitHubAppForm(false)}
             onShowGuide={() => setShowGuide(true)}
+            isValidatingGitHubApp={isValidatingGitHubApp}
           />
         )}
       </div>

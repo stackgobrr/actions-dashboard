@@ -1,5 +1,6 @@
 import { GearIcon, LinkExternalIcon, ArrowLeftIcon } from '@primer/octicons-react'
 import { Button, TextInput, Textarea, FormControl, IconButton } from '@primer/react'
+import { useState } from 'react'
 
 export function GitHubAppForm({
   appId,
@@ -11,8 +12,94 @@ export function GitHubAppForm({
   appFormError,
   onSubmit,
   onBack,
-  onShowGuide
+  onShowGuide,
+  isValidatingGitHubApp
 }) {
+  const [validationErrors, setValidationErrors] = useState({
+    appId: '',
+    installationId: '',
+    privateKey: ''
+  })
+
+  // Validate App ID (should be a positive integer)
+  const validateAppId = (id) => {
+    if (!id) return 'App ID is required'
+    if (!/^\d+$/.test(id)) return 'App ID must be a number'
+    if (parseInt(id) <= 0) return 'App ID must be a positive number'
+    return ''
+  }
+
+  // Validate Installation ID (should be a positive integer)
+  const validateInstallationId = (id) => {
+    if (!id) return 'Installation ID is required'
+    if (!/^\d+$/.test(id)) return 'Installation ID must be a number'
+    if (parseInt(id) <= 0) return 'Installation ID must be a positive number'
+    return ''
+  }
+
+  // Validate Private Key (should be in PEM format)
+  const validatePrivateKey = (key) => {
+    if (!key) return 'Private Key is required'
+    
+    const trimmedKey = key.trim()
+    if (!trimmedKey.includes('-----BEGIN') || !trimmedKey.includes('-----END')) {
+      return 'Private Key must be in PEM format (BEGIN/END markers required)'
+    }
+    
+    // Check for common PEM formats
+    const pemPatterns = [
+      /-----BEGIN RSA PRIVATE KEY-----/,
+      /-----BEGIN PRIVATE KEY-----/,
+      /-----BEGIN ENCRYPTED PRIVATE KEY-----/
+    ]
+    
+    if (!pemPatterns.some(pattern => pattern.test(trimmedKey))) {
+      return 'Private Key must start with a valid PEM header'
+    }
+    
+    return ''
+  }
+
+  const handleAppIdChange = (e) => {
+    const value = e.target.value
+    setAppId(value)
+    if (validationErrors.appId) {
+      setValidationErrors({ ...validationErrors, appId: '' })
+    }
+  }
+
+  const handleInstallationIdChange = (e) => {
+    const value = e.target.value
+    setInstallationId(value)
+    if (validationErrors.installationId) {
+      setValidationErrors({ ...validationErrors, installationId: '' })
+    }
+  }
+
+  const handlePrivateKeyChange = (e) => {
+    const value = e.target.value
+    setPrivateKey(value)
+    if (validationErrors.privateKey) {
+      setValidationErrors({ ...validationErrors, privateKey: '' })
+    }
+  }
+
+  const handleSubmit = () => {
+    const errors = {
+      appId: validateAppId(appId),
+      installationId: validateInstallationId(installationId),
+      privateKey: validatePrivateKey(privateKey)
+    }
+
+    setValidationErrors(errors)
+
+    // If any validation errors, don't submit
+    if (errors.appId || errors.installationId || errors.privateKey) {
+      return
+    }
+
+    onSubmit()
+  }
   return (
     <div style={{
       boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
@@ -71,10 +158,14 @@ export function GitHubAppForm({
             type="text"
             placeholder="123456"
             value={appId}
-            onChange={(e) => setAppId(e.target.value)}
+            onChange={handleAppIdChange}
             block
             size="large"
+            validationStatus={validationErrors.appId ? 'error' : undefined}
           />
+          {validationErrors.appId && (
+            <p className="f6 color-fg-danger mt-2 mb-0">{validationErrors.appId}</p>
+          )}
         </div>
         
         <div style={{marginBottom: '12px'}}>
@@ -86,10 +177,14 @@ export function GitHubAppForm({
             type="text"
             placeholder="12345678"
             value={installationId}
-            onChange={(e) => setInstallationId(e.target.value)}
+            onChange={handleInstallationIdChange}
             block
             size="large"
+            validationStatus={validationErrors.installationId ? 'error' : undefined}
           />
+          {validationErrors.installationId && (
+            <p className="f6 color-fg-danger mt-2 mb-0">{validationErrors.installationId}</p>
+          )}
         </div>
         
         <div style={{marginBottom: '12px'}}>
@@ -100,10 +195,14 @@ export function GitHubAppForm({
             id="private-key"
             placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;...&#10;-----END RSA PRIVATE KEY-----"
             value={privateKey}
-            onChange={(e) => setPrivateKey(e.target.value)}
+            onChange={handlePrivateKeyChange}
             rows={8}
             block
+            validationStatus={validationErrors.privateKey ? 'error' : undefined}
           />
+          {validationErrors.privateKey && (
+            <p className="f6 color-fg-danger mt-2 mb-0">{validationErrors.privateKey}</p>
+          )}
         </div>
         
         {appFormError && (
@@ -114,14 +213,15 @@ export function GitHubAppForm({
         
         <div style={{marginTop: '16px'}}>
           <Button 
-            onClick={onSubmit} 
-            disabled={!appId || !privateKey || !installationId}
+            onClick={handleSubmit} 
+            disabled={!appId || !privateKey || !installationId || isValidatingGitHubApp}
             variant="primary"
             block
             size="large"
             leadingVisual={GearIcon}
+            loading={isValidatingGitHubApp}
           >
-            Save & Authenticate
+            {isValidatingGitHubApp ? 'Validating Credentials...' : 'Save & Authenticate'}
           </Button>
         </div>
         <p className="f6 color-fg-muted mt-3 mb-0 text-center">
