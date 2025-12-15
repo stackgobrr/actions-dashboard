@@ -7,7 +7,8 @@ import {
   TagIcon,
   XIcon,
   ChevronDownIcon,
-  BugIcon
+  BugIcon,
+  QuestionIcon
 } from '@primer/octicons-react'
 import { Button, IconButton, Select, Checkbox, Label, ActionMenu, ActionList } from '@primer/react'
 import { ThemeToggle } from '../UI/ThemeToggle'
@@ -39,7 +40,8 @@ export function DashboardHeader({
   allTopics,
   isDemoMode,
   toggleDemoMode,
-  canToggleDemoMode
+  canToggleDemoMode,
+  onToggleHotkeyHelper
 }) {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark'
@@ -93,6 +95,13 @@ export function DashboardHeader({
         </div>
         
         <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
+          <IconButton
+            icon={QuestionIcon}
+            onClick={onToggleHotkeyHelper}
+            aria-label="Keyboard shortcuts"
+            title="Keyboard shortcuts (H)"
+            size="medium"
+          />
           <IconButton
             icon={BugIcon}
             as="a"

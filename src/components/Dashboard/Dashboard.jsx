@@ -30,7 +30,8 @@ export function Dashboard({
   setFilterByLabels,
   isDemoMode,
   toggleDemoMode,
-  canToggleDemoMode
+  canToggleDemoMode,
+  onToggleHotkeyHelper
 }) {
   // Collect all unique topics from all repositories
   const allTopics = [...new Set(
@@ -83,6 +84,7 @@ export function Dashboard({
           isDemoMode={isDemoMode}
           toggleDemoMode={toggleDemoMode}
           canToggleDemoMode={canToggleDemoMode}
+          onToggleHotkeyHelper={onToggleHotkeyHelper}
         />
       )}
 

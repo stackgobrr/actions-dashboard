@@ -3,6 +3,7 @@ import './App.css'
 import { Dashboard } from './components/Dashboard/Dashboard'
 import { AuthSetup } from './components/Auth/AuthSetup'
 import { Settings } from './components/Settings/Settings'
+import { HotkeyHelper } from './components/UI/HotkeyHelper'
 import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
 import { useAuth } from './hooks/useAuth'
@@ -16,6 +17,7 @@ function App() {
   const [refreshInterval, setRefreshInterval] = useState(10)
   const [showGuide, setShowGuide] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showHotkeyHelper, setShowHotkeyHelper] = useState(false)
   const [filterByLabels, setFilterByLabels] = useState([])
   const [selectedRepos, setSelectedRepos] = useState(() => {
     // Load from localStorage or use default
@@ -91,6 +93,10 @@ function App() {
       }
 
       switch(e.key.toLowerCase()) {
+        case 'h':
+          // Toggle hotkey helper
+          setShowHotkeyHelper(prev => !prev)
+          break
         case 't':
           // Toggle between light and dark themes
           const nextTheme = theme === 'dark' ? 'light' : 'dark'
@@ -169,6 +175,7 @@ function App() {
         isDemoMode={isDemoMode}
         toggleDemoMode={toggleDemoMode}
         canToggleDemoMode={canToggleDemoMode}
+        onToggleHotkeyHelper={() => setShowHotkeyHelper(prev => !prev)}
       />
       {showSettings && (
         <Settings
@@ -178,6 +185,10 @@ function App() {
           onSaveRepos={handleSaveRepos}
         />
       )}
+      <HotkeyHelper 
+        isOpen={showHotkeyHelper} 
+        onClose={() => setShowHotkeyHelper(false)} 
+      />
     </>
   )
 }
