@@ -88,7 +88,7 @@ describe('GitHubAppForm Component - Critical Functionality', () => {
       const onShowGuide = vi.fn()
       render(<GitHubAppForm {...defaultProps} onShowGuide={onShowGuide} />)
       
-      await userEvent.click(screen.getByText('View setup guide'))
+      await userEvent.click(screen.getByText('Need help setting up?'))
       expect(onShowGuide).toHaveBeenCalledOnce()
     })
   })

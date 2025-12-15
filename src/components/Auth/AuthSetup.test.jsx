@@ -67,16 +67,16 @@ describe('AuthSetup Component', () => {
 
     it('shows setup guide link', () => {
       render(<AuthSetup {...defaultProps} />)
-      const guideLinks = screen.getAllByText('View setup guide')
+      const guideLinks = screen.getAllByText('Need help?')
       expect(guideLinks.length).toBeGreaterThan(0)
     })
 
-    it('opens guide when View setup guide clicked', async () => {
+    it('opens guide when Need help link clicked', async () => {
       const user = userEvent.setup()
       const setShowGuide = vi.fn()
       render(<AuthSetup {...defaultProps} setShowGuide={setShowGuide} />)
       
-      const guideLinks = screen.getAllByText('View setup guide')
+      const guideLinks = screen.getAllByText('Need help?')
       await user.click(guideLinks[0])
       expect(setShowGuide).toHaveBeenCalledWith(true)
     })
