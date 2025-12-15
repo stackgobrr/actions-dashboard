@@ -8,7 +8,8 @@ import {
   XIcon,
   ChevronDownIcon,
   BugIcon,
-  QuestionIcon
+  QuestionIcon,
+  HeartIcon
 } from '@primer/octicons-react'
 import { Button, IconButton, Select, Checkbox, Label, ActionMenu, ActionList } from '@primer/react'
 import { ThemeToggle } from '../UI/ThemeToggle'
@@ -101,6 +102,23 @@ export function DashboardHeader({
             aria-label="Keyboard shortcuts"
             title="Keyboard shortcuts (H)"
             size="medium"
+          />
+          <IconButton
+            icon={HeartIcon}
+            as="a"
+            href="https://github.com/sponsors/h3ow3d"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Support this project"
+            title="Support this project ❤️"
+            size="medium"
+            sx={{
+              color: 'var(--fgColor-danger)',
+              '&:hover': {
+                color: 'var(--fgColor-danger)',
+                backgroundColor: 'var(--bgColor-danger-muted)'
+              }
+            }}
           />
           <IconButton
             icon={BugIcon}
