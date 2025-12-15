@@ -24,9 +24,21 @@ export function Dashboard({
   autoRefresh,
   setAutoRefresh,
   refreshInterval,
-  setRefreshInterval
+  setRefreshInterval,
+  onOpenSettings,
+  filterByLabels,
+  setFilterByLabels
 }) {
-  const sortedRepos = sortRepositories(repoStatuses, sortBy)
+  // Filter repositories by labels first, then sort
+  const filteredRepos = filterByLabels.length > 0
+    ? Object.fromEntries(
+        Object.entries(repoStatuses).filter(([_, status]) => 
+          status.labels && status.labels.some(label => filterByLabels.includes(label))
+        )
+      )
+    : repoStatuses
+  
+  const sortedRepos = sortRepositories(filteredRepos, sortBy)
 
   return (
     <div 
@@ -55,6 +67,9 @@ export function Dashboard({
           lastUpdate={lastUpdate}
           fetchAllStatuses={fetchAllStatuses}
           loading={loading}
+          onOpenSettings={onOpenSettings}
+          filterByLabels={filterByLabels}
+          setFilterByLabels={setFilterByLabels}
         />
       )}
 

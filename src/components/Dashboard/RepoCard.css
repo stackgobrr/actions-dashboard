@@ -58,6 +58,13 @@
   line-height: 1.4;
 }
 
+.repo-card__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
 .repo-card__status-icon {
   flex-shrink: 0;
 }

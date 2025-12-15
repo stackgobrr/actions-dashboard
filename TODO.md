@@ -40,6 +40,7 @@
 - [ ] UI for adding/removing repositories
 - [ ] Persist configuration to localStorage
 - [ ] Import/export configuration
+- [ ] UI to enable/disable specific repositories from view
 
 ### Configuration Options
 - [ ] GitHub owner/organization (default: h3ow3d)
@@ -76,6 +77,14 @@
 - [ ] Filter by status (success, failure, in-progress)
 - [ ] Filter by category
 - [ ] Filter by workflow name
+- [ ] Sort by most PRs open
+
+### Pagination & Auto-play
+- [ ] Implement pagination for large repository lists
+- [ ] Configurable cards per page
+- [ ] Auto-play mode with timer-based pagination
+- [ ] User controls to enable/disable auto-play
+- [ ] Configurable auto-play interval
 
 ### Notifications
 - [ ] Browser notifications for status changes

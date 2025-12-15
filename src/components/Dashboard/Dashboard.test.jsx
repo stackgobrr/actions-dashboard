@@ -21,7 +21,10 @@ describe('Dashboard Component - Critical Functionality', () => {
     autoRefresh: true,
     setAutoRefresh: vi.fn(),
     refreshInterval: 10,
-    setRefreshInterval: vi.fn()
+    setRefreshInterval: vi.fn(),
+    onOpenSettings: vi.fn(),
+    filterByLabels: [],
+    setFilterByLabels: vi.fn()
   }
 
   describe('Repository Display', () => {

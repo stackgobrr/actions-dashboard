@@ -10,6 +10,9 @@ import './RepoCard.css'
 export function RepoCard({ repoName, status }) {
   const labelColor = getLabelColor(status.category)
   const hasPRs = status.openPRCount > 0
+  
+  // Get custom labels from localStorage
+  const customLabels = JSON.parse(localStorage.getItem('customLabels') || '[]')
 
   return (
     <div className={`repo-card ${getStatusClass(status)}`}>
@@ -82,17 +85,25 @@ export function RepoCard({ repoName, status }) {
         ) : (
           <span className="repo-card__no-runs">No recent runs</span>
         )}
-        <Label 
-          sx={{
-            color: labelColor.text,
-            backgroundColor: labelColor.bg,
-            borderColor: labelColor.border,
-            borderWidth: 1,
-            borderStyle: 'solid'
-          }}
-        >
-          {status.category}
-        </Label>
+        <div className="repo-card__labels">
+          {status.labels && status.labels.length > 0 && (
+            status.labels.map(labelName => {
+              const labelDef = customLabels.find(l => l.name === labelName)
+              return labelDef ? (
+                <Label
+                  key={labelName}
+                  sx={{
+                    backgroundColor: labelDef.color,
+                    color: 'white',
+                    fontSize: 0
+                  }}
+                >
+                  {labelName}
+                </Label>
+              ) : null
+            })
+          )}
+        </div>
       </div>
     </div>
   )
