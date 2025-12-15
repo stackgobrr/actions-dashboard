@@ -41,14 +41,15 @@ describe('AuthSetup Component', () => {
 
     it('renders OR divider between options', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('OR')).toBeInTheDocument()
+      const orDividers = screen.getAllByText('OR')
+      expect(orDividers.length).toBeGreaterThan(0)
     })
   })
 
   describe('GitHub App Option', () => {
     it('displays GitHub App description', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('More secure, automatic token refresh, fine-grained permissions.')).toBeInTheDocument()
+      expect(screen.getByText('Enhanced security with automatic token refresh, ideal for professional use.')).toBeInTheDocument()
     })
 
     it('shows Configure GitHub App button', () => {
@@ -85,7 +86,7 @@ describe('AuthSetup Component', () => {
   describe('Personal Access Token Option', () => {
     it('displays PAT description', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText(/Simple setup, use a PAT with/)).toBeInTheDocument()
+      expect(screen.getByText('Simple authentication with your GitHub token, perfect for individual use.')).toBeInTheDocument()
     })
 
     it('shows Create a new token link', () => {
