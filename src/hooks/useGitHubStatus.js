@@ -1,11 +1,42 @@
 import { useState, useEffect } from 'react'
+import { MOCK_REPO_STATUSES } from '../data/mockRepoStatuses'
 
 const GITHUB_OWNER = 'h3ow3d'
+
+/**
+ * Check if we're in a demo-capable environment
+ * (localhost or Vercel preview deployments)
+ */
+const isDemoCapableEnvironment = () => {
+  if (typeof window === 'undefined') return false
+  const hostname = window.location.hostname
+  
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname.includes('-git-') || // Vercel preview URLs contain -git-
+    hostname.includes('.vercel.app') // All Vercel preview deployments
+  )
+}
+
+/**
+ * Check if demo mode is currently enabled
+ * Demo mode is enabled by default in demo-capable environments,
+ * but can be disabled by the user (stored in localStorage)
+ */
+const isDemoModeEnabled = () => {
+  if (!isDemoCapableEnvironment()) return false
+  
+  // Check if user has explicitly disabled demo mode
+  const demoModeDisabled = localStorage.getItem('demoModeDisabled') === 'true'
+  return !demoModeDisabled
+}
 
 export function useGitHubStatus(repositories, getActiveToken, authMethod, showAuthSetup, autoRefresh, refreshInterval) {
   const [repoStatuses, setRepoStatuses] = useState({})
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
+  const [isDemoMode, setIsDemoMode] = useState(isDemoModeEnabled())
 
   // Create a stable key from repositories to detect real changes
   const reposKey = JSON.stringify(
@@ -14,6 +45,21 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       .map(r => r.name)
       .sort()
   )
+
+  // Function to toggle demo mode
+  const toggleDemoMode = () => {
+    const newDemoMode = !isDemoMode
+    setIsDemoMode(newDemoMode)
+    
+    // Store preference in localStorage
+    if (isDemoCapableEnvironment()) {
+      localStorage.setItem('demoModeDisabled', String(!newDemoMode))
+    }
+    
+    // Clear statuses to force re-fetch
+    setRepoStatuses({})
+    setLoading(true)
+  }
 
   const fetchRepoStatus = async (repoName, token) => {
     try {
@@ -102,6 +148,39 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   }
 
   useEffect(() => {
+    // Use demo data for local development and Vercel previews
+    if (isDemoMode) {
+      setRepoStatuses(MOCK_REPO_STATUSES)
+      setLastUpdate(new Date())
+      setLoading(false)
+      
+      // Cycle the animation demo card through different statuses to showcase pulse effect
+      const statusCycle = [
+        { status: 'completed', conclusion: 'success' },
+        { status: 'completed', conclusion: 'failure' },
+        { status: 'in_progress', conclusion: null },
+        { status: 'completed', conclusion: 'cancelled' }
+      ]
+      let cycleIndex = 0
+      
+      const cycleInterval = setInterval(() => {
+        cycleIndex = (cycleIndex + 1) % statusCycle.length
+        const nextStatus = statusCycle[cycleIndex]
+        
+        setRepoStatuses(prev => ({
+          ...prev,
+          'demo-pulse-animation': {
+            ...prev['demo-pulse-animation'],
+            ...nextStatus,
+            updatedAt: new Date().toISOString()
+          }
+        }))
+      }, 5000) // Change status every 5 seconds
+      
+      return () => clearInterval(cycleInterval)
+    }
+    
+    // Normal production flow
     if (!showAuthSetup && authMethod !== 'none') {
       fetchAllStatuses()
       
@@ -110,12 +189,15 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
         return () => clearInterval(interval)
       }
     }
-  }, [showAuthSetup, authMethod, autoRefresh, refreshInterval, reposKey])
+  }, [showAuthSetup, authMethod, autoRefresh, refreshInterval, reposKey, isDemoMode])
 
   return {
     repoStatuses,
     loading,
     lastUpdate,
-    fetchAllStatuses
+    fetchAllStatuses,
+    isDemoMode,
+    toggleDemoMode,
+    canToggleDemoMode: isDemoCapableEnvironment()
   }
 }

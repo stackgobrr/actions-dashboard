@@ -191,11 +191,13 @@
     border-top-color: var(--borderColor-success-emphasis);
     transform: scale(1);
     box-shadow: 0 1px 3px var(--color-shadow-small);
+    background-color: var(--bgColor-default);
   }
   50% { 
     border-top-color: var(--color-success-emphasis);
     transform: scale(1.02);
     box-shadow: 0 0 0 3px rgba(26, 127, 55, 0.3);
+    background-color: rgba(26, 127, 55, 0.08);
   }
 }
 
@@ -204,11 +206,13 @@
     border-top-color: var(--borderColor-danger-emphasis);
     transform: scale(1);
     box-shadow: 0 1px 3px var(--color-shadow-small);
+    background-color: var(--bgColor-default);
   }
   50% { 
     border-top-color: var(--color-danger-emphasis);
     transform: scale(1.02);
     box-shadow: 0 0 0 3px rgba(207, 34, 46, 0.3);
+    background-color: rgba(207, 34, 46, 0.08);
   }
 }
 
@@ -217,11 +221,13 @@
     border-top-color: var(--borderColor-accent-emphasis);
     transform: scale(1);
     box-shadow: 0 1px 3px var(--color-shadow-small);
+    background-color: var(--bgColor-default);
   }
   50% { 
     border-top-color: var(--color-accent-emphasis);
     transform: scale(1.02);
     box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+    background-color: rgba(9, 105, 218, 0.08);
   }
 }
 
@@ -230,11 +236,13 @@
     border-top-color: var(--borderColor-attention-emphasis);
     transform: scale(1);
     box-shadow: 0 1px 3px var(--color-shadow-small);
+    background-color: var(--bgColor-default);
   }
   50% { 
     border-top-color: var(--color-attention-emphasis);
     transform: scale(1.02);
     box-shadow: 0 0 0 3px rgba(191, 135, 0, 0.3);
+    background-color: rgba(191, 135, 0, 0.08);
   }
 }
 

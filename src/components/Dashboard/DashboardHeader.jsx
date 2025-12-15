@@ -35,7 +35,10 @@ export function DashboardHeader({
   onOpenSettings,
   filterByLabels,
   setFilterByLabels,
-  allTopics
+  allTopics,
+  isDemoMode,
+  toggleDemoMode,
+  canToggleDemoMode
 }) {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark'
@@ -58,11 +61,26 @@ export function DashboardHeader({
     <header className="pb-3 mb-3 border-bottom">
       <div className="d-flex flex-justify-between flex-items-center mb-2">
         <div>
-          <h1 className="f3 text-normal mb-1">
+          <h1 className="f3 text-normal mb-1 d-flex flex-items-center" style={{ gap: '8px' }}>
             <MarkGithubIcon size={24} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
             Actions Dashboard
+            {canToggleDemoMode && (
+              <Label 
+                variant={isDemoMode ? "attention" : "success"}
+                size="small"
+                sx={{ cursor: 'pointer' }}
+                onClick={toggleDemoMode}
+                title={isDemoMode ? "Click to disable demo mode and use real data" : "Click to enable demo mode"}
+              >
+                {isDemoMode ? "Demo Mode" : "Live Mode"}
+              </Label>
+            )}
           </h1>
-          <p className="f6 color-fg-muted mb-0">Real-time GitHub Actions status for all repositories</p>
+          <p className="f6 color-fg-muted mb-0">
+            {isDemoMode 
+              ? "Showing demo data - click badge to connect to real repositories" 
+              : "Real-time GitHub Actions status for all repositories"}
+          </p>
         </div>
         
         <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
