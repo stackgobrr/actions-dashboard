@@ -29,11 +29,17 @@ export function Dashboard({
   filterByLabels,
   setFilterByLabels
 }) {
-  // Filter repositories by labels first, then sort
+  // Collect all unique topics from all repositories
+  const allTopics = [...new Set(
+    Object.values(repoStatuses)
+      .flatMap(status => status.topics || [])
+  )].sort()
+  
+  // Filter repositories by labels (topics) first, then sort
   const filteredRepos = filterByLabels.length > 0
     ? Object.fromEntries(
         Object.entries(repoStatuses).filter(([_, status]) => 
-          status.labels && status.labels.some(label => filterByLabels.includes(label))
+          status.topics && status.topics.some(topic => filterByLabels.includes(topic))
         )
       )
     : repoStatuses
@@ -70,6 +76,7 @@ export function Dashboard({
           onOpenSettings={onOpenSettings}
           filterByLabels={filterByLabels}
           setFilterByLabels={setFilterByLabels}
+          allTopics={allTopics}
         />
       )}
 

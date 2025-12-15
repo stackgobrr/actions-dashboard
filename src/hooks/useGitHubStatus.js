@@ -39,7 +39,8 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       
       const result = {
         description: repoData.description || null,
-        openPRCount: Array.isArray(prsData) ? prsData.length : 0
+        openPRCount: Array.isArray(prsData) ? prsData.length : 0,
+        topics: repoData.topics || []
       }
       
       if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {

@@ -61,3 +61,36 @@ export const getLabelColor = (category) => {
   
   return { text: textColor, bg: bgColor, border: borderColor }
 }
+
+/**
+ * Color palette for topics (matches GitHub label colors)
+ */
+const TOPIC_COLOR_PALETTE = [
+  '#0969da', // blue
+  '#1a7f37', // green
+  '#cf222e', // red
+  '#8250df', // purple
+  '#bf8700', // yellow
+  '#bc4c00', // orange
+  '#1b7c83', // teal
+  '#622cbc', // indigo
+  '#c93c7e', // pink
+  '#656d76'  // gray
+]
+
+/**
+ * Assigns a consistent color to a topic based on its name
+ * @param {string} topic - Topic name
+ * @returns {string} Hex color code
+ */
+export const getTopicColor = (topic) => {
+  // Generate a consistent hash from the topic name
+  let hash = 0
+  for (let i = 0; i < topic.length; i++) {
+    hash = topic.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  
+  // Use the hash to select a color from the palette
+  const index = Math.abs(hash) % TOPIC_COLOR_PALETTE.length
+  return TOPIC_COLOR_PALETTE[index]
+}
