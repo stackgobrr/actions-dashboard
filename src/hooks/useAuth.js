@@ -39,6 +39,8 @@ export function useAuth() {
       } else if (localStorage.getItem('github_token')) {
         setGithubToken(localStorage.getItem('github_token'))
         setAuthMethod('pat')
+      } else if (localStorage.getItem('demo_mode') === 'true') {
+        setAuthMethod('demo')
       } else {
         setShowAuthSetup(true)
       }
@@ -70,12 +72,20 @@ export function useAuth() {
     if (authMethod === 'github-app') {
       clearGitHubAppAuth()
       setAppInfo(null)
+    } else if (authMethod === 'demo') {
+      localStorage.removeItem('demo_mode')
     } else {
       localStorage.removeItem('github_token')
     }
     setGithubToken('')
     setAuthMethod('none')
     setShowAuthSetup(true)
+  }
+  
+  const handleDemoMode = () => {
+    localStorage.setItem('demo_mode', 'true')
+    setAuthMethod('demo')
+    setShowAuthSetup(false)
   }
 
   const handleGitHubAppSetup = async () => {
@@ -136,6 +146,7 @@ export function useAuth() {
     saveToken,
     clearToken,
     handleLogout,
-    handleGitHubAppSetup
+    handleGitHubAppSetup,
+    handleDemoMode
   }
 }

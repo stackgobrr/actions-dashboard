@@ -135,6 +135,9 @@ function App() {
         setPrivateKey={auth.setPrivateKey}
         appFormError={auth.appFormError}
         handleGitHubAppSetup={auth.handleGitHubAppSetup}
+        handleDemoMode={auth.handleDemoMode}
+        handleLogout={auth.handleLogout}
+        authMethod={auth.authMethod}
       />
     )
   }

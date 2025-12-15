@@ -65,13 +65,19 @@ export function DashboardHeader({
           <h1 className="f3 text-normal mb-1 d-flex flex-items-center" style={{ gap: '8px' }}>
             <MarkGithubIcon size={24} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
             Actions Dashboard
-            {canToggleDemoMode && (
+            {(isDemoMode || canToggleDemoMode) && (
               <Label 
                 variant={isDemoMode ? "attention" : "success"}
                 size="small"
-                sx={{ cursor: 'pointer' }}
-                onClick={toggleDemoMode}
-                title={isDemoMode ? "Click to disable demo mode and use real data" : "Click to enable demo mode"}
+                sx={{ cursor: canToggleDemoMode ? 'pointer' : 'default' }}
+                onClick={canToggleDemoMode ? toggleDemoMode : undefined}
+                title={
+                  !canToggleDemoMode && isDemoMode 
+                    ? "Demo Mode (selected as authentication method)"
+                    : isDemoMode 
+                      ? "Click to disable demo mode and use real data" 
+                      : "Click to enable demo mode"
+                }
               >
                 {isDemoMode ? "Demo Mode" : "Live Mode"}
               </Label>
@@ -79,7 +85,9 @@ export function DashboardHeader({
           </h1>
           <p className="f6 color-fg-muted mb-0">
             {isDemoMode 
-              ? "Showing demo data - click badge to connect to real repositories" 
+              ? canToggleDemoMode
+                ? "Showing demo data - click badge to connect to real repositories"
+                : "Showing demo data - logout to connect to real repositories"
               : "Real-time GitHub Actions status for all repositories"}
           </p>
         </div>
@@ -122,6 +130,14 @@ export function DashboardHeader({
               onClick={clearToken} 
               aria-label="Sign out"
               title="Sign out"
+              size="medium"
+            />
+          ) : authMethod === 'demo' ? (
+            <IconButton 
+              icon={SignOutIcon}
+              onClick={handleLogout} 
+              aria-label="Sign out of demo mode"
+              title="Sign out of demo mode"
               size="medium"
             />
           ) : null}

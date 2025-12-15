@@ -19,22 +19,18 @@ const isDemoCapableEnvironment = () => {
 
 /**
  * Check if demo mode is currently enabled
- * Demo mode is enabled by default in demo-capable environments,
- * but can be disabled by the user (stored in localStorage)
+ * Demo mode is only enabled when explicitly selected as auth method
  */
-const isDemoModeEnabled = () => {
-  if (!isDemoCapableEnvironment()) return false
-  
-  // Check if user has explicitly disabled demo mode
-  const demoModeDisabled = localStorage.getItem('demoModeDisabled') === 'true'
-  return !demoModeDisabled
+const isDemoModeEnabled = (authMethod) => {
+  // Demo mode only enabled when explicitly selected as authentication method
+  return authMethod === 'demo'
 }
 
 export function useGitHubStatus(repositories, getActiveToken, authMethod, showAuthSetup, autoRefresh, refreshInterval) {
   const [repoStatuses, setRepoStatuses] = useState({})
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
-  const [isDemoMode, setIsDemoMode] = useState(isDemoModeEnabled())
+  const [isDemoMode, setIsDemoMode] = useState(isDemoModeEnabled(authMethod))
 
   // Create a stable key from repositories to detect real changes
   const reposKey = JSON.stringify(
@@ -44,19 +40,10 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       .sort()
   )
 
-  // Function to toggle demo mode
+  // Function to toggle demo mode (deprecated - demo mode now only accessible via auth page)
   const toggleDemoMode = () => {
-    const newDemoMode = !isDemoMode
-    setIsDemoMode(newDemoMode)
-    
-    // Store preference in localStorage
-    if (isDemoCapableEnvironment()) {
-      localStorage.setItem('demoModeDisabled', String(!newDemoMode))
-    }
-    
-    // Clear statuses to force re-fetch
-    setRepoStatuses({})
-    setLoading(true)
+    // No-op: Demo mode can only be selected from auth page
+    return
   }
 
   const fetchRepoStatus = async (repo, token) => {
@@ -146,8 +133,13 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     setLoading(false)
   }
 
+  // Update demo mode when authMethod changes
   useEffect(() => {
-    // Use demo data for local development and Vercel previews
+    setIsDemoMode(isDemoModeEnabled(authMethod))
+  }, [authMethod])
+
+  useEffect(() => {
+    // Use demo data when in demo mode (selected as auth or environment-based)
     if (isDemoMode) {
       setRepoStatuses(MOCK_REPO_STATUSES)
       setLastUpdate(new Date())
@@ -180,7 +172,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     }
     
     // Normal production flow
-    if (!showAuthSetup && authMethod !== 'none') {
+    if (!showAuthSetup && authMethod !== 'none' && authMethod !== 'demo') {
       fetchAllStatuses()
       
       if (autoRefresh) {
@@ -197,6 +189,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     fetchAllStatuses,
     isDemoMode,
     toggleDemoMode,
-    canToggleDemoMode: isDemoCapableEnvironment()
+    // Demo mode can only be selected from the auth page, not toggled from dashboard
+    canToggleDemoMode: false
   }
 }

@@ -1,4 +1,4 @@
-import { KeyIcon, LinkExternalIcon } from '@primer/octicons-react'
+import { KeyIcon, LinkExternalIcon, UnlockIcon } from '@primer/octicons-react'
 import { Button, TextInput } from '@primer/react'
 
 export function PatForm({
@@ -20,7 +20,7 @@ export function PatForm({
         </h2>
       </div>
       <div style={{padding: '32px 40px 16px 40px'}}>
-        <p className="color-fg-muted f5 mb-3">Simple setup, use a PAT with <code className="p-1">repo</code> scope.</p>
+        <p className="color-fg-muted f5 mb-3">Simple authentication with your GitHub token, perfect for individual use.</p>
         <p className="f6 mb-3">
           <a 
             href="https://github.com/settings/tokens/new?scopes=repo&description=GitHub-Actions-Dashboard" 
@@ -47,7 +47,7 @@ export function PatForm({
             variant="primary"
             block
             size="large"
-            leadingVisual={KeyIcon}
+            leadingVisual={UnlockIcon}
           >
             Save Token & Continue
           </Button>
