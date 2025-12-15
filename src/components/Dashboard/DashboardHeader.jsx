@@ -3,7 +3,6 @@ import {
   GearIcon,
   SignOutIcon,
   TrashIcon,
-  PaintbrushIcon,
   FilterIcon,
   ClockIcon,
   TagIcon,
@@ -105,22 +104,7 @@ export function DashboardHeader({
       </div>
       
       <div className="d-flex flex-wrap flex-items-center gap-3">
-        <div className="d-flex flex-items-center gap-2">
-          <PaintbrushIcon size={16} className="color-fg-muted" />
-          <label htmlFor="theme-select" className="f6 color-fg-muted">
-            Theme:
-          </label>
-          <Select 
-            id="theme-select"
-            value={theme} 
-            onChange={(e) => setTheme(e.target.value)}
-            size="small"
-          >
-            <Select.Option value="dark">Dark</Select.Option>
-            <Select.Option value="light">Light</Select.Option>
-          </Select>
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
-        </div>
+        <ThemeToggle theme={theme} onToggle={toggleTheme} />
         
         <div className="d-flex flex-items-center gap-2">
           <FilterIcon size={16} className="color-fg-muted" />
