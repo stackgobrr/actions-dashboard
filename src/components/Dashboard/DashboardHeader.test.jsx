@@ -21,7 +21,11 @@ describe('DashboardHeader Component', () => {
     setRefreshInterval: vi.fn(),
     lastUpdate: new Date('2025-12-14T11:30:00'),
     fetchAllStatuses: vi.fn(),
-    loading: false
+    loading: false,
+    onOpenSettings: vi.fn(),
+    filterByLabels: [],
+    setFilterByLabels: vi.fn(),
+    allTopics: []
   }
 
   describe('Basic Rendering', () => {
@@ -84,58 +88,39 @@ describe('DashboardHeader Component', () => {
       expect(handleLogout).toHaveBeenCalledOnce()
     })
 
-    it('shows Clear Token button for PAT auth', () => {
+    it('shows Sign Out button for PAT auth', () => {
       render(<DashboardHeader {...defaultProps} authMethod="pat" />)
-      expect(screen.getByRole('button', { name: /clear token/i })).toBeInTheDocument()
+      expect(screen.getByLabelText('Sign out')).toBeInTheDocument()
     })
 
-    it('calls clearToken when Clear Token clicked', async () => {
+    it('calls clearToken when Sign Out clicked for PAT', async () => {
       const user = userEvent.setup()
       const clearToken = vi.fn()
       render(<DashboardHeader {...defaultProps} authMethod="pat" clearToken={clearToken} />)
       
-      await user.click(screen.getByRole('button', { name: /clear token/i }))
+      await user.click(screen.getByLabelText('Sign out'))
       expect(clearToken).toHaveBeenCalledOnce()
     })
 
     it('shows no auth controls when authMethod is none', () => {
       render(<DashboardHeader {...defaultProps} authMethod="none" />)
-      expect(screen.queryByText(/clear token/i)).not.toBeInTheDocument()
       expect(screen.queryByLabelText('Sign out')).not.toBeInTheDocument()
     })
   })
 
-  describe('Theme Selection', () => {
-    it('renders theme selector with correct value', () => {
-      render(<DashboardHeader {...defaultProps} theme="light" />)
-      const select = screen.getByLabelText('Theme:')
-      expect(select).toHaveValue('light')
-    })
-
-    it('calls setTheme when theme changes', async () => {
-      const user = userEvent.setup()
-      const setTheme = vi.fn()
-      render(<DashboardHeader {...defaultProps} setTheme={setTheme} />)
-      
-      await user.selectOptions(screen.getByLabelText('Theme:'), 'light')
-      expect(setTheme).toHaveBeenCalledWith('light')
+  describe('Theme Toggle', () => {
+    it('renders theme toggle button', () => {
+      render(<DashboardHeader {...defaultProps} theme="dark" />)
+      const button = screen.getByLabelText('Switch to light theme')
+      expect(button).toBeInTheDocument()
     })
   })
 
   describe('Sort Selection', () => {
-    it('renders sort selector with correct value', () => {
-      render(<DashboardHeader {...defaultProps} sortBy="group" />)
-      const select = screen.getByLabelText('Sort:')
-      expect(select).toHaveValue('group')
-    })
-
-    it('calls setSortBy when sort changes', async () => {
-      const user = userEvent.setup()
-      const setSortBy = vi.fn()
-      render(<DashboardHeader {...defaultProps} setSortBy={setSortBy} />)
-      
-      await user.selectOptions(screen.getByLabelText('Sort:'), 'status')
-      expect(setSortBy).toHaveBeenCalledWith('status')
+    it('renders sort button', () => {
+      render(<DashboardHeader {...defaultProps} sortBy="last-run-desc" />)
+      // Sort is now an ActionMenu button, check for its presence
+      expect(screen.getByText('Last Run (Newest)')).toBeInTheDocument()
     })
   })
 
@@ -157,16 +142,16 @@ describe('DashboardHeader Component', () => {
 
     it('shows interval selector when auto-refresh enabled', () => {
       render(<DashboardHeader {...defaultProps} autoRefresh={true} />)
-      const selects = screen.getAllByRole('combobox')
-      // Should have 3 selects: theme, sort, and refresh interval
-      expect(selects).toHaveLength(3)
+      const select = screen.getByRole('combobox')
+      // Should have refresh interval select
+      expect(select).toBeInTheDocument()
     })
 
     it('hides interval selector when auto-refresh disabled', () => {
       render(<DashboardHeader {...defaultProps} autoRefresh={false} />)
-      const selects = screen.getAllByRole('combobox')
-      // Should have only 2 selects: theme and sort
-      expect(selects).toHaveLength(2)
+      const select = screen.queryByRole('combobox')
+      // Should have no selects when auto-refresh is disabled
+      expect(select).not.toBeInTheDocument()
     })
   })
 
