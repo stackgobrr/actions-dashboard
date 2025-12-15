@@ -28,7 +28,7 @@ export function getOptimalColumns(itemCount, isFullscreen = false) {
 /**
  * Sort repository entries by specified criteria
  * @param {Object} repos - Repository status object
- * @param {string} sortBy - Sort method: 'last-run-desc', 'last-run-asc', 'group', 'status'
+ * @param {string} sortBy - Sort method: 'last-run-desc', 'last-run-asc', 'pr-count', 'status'
  * @returns {Array} Sorted array of [name, status] tuples
  */
 export function sortRepositories(repos, sortBy) {
@@ -47,12 +47,14 @@ export function sortRepositories(repos, sortBy) {
         const dateB = b[1].updatedAt ? new Date(b[1].updatedAt) : new Date(0)
         return dateA - dateB
       })
-    case 'group':
+    case 'pr-count':
       return entries.sort((a, b) => {
-        if (a[1].category === b[1].category) {
+        const prCountA = a[1].openPRCount || 0
+        const prCountB = b[1].openPRCount || 0
+        if (prCountB === prCountA) {
           return a[0].localeCompare(b[0])
         }
-        return a[1].category.localeCompare(b[1].category)
+        return prCountB - prCountA // Descending order (most PRs first)
       })
     case 'status':
       return entries.sort((a, b) => {

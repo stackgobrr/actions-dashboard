@@ -139,7 +139,7 @@ export function DashboardHeader({
             >
               {sortBy === 'last-run-desc' ? 'Last Run (Newest)' : 
                sortBy === 'last-run-asc' ? 'Last Run (Oldest)' :
-               sortBy === 'group' ? 'Category' : 'Status'}
+               sortBy === 'pr-count' ? 'PR Count' : 'Status'}
             </Button>
           </ActionMenu.Anchor>
           <ActionMenu.Overlay>
@@ -150,8 +150,8 @@ export function DashboardHeader({
               <ActionList.Item selected={sortBy === 'last-run-asc'} onSelect={() => setSortBy('last-run-asc')}>
                 Last Run (Oldest)
               </ActionList.Item>
-              <ActionList.Item selected={sortBy === 'group'} onSelect={() => setSortBy('group')}>
-                Category
+              <ActionList.Item selected={sortBy === 'pr-count'} onSelect={() => setSortBy('pr-count')}>
+                PR Count
               </ActionList.Item>
               <ActionList.Item selected={sortBy === 'status'} onSelect={() => setSortBy('status')}>
                 Status
