@@ -96,6 +96,11 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   }
 
   const fetchAllStatuses = async () => {
+    // Don't fetch if in demo mode
+    if (authMethod === 'demo') {
+      return
+    }
+    
     setLoading(true)
     const token = await getActiveToken()
     

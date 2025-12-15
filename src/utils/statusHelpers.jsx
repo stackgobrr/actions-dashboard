@@ -44,6 +44,15 @@ export const getStatusClass = (status) => {
  * @returns {Object} Object with text, bg, and border color strings
  */
 export const getLabelColor = (category) => {
+  // Handle undefined/null/empty category
+  if (!category) {
+    return {
+      textColor: 'var(--fgColor-muted)',
+      bgColor: 'var(--bgColor-muted)',
+      borderColor: 'var(--borderColor-default)'
+    }
+  }
+  
   // Generate a unique color for each category name (like GitHub labels)
   let hash = 0
   for (let i = 0; i < category.length; i++) {
@@ -84,6 +93,11 @@ const TOPIC_COLOR_PALETTE = [
  * @returns {string} Hex color code
  */
 export const getTopicColor = (topic) => {
+  // Handle undefined/null/empty topic
+  if (!topic) {
+    return TOPIC_COLOR_PALETTE[0] // Return first color as default
+  }
+  
   // Generate a consistent hash from the topic name
   let hash = 0
   for (let i = 0; i < topic.length; i++) {
