@@ -27,7 +27,10 @@ export function Dashboard({
   setRefreshInterval,
   onOpenSettings,
   filterByLabels,
-  setFilterByLabels
+  setFilterByLabels,
+  isDemoMode,
+  toggleDemoMode,
+  canToggleDemoMode
 }) {
   // Collect all unique topics from all repositories
   const allTopics = [...new Set(
@@ -77,6 +80,9 @@ export function Dashboard({
           filterByLabels={filterByLabels}
           setFilterByLabels={setFilterByLabels}
           allTopics={allTopics}
+          isDemoMode={isDemoMode}
+          toggleDemoMode={toggleDemoMode}
+          canToggleDemoMode={canToggleDemoMode}
         />
       )}
 

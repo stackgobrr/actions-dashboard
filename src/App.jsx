@@ -45,7 +45,7 @@ function App() {
     custom: selectedRepos.filter(r => r.category === 'custom')
   }), [selectedRepos])
   
-  const { repoStatuses, loading, lastUpdate, fetchAllStatuses } = useGitHubStatus(
+  const { repoStatuses, loading, lastUpdate, fetchAllStatuses, isDemoMode, toggleDemoMode, canToggleDemoMode } = useGitHubStatus(
     reposForHook,
     auth.getActiveToken,
     auth.authMethod,
@@ -163,6 +163,9 @@ function App() {
         onOpenSettings={() => setShowSettings(true)}
         filterByLabels={filterByLabels}
         setFilterByLabels={setFilterByLabels}
+        isDemoMode={isDemoMode}
+        toggleDemoMode={toggleDemoMode}
+        canToggleDemoMode={canToggleDemoMode}
       />
       {showSettings && (
         <Settings
