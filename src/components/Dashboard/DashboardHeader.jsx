@@ -2,8 +2,6 @@ import {
   MarkGithubIcon,
   GearIcon,
   SignOutIcon,
-  TrashIcon,
-  PaintbrushIcon,
   FilterIcon,
   ClockIcon,
   TagIcon,
@@ -14,6 +12,7 @@ import { Button, IconButton, Select, Checkbox, Label, ActionMenu, ActionList } f
 import { ThemeToggle } from '../UI/ThemeToggle'
 import { RefreshButton } from '../UI/RefreshButton'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
+import { getTopicColor } from '../../utils/statusHelpers'
 
 export function DashboardHeader({
   isFullscreen,
@@ -35,21 +34,19 @@ export function DashboardHeader({
   loading,
   onOpenSettings,
   filterByLabels,
-  setFilterByLabels
+  setFilterByLabels,
+  allTopics
 }) {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(nextTheme)
   }
-
-  // Get custom labels from localStorage for the filter dropdown
-  const customLabels = JSON.parse(localStorage.getItem('customLabels') || '[]')
   
-  const toggleLabelFilter = (labelName) => {
-    if (filterByLabels.includes(labelName)) {
-      setFilterByLabels(filterByLabels.filter(l => l !== labelName))
+  const toggleLabelFilter = (topicName) => {
+    if (filterByLabels.includes(topicName)) {
+      setFilterByLabels(filterByLabels.filter(l => l !== topicName))
     } else {
-      setFilterByLabels([...filterByLabels, labelName])
+      setFilterByLabels([...filterByLabels, topicName])
     }
   }
   
@@ -59,25 +56,25 @@ export function DashboardHeader({
 
   return (
     <header className="pb-3 mb-3 border-bottom">
-      <div className="d-flex flex-justify-between flex-items-start mb-3">
+      <div className="d-flex flex-justify-between flex-items-center mb-2">
         <div>
           <h1 className="f3 text-normal mb-1">
-            <MarkGithubIcon size={28} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
+            <MarkGithubIcon size={24} style={{display: 'inline', marginRight: '0.5rem', verticalAlign: 'text-bottom'}} />
             Actions Dashboard
           </h1>
           <p className="f6 color-fg-muted mb-0">Real-time GitHub Actions status for all repositories</p>
         </div>
         
-        <div className="d-flex flex-items-center gap-2">
+        <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
+          <FullscreenToggle isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <IconButton
             icon={GearIcon}
             onClick={onOpenSettings}
             aria-label="Settings"
             title="Repository Configuration"
             size="medium"
-            variant="invisible"
           />
-          <FullscreenToggle isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
           {authMethod === 'github-app' && appInfo ? (
             <div className="d-flex flex-items-center gap-2 border rounded-2 px-3 py-1">
               <GearIcon size={16} className="color-fg-muted" />
@@ -87,90 +84,106 @@ export function DashboardHeader({
                 aria-label="Sign out"
                 title="Sign out"
                 icon={SignOutIcon}
-                size="small"
-                variant="invisible"
+                size="medium"
               />
             </div>
           ) : authMethod === 'pat' ? (
-            <Button 
+            <IconButton 
+              icon={SignOutIcon}
               onClick={clearToken} 
-              size="small"
-              variant="danger"
-              leadingVisual={TrashIcon}
-            >
-              Clear Token
-            </Button>
+              aria-label="Sign out"
+              title="Sign out"
+              size="medium"
+            />
           ) : null}
         </div>
       </div>
       
-      <div className="d-flex flex-wrap flex-items-center gap-3">
-        <div className="d-flex flex-items-center gap-2">
-          <PaintbrushIcon size={16} className="color-fg-muted" />
-          <label htmlFor="theme-select" className="f6 color-fg-muted">
-            Theme:
-          </label>
-          <Select 
-            id="theme-select"
-            value={theme} 
-            onChange={(e) => setTheme(e.target.value)}
-            size="small"
-          >
-            <Select.Option value="dark">Dark</Select.Option>
-            <Select.Option value="light">Light</Select.Option>
-          </Select>
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
-        </div>
+      <div className="d-flex flex-wrap flex-items-center" style={{ gap: '8px' }}>
+        <ActionMenu>
+          <ActionMenu.Anchor>
+            <Button 
+              size="small" 
+              leadingVisual={FilterIcon} 
+              trailingAction={ChevronDownIcon}
+              sx={{
+                position: 'relative',
+                color: 'fg.muted',
+                bg: 'transparent',
+                borderWidth: 'thin',
+                borderColor: 'button.default.borderColor.rest',
+                borderRadius: 'medium',
+                '&:hover': {
+                  bg: 'button.default.bgColor.hover',
+                  borderColor: 'button.default.borderColor.hover'
+                }
+              }}
+            >
+              {sortBy === 'last-run-desc' ? 'Last Run (Newest)' : 
+               sortBy === 'last-run-asc' ? 'Last Run (Oldest)' :
+               sortBy === 'group' ? 'Category' : 'Status'}
+            </Button>
+          </ActionMenu.Anchor>
+          <ActionMenu.Overlay>
+            <ActionList>
+              <ActionList.Item selected={sortBy === 'last-run-desc'} onSelect={() => setSortBy('last-run-desc')}>
+                Last Run (Newest)
+              </ActionList.Item>
+              <ActionList.Item selected={sortBy === 'last-run-asc'} onSelect={() => setSortBy('last-run-asc')}>
+                Last Run (Oldest)
+              </ActionList.Item>
+              <ActionList.Item selected={sortBy === 'group'} onSelect={() => setSortBy('group')}>
+                Category
+              </ActionList.Item>
+              <ActionList.Item selected={sortBy === 'status'} onSelect={() => setSortBy('status')}>
+                Status
+              </ActionList.Item>
+            </ActionList>
+          </ActionMenu.Overlay>
+        </ActionMenu>
         
-        <div className="d-flex flex-items-center gap-2">
-          <FilterIcon size={16} className="color-fg-muted" />
-          <label htmlFor="sort-select" className="f6 color-fg-muted">
-            Sort:
-          </label>
-          <Select 
-            id="sort-select"
-            value={sortBy} 
-            onChange={(e) => setSortBy(e.target.value)}
-            size="small"
-          >
-            <Select.Option value="last-run-desc">Last Run (Newest)</Select.Option>
-            <Select.Option value="last-run-asc">Last Run (Oldest)</Select.Option>
-            <Select.Option value="group">Category</Select.Option>
-            <Select.Option value="status">Status</Select.Option>
-          </Select>
-        </div>
-        
-        {customLabels.length > 0 && (
-          <div className="d-flex flex-items-center gap-2">
-            <TagIcon size={16} className="color-fg-muted" />
-            <span className="f6 color-fg-muted">Filter:</span>
-            <ActionMenu>
-              <ActionMenu.Anchor>
-                <Button size="small" trailingAction={ChevronDownIcon}>
-                  {filterByLabels.length === 0 
-                    ? 'Select labels...' 
-                    : `${filterByLabels.length} selected`}
-                </Button>
-              </ActionMenu.Anchor>
-              <ActionMenu.Overlay width="medium">
+        {allTopics && allTopics.length > 0 && (
+          <ActionMenu>
+            <ActionMenu.Anchor>
+              <Button 
+                size="small" 
+                leadingVisual={TagIcon} 
+                trailingAction={ChevronDownIcon}
+                sx={{
+                  position: 'relative',
+                  color: 'fg.muted',
+                  bg: 'transparent',
+                  borderWidth: 'thin',
+                  borderColor: 'button.default.borderColor.rest',
+                  borderRadius: 'medium',
+                  '&:hover': {
+                    bg: 'button.default.bgColor.hover',
+                    borderColor: 'button.default.borderColor.hover'
+                  }
+                }}
+              >
+                {filterByLabels.length === 0 
+                  ? 'Select topics...' 
+                  : `${filterByLabels.length} selected`}
+              </Button>
+            </ActionMenu.Anchor>
+              <ActionMenu.Overlay width="auto">
                 <ActionList selectionVariant="multiple">
-                  {customLabels.map(label => (
+                  {allTopics.map(topic => (
                     <ActionList.Item
-                      key={label.name}
-                      selected={filterByLabels.includes(label.name)}
-                      onSelect={() => toggleLabelFilter(label.name)}
+                      key={topic}
+                      selected={filterByLabels.includes(topic)}
+                      onSelect={() => toggleLabelFilter(topic)}
                     >
-                      <ActionList.LeadingVisual>
-                        <div
-                          style={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: '50%',
-                            backgroundColor: label.color
-                          }}
-                        />
-                      </ActionList.LeadingVisual>
-                      {label.name}
+                      <Label
+                        sx={{
+                          backgroundColor: getTopicColor(topic),
+                          color: 'white',
+                          fontSize: 0
+                        }}
+                      >
+                        {topic}
+                      </Label>
                     </ActionList.Item>
                   ))}
                 </ActionList>
@@ -189,18 +202,15 @@ export function DashboardHeader({
                 )}
               </ActionMenu.Overlay>
             </ActionMenu>
-          </div>
         )}
         
-        <div className="d-flex flex-items-center gap-2">
+        <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
           <ClockIcon size={16} className="color-fg-muted" />
-          <label className="d-flex flex-items-center gap-1 f6">
-            <Checkbox
-              checked={autoRefresh}
-              onChange={(e) => setAutoRefresh(e.target.checked)}
-            />
-            <span>Auto-refresh</span>
-          </label>
+          <Checkbox
+            checked={autoRefresh}
+            onChange={(e) => setAutoRefresh(e.target.checked)}
+          />
+          <span className="f6">Auto-refresh</span>
           {autoRefresh && (
             <Select 
               value={refreshInterval} 
@@ -216,18 +226,18 @@ export function DashboardHeader({
           )}
         </div>
         
-        {lastUpdate && (
-          <span className="f6 color-fg-muted d-flex flex-items-center gap-1">
-            <ClockIcon size={14} />
-            {lastUpdate.toLocaleTimeString()}
-          </span>
-        )}
-        
         <RefreshButton 
           onRefresh={fetchAllStatuses}
           loading={loading}
           disabled={false}
         />
+        
+        {lastUpdate && (
+          <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
+            <ClockIcon size={14} className="color-fg-muted" />
+            <span className="f6 color-fg-muted">{lastUpdate.toLocaleTimeString()}</span>
+          </div>
+        )}
       </div>
     </header>
   )

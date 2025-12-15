@@ -106,6 +106,10 @@ function App() {
           // Toggle fullscreen
           toggleFullscreen()
           break
+        case 's':
+          // Open settings
+          setShowSettings(true)
+          break
       }
     }
 

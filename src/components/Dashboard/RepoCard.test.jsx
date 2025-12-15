@@ -98,9 +98,9 @@ describe('RepoCard Component', () => {
       
       render(<RepoCard repoName="my-repo" status={status} />)
       
-      const link = screen.getByText('View Run')
-      expect(link.closest('a')).toHaveAttribute('href', 'https://github.com/example/repo/actions/runs/123')
-      expect(link.closest('a')).toHaveAttribute('target', '_blank')
+      const link = screen.getByLabelText('View workflow run')
+      expect(link).toHaveAttribute('href', 'https://github.com/example/repo/actions/runs/123')
+      expect(link).toHaveAttribute('target', '_blank')
     })
   })
   
@@ -123,7 +123,7 @@ describe('RepoCard Component', () => {
   })
   
   describe('Empty States', () => {
-    it('shows N/A for missing workflow data', () => {
+    it('shows icon for missing workflow data', () => {
       const status = {
         category: 'Frontend',
         description: 'No runs yet'
@@ -131,7 +131,7 @@ describe('RepoCard Component', () => {
       
       render(<RepoCard repoName="new-repo" status={status} />)
       
-      expect(screen.getByText('No recent runs')).toBeInTheDocument()
+      expect(screen.getByLabelText('No recent runs')).toBeInTheDocument()
     })
   })
   

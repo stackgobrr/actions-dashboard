@@ -1,21 +1,36 @@
 import { 
   GitBranchIcon,
   LinkExternalIcon,
-  GitPullRequestIcon
+  GitPullRequestIcon,
+  NoEntryIcon
 } from '@primer/octicons-react'
 import { Link, Label, CounterLabel } from '@primer/react'
-import { getStatusIcon, getStatusClass, getLabelColor } from '../../utils/statusHelpers.jsx'
+import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../../utils/statusHelpers.jsx'
+import { useState, useEffect, useRef } from 'react'
 import './RepoCard.css'
 
 export function RepoCard({ repoName, status }) {
   const labelColor = getLabelColor(status.category)
   const hasPRs = status.openPRCount > 0
+  const topics = status.topics || []
+  const [isFlashing, setIsFlashing] = useState(false)
+  const prevStatusRef = useRef(null)
   
-  // Get custom labels from localStorage
-  const customLabels = JSON.parse(localStorage.getItem('customLabels') || '[]')
+  useEffect(() => {
+    const currentStatus = getStatusClass(status)
+    const prevStatus = prevStatusRef.current
+    
+    // Trigger flash if status changed (but not on initial mount)
+    if (prevStatus && prevStatus !== currentStatus) {
+      setIsFlashing(true)
+      setTimeout(() => setIsFlashing(false), 1800) // 3 pulses at 0.6s each
+    }
+    
+    prevStatusRef.current = currentStatus
+  }, [status.status, status.conclusion])
 
   return (
-    <div className={`repo-card ${getStatusClass(status)}`}>
+    <div className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''}`}>
       {hasPRs && (
         <div className="repo-card__pr-badge">
           <CounterLabel>
@@ -78,30 +93,31 @@ export function RepoCard({ repoName, status }) {
             href={status.url}
             target="_blank"
             rel="noopener noreferrer"
-            sx={{ fontSize: 0 }}
+            sx={{ fontSize: 0, display: 'inline-flex', alignItems: 'center' }}
+            aria-label="View workflow run"
           >
-            View Run <LinkExternalIcon size={10} />
+            <LinkExternalIcon size={16} />
           </Link>
         ) : (
-          <span className="repo-card__no-runs">No recent runs</span>
+          <NoEntryIcon size={16} className="color-fg-muted" aria-label="No recent runs" />
         )}
         <div className="repo-card__labels">
-          {status.labels && status.labels.length > 0 && (
-            status.labels.map(labelName => {
-              const labelDef = customLabels.find(l => l.name === labelName)
-              return labelDef ? (
-                <Label
-                  key={labelName}
-                  sx={{
-                    backgroundColor: labelDef.color,
-                    color: 'white',
-                    fontSize: 0
-                  }}
-                >
-                  {labelName}
-                </Label>
-              ) : null
-            })
+          {topics.length > 0 && (
+            topics.map(topic => (
+              <Label
+                key={topic}
+                sx={{
+                  backgroundColor: getTopicColor(topic),
+                  color: 'white',
+                  fontSize: 0,
+                  px: 1,
+                  py: 0,
+                  lineHeight: '18px'
+                }}
+              >
+                {topic}
+              </Label>
+            ))
           )}
         </div>
       </div>

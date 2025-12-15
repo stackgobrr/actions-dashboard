@@ -61,8 +61,20 @@
 .repo-card__labels {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
   margin-top: 6px;
+  margin-left: auto;
+  justify-content: flex-end;
+  max-width: 100%;
+  line-height: 1;
+}
+
+.repo-card__labels > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  flex-shrink: 1;
 }
 
 .repo-card__status-icon {
@@ -139,6 +151,12 @@
   border-top: 1px solid var(--borderColor-default);
 }
 
+.repo-card__footer a,
+.repo-card__footer .repo-card__no-runs {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .repo-card__no-runs {
   font-size: 12px;
   color: var(--fgColor-muted);
@@ -165,6 +183,75 @@
 .repo-card.unknown,
 .repo-card.no_runs {
   border-top: 3px solid var(--borderColor-default) !important;
+}
+
+/* Pulse animation when status changes */
+@keyframes pulse-success {
+  0%, 100% { 
+    border-top-color: var(--borderColor-success-emphasis);
+    transform: scale(1);
+    box-shadow: 0 1px 3px var(--color-shadow-small);
+  }
+  50% { 
+    border-top-color: var(--color-success-emphasis);
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(26, 127, 55, 0.3);
+  }
+}
+
+@keyframes pulse-failure {
+  0%, 100% { 
+    border-top-color: var(--borderColor-danger-emphasis);
+    transform: scale(1);
+    box-shadow: 0 1px 3px var(--color-shadow-small);
+  }
+  50% { 
+    border-top-color: var(--color-danger-emphasis);
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(207, 34, 46, 0.3);
+  }
+}
+
+@keyframes pulse-in-progress {
+  0%, 100% { 
+    border-top-color: var(--borderColor-accent-emphasis);
+    transform: scale(1);
+    box-shadow: 0 1px 3px var(--color-shadow-small);
+  }
+  50% { 
+    border-top-color: var(--color-accent-emphasis);
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% { 
+    border-top-color: var(--borderColor-attention-emphasis);
+    transform: scale(1);
+    box-shadow: 0 1px 3px var(--color-shadow-small);
+  }
+  50% { 
+    border-top-color: var(--color-attention-emphasis);
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(191, 135, 0, 0.3);
+  }
+}
+
+.repo-card.success.flashing {
+  animation: pulse-success 0.6s ease-in-out 3;
+}
+
+.repo-card.failure.flashing {
+  animation: pulse-failure 0.6s ease-in-out 3;
+}
+
+.repo-card.in-progress.flashing {
+  animation: pulse-in-progress 0.6s ease-in-out 3;
+}
+
+.repo-card.warning.flashing {
+  animation: pulse-warning 0.6s ease-in-out 3;
 }
 
 

@@ -5,7 +5,7 @@ export function ThemeToggle({ theme, onToggle }) {
   return (
     <IconButton 
       onClick={onToggle}
-      size="small"
+      size="medium"
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
       title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme (T)`}
       icon={theme === 'dark' ? SunIcon : MoonIcon}
