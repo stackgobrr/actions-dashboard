@@ -1,7 +1,14 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useState } from 'react'
 import { AuthSetup } from './AuthSetup'
+
+// Wrapper component to handle PAT state for controlled component testing
+function AuthSetupWithPATState({ saveToken, ...otherProps }) {
+  const [githubToken, setGithubToken] = useState('')
+  return <AuthSetup {...otherProps} githubToken={githubToken} setGithubToken={setGithubToken} saveToken={saveToken} />
+}
 
 describe('AuthSetup Component', () => {
   const defaultProps = {
@@ -128,7 +135,10 @@ describe('AuthSetup Component', () => {
     it('calls saveToken when Save button clicked', async () => {
       const user = userEvent.setup()
       const saveToken = vi.fn()
-      render(<AuthSetup {...defaultProps} githubToken="ghp_test123" saveToken={saveToken} />)
+      render(<AuthSetupWithPATState {...defaultProps} saveToken={saveToken} />)
+      
+      const tokenInput = screen.getByPlaceholderText('ghp_xxxxxxxxxxxx')
+      await user.type(tokenInput, 'ghp_123456789012345678901234567890123456')
       
       await user.click(screen.getByRole('button', { name: /save token & continue/i }))
       expect(saveToken).toHaveBeenCalledOnce()
@@ -136,7 +146,7 @@ describe('AuthSetup Component', () => {
 
     it('shows local storage notice', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Token is stored locally in your browser.')).toBeInTheDocument()
+      expect(screen.getByText('Your credentials are stored locally in your browser. No data is sent to or stored on external servers.')).toBeInTheDocument()
     })
   })
 
@@ -215,11 +225,14 @@ describe('AuthSetup Component', () => {
     })
 
     it('enables Save button when all fields are filled', () => {
+      const validPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
+-----END RSA PRIVATE KEY-----`
       render(<AuthSetup {...defaultProps} 
         showGitHubAppForm={true}
         appId="123"
         installationId="456"
-        privateKey="-----BEGIN RSA PRIVATE KEY-----"
+        privateKey={validPrivateKey}
       />)
       const button = screen.getByRole('button', { name: /save & authenticate/i })
       expect(button).not.toBeDisabled()
@@ -228,11 +241,14 @@ describe('AuthSetup Component', () => {
     it('calls handleGitHubAppSetup when Save button clicked', async () => {
       const user = userEvent.setup()
       const handleGitHubAppSetup = vi.fn()
+      const validPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
+-----END RSA PRIVATE KEY-----`
       render(<AuthSetup {...defaultProps} 
         showGitHubAppForm={true}
         appId="123"
         installationId="456"
-        privateKey="-----BEGIN RSA PRIVATE KEY-----"
+        privateKey={validPrivateKey}
         handleGitHubAppSetup={handleGitHubAppSetup}
       />)
       

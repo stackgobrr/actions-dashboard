@@ -1,7 +1,14 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useState } from 'react'
 import { PatForm } from './PatForm'
+
+// Wrapper component to handle state for controlled component testing
+function PatFormWrapper({ onSubmit, initialToken = '' }) {
+  const [githubToken, setGithubToken] = useState(initialToken)
+  return <PatForm githubToken={githubToken} setGithubToken={setGithubToken} onSubmit={onSubmit} />
+}
 
 describe('PatForm Component - Critical Functionality', () => {
   const defaultProps = {
@@ -25,8 +32,11 @@ describe('PatForm Component - Critical Functionality', () => {
 
     it('allows submission when token is provided', async () => {
       const onSubmit = vi.fn()
-      const token = 'ghp_validtoken123'
-      render(<PatForm {...defaultProps} githubToken={token} onSubmit={onSubmit} />)
+      const token = 'ghp_123456789012345678901234567890123456'
+      render(<PatFormWrapper onSubmit={onSubmit} />)
+      
+      const tokenInput = screen.getByPlaceholderText('ghp_xxxxxxxxxxxx')
+      await userEvent.type(tokenInput, token)
       
       const submitButton = screen.getByRole('button', { name: /save token/i })
       expect(submitButton).toBeEnabled()

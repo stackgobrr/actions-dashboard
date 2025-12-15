@@ -144,6 +144,9 @@ function App() {
         handleDemoMode={auth.handleDemoMode}
         handleLogout={auth.handleLogout}
         authMethod={auth.authMethod}
+        patError={auth.patError}
+        isValidatingPat={auth.isValidatingPat}
+        isValidatingGitHubApp={auth.isValidatingGitHubApp}
       />
     )
   }

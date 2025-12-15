@@ -40,7 +40,10 @@ describe('GitHubAppForm Component - Critical Functionality', () => {
 
     it('allows submission when all required fields are filled', async () => {
       const onSubmit = vi.fn()
-      render(<GitHubAppForm {...defaultProps} appId="123" installationId="456" privateKey="key" onSubmit={onSubmit} />)
+      const validPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
+-----END RSA PRIVATE KEY-----`
+      render(<GitHubAppForm {...defaultProps} appId="123" installationId="456" privateKey={validPrivateKey} onSubmit={onSubmit} />)
       
       const submitButton = screen.getByRole('button', { name: /save & authenticate/i })
       expect(submitButton).toBeEnabled()
