@@ -1,5 +1,6 @@
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/rest'
+import { logger } from '../utils/logger'
 
 const GITHUB_APP_ID_KEY = 'github_app_id'
 const GITHUB_APP_PRIVATE_KEY_KEY = 'github_app_private_key'
@@ -61,7 +62,7 @@ export const generateInstallationToken = async () => {
     
     return token
   } catch (error) {
-    console.error('Failed to generate installation token:', error)
+    logger.error('Failed to generate installation token:', error)
     
     // Provide more helpful error messages
     if (error.message.includes('PKCS#1')) {
@@ -114,7 +115,7 @@ export const validateGitHubAppCredentials = async (appId, privateKey, installati
     
     return { valid: true, token }
   } catch (error) {
-    console.error('GitHub App validation failed:', error)
+    logger.error('GitHub App validation failed:', error)
     return { valid: false, error: error.message }
   }
 }
@@ -137,7 +138,7 @@ export const getAppInstallationInfo = async () => {
       accountType: installation.account.type
     }
   } catch (error) {
-    console.error('Failed to get installation info:', error)
+    logger.error('Failed to get installation info:', error)
     return null
   }
 }

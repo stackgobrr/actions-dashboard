@@ -9,6 +9,7 @@ import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
 import { useAuth } from './hooks/useAuth'
 import { REPOSITORIES } from './constants'
+import { logger } from './utils/logger'
 
 function App() {
   const [showLanding, setShowLanding] = useState(true)
@@ -93,7 +94,7 @@ function App() {
       document.documentElement.requestFullscreen().then(() => {
         setIsFullscreen(true)
       }).catch(err => {
-        console.error('Error attempting to enable fullscreen:', err)
+        logger.error('Error attempting to enable fullscreen:', err)
       })
     } else {
       document.exitFullscreen().then(() => {

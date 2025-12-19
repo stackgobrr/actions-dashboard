@@ -7,6 +7,7 @@ import {
   validateGitHubAppCredentials,
   getAppInstallationInfo
 } from '../services/githubAppAuth'
+import { logger } from '../utils/logger'
 
 /**
  * Hook to manage authentication state for both GitHub App and PAT methods
@@ -37,7 +38,7 @@ export function useAuth() {
           const info = await getAppInstallationInfo()
           setAppInfo(info)
         } catch (err) {
-          console.error('Failed to get app info:', err)
+          logger.error('Failed to get app info:', err)
         }
       } else if (localStorage.getItem('github_token')) {
         setGithubToken(localStorage.getItem('github_token'))
