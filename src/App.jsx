@@ -59,14 +59,13 @@ function App() {
   }, [auth.authMethod, auth.showAuthSetup])
   
   // Convert selectedRepos to REPOSITORIES format for hook - memoized to prevent re-renders
-  const reposForHook = useMemo(() => ({
-    common: selectedRepos.filter(r => r.category === 'common'),
-    modules: selectedRepos.filter(r => r.category === 'modules'),
-    infra: selectedRepos.filter(r => r.category === 'infra'),
-    services: selectedRepos.filter(r => r.category === 'services'),
-    utils: selectedRepos.filter(r => r.category === 'utils'),
-    custom: selectedRepos.filter(r => r.category === 'custom')
-  }), [selectedRepos])
+  const reposForHook = useMemo(() => 
+    ['common', 'modules', 'infra', 'services', 'utils', 'custom']
+      .reduce((acc, category) => ({
+        ...acc,
+        [category]: selectedRepos.filter(r => r.category === category)
+      }), {})
+  , [selectedRepos])
   
   const { repoStatuses, loading, lastUpdate, fetchAllStatuses, isDemoMode, toggleDemoMode, canToggleDemoMode } = useGitHubStatus(
     reposForHook,
