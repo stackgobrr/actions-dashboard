@@ -37,7 +37,7 @@ function GitHubAppGuide({ onClose }) {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <h1 style={{fontSize: '20px', fontWeight: 600, margin: 0}}>GitHub App Setup Guide</h1>
+          <h1 className="f3 text-bold mb-0">GitHub App Setup Guide</h1>
           <IconButton 
             onClick={onClose} 
             className="color-fg-muted"
