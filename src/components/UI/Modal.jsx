@@ -74,7 +74,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = '500px', fo
             alignItems: 'center',
           }}
         >
-          <h2 style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>
+          <h2 className="f3 text-bold mb-0">
             {title}
           </h2>
           <IconButton
