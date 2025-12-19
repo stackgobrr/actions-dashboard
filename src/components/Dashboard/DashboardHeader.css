@@ -1,0 +1,160 @@
+/* Dashboard Header - consistent with Landing Page header */
+
+.dashboard-header {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--borderColor-default);
+  background: var(--bgColor-default);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.8);
+  margin-bottom: 32px;
+  transition: all 0.3s ease;
+}
+
+[data-color-mode="dark"] .dashboard-header {
+  background: rgba(13, 17, 23, 0.8);
+}
+
+.dashboard-header.scrolled {
+  box-shadow: 0 1px 3px var(--color-shadow-small);
+}
+
+.dashboard-title-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Gradient text effect like landing page */
+.dashboard-title .gradient-text {
+  background: linear-gradient(135deg, var(--color-accent-fg) 0%, var(--color-done-fg) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+[data-color-mode="dark"] .dashboard-title .gradient-text {
+  background: linear-gradient(135deg, #58a6ff 0%, #79c0ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dashboard-subtitle {
+  font-size: 14px;
+  color: var(--fgColor-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.dashboard-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.4s ease-out 0.1s backwards;
+}
+
+/* Button spacing and sizing */
+.dashboard-header button,
+.dashboard-header [class*="Button"] {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.dashboard-header button:hover {
+  transform: translateY(-1px);
+}
+
+/* Filters section */
+.dashboard-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--borderColor-muted);
+  animation: fadeInUp 0.4s ease-out 0.2s backwards;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Label badges with hover effect */
+.filter-label-badge {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.filter-label-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--color-shadow-small);
+}
+
+/* Active filters display */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.active-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--bgColor-muted);
+  border: 1px solid var(--borderColor-default);
+  border-radius: 999px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.active-filter-tag:hover {
+  background: var(--bgColor-emphasis);
+  border-color: var(--borderColor-emphasis);
+}
+
+.active-filter-tag button {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--fgColor-muted);
+  transition: color 0.2s ease;
+}
+
+.active-filter-tag button:hover {
+  color: var(--fgColor-danger);
+}

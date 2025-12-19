@@ -1,4 +1,14 @@
-/* GitHub Actions Dashboard - Project Board Style */
+/* GitHub Actions Dashboard - Modern Style */
+
+/* Smooth page transitions */
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+  background: var(--bgColor-default);
+}
 
 /* Spinning animation for refresh button */
 @keyframes spin {
@@ -9,103 +19,24 @@
   animation: spin 1s linear infinite;
 }
 
-/* Project board style cards */
-.Box {
-  border: 1px solid var(--borderColor-default) !important;
-  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-  overflow: hidden;
-  cursor: default;
-  display: flex !important;
-  flex-direction: column !important;
+/* Global smooth transitions */
+button, a {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.Box:hover {
-  box-shadow: 0 3px 8px var(--color-shadow-medium) !important;
-  transform: translateY(-1px);
-  border-color: var(--borderColor-emphasis) !important;
+/* Loading state */
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bgColor-muted) 0%,
+    var(--bgColor-emphasis) 50%,
+    var(--bgColor-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
-/* Status indicator stripe at top */
-.Box.success {
-  border-top: 3px solid var(--borderColor-success-emphasis) !important;
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
-
-.Box.failure {
-  border-top: 3px solid var(--borderColor-danger-emphasis) !important;
-}
-
-.Box.in-progress {
-  border-top: 3px solid var(--borderColor-attention-emphasis) !important;
-}
-
-.Box.warning {
-  border-top: 3px solid var(--borderColor-attention-emphasis) !important;
-}
-
-.Box.error,
-.Box.unknown {
-  border-top: 3px solid var(--borderColor-neutral-emphasis) !important;
-}
-
-/* Compact header like GitHub issues */
-.Box-header {
-  padding: 10px 12px !important;
-  background-color: transparent !important;
-  border-bottom: 0 !important;
-}
-
-.Box-title {
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  line-height: 1.25 !important;
-}
-
-/* Compact body */
-.Box-body {
-  padding: 6px 12px 6px 12px !important;
-  background-color: transparent;
-  flex: 1;
-}
-
-/* Subtle footer */
-.Box-footer {
-  padding: 6px 12px !important;
-  background-color: var(--bgColor-muted) !important;
-  border-top: 1px solid var(--borderColor-default) !important;
-  font-size: 11px;
-  margin-top: auto;
-}
-
-/* Metadata rows - more compact */
-.metadata-row {
-  padding: 5px 0 !important;
-  font-size: 11px !important;
-}
-
-.metadata-row:not(:last-child) {
-  border-bottom: 1px solid var(--borderColor-muted) !important;
-}
-
-/* Status icon positioning */
-.status-icon {
-  flex-shrink: 0;
-}
-
-/* GitHub-style labels */
-.Label {
-  display: inline-block;
-  padding: 0 7px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 18px;
-  white-space: nowrap;
-  border: 1px solid;
-  border-radius: 2em;
-}
-
-/* Ensure proper root styling */
-#root {
-  min-height: 100vh;
-}
-
-/* No fixed grid rules - let JavaScript handle it dynamically */

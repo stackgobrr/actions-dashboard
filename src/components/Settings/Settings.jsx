@@ -71,7 +71,7 @@ export function Settings({ onClose, getActiveToken, selectedRepos, onSaveRepos }
             icon={XIcon}
             onClick={onClose}
             aria-label="Close settings"
-            variant="invisible"
+            className="color-fg-muted"
           />
         </div>
 

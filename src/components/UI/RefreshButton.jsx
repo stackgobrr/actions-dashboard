@@ -7,6 +7,7 @@ export function RefreshButton({ onRefresh, loading, disabled }) {
       onClick={onRefresh}
       disabled={disabled || loading}
       size="small"
+      className="color-fg-muted"
       aria-label="Refresh all repos"
       title="Refresh all repos (R)"
       icon={SyncIcon}

@@ -16,6 +16,7 @@ import { ThemeToggle } from '../UI/ThemeToggle'
 import { RefreshButton } from '../UI/RefreshButton'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
 import { getTopicColor } from '../../utils/statusHelpers'
+import './DashboardHeader.css'
 
 export function DashboardHeader({
   isFullscreen,
@@ -95,13 +96,14 @@ export function DashboardHeader({
           </p>
         </div>
         
-        <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
+        <div className="dashboard-header-actions">
           <IconButton
             icon={QuestionIcon}
             onClick={onToggleHotkeyHelper}
             aria-label="Keyboard shortcuts"
             title="Keyboard shortcuts (H)"
             size="medium"
+            className="color-fg-muted"
           />
           <IconButton
             icon={HeartIcon}
@@ -112,13 +114,7 @@ export function DashboardHeader({
             aria-label="Support this project"
             title="Support this project ❤️"
             size="medium"
-            sx={{
-              color: 'var(--fgColor-danger)',
-              '&:hover': {
-                color: 'var(--fgColor-danger)',
-                backgroundColor: 'var(--bgColor-danger-muted)'
-              }
-            }}
+            className="color-fg-muted"
           />
           <IconButton
             icon={BugIcon}
@@ -129,6 +125,7 @@ export function DashboardHeader({
             aria-label="Report an issue"
             title="Report an issue"
             size="medium"
+            className="color-fg-muted"
           />
           <FullscreenToggle isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
@@ -138,6 +135,7 @@ export function DashboardHeader({
             aria-label="Settings"
             title="Repository Configuration"
             size="medium"
+            className="color-fg-muted"
           />
           {authMethod === 'github-app' && appInfo ? (
             <div className="d-flex flex-items-center gap-2 border rounded-2 px-3 py-1">
@@ -149,6 +147,7 @@ export function DashboardHeader({
                 title="Sign out"
                 icon={SignOutIcon}
                 size="medium"
+                className="color-fg-muted"
               />
             </div>
           ) : authMethod === 'pat' ? (
@@ -158,6 +157,7 @@ export function DashboardHeader({
               aria-label="Sign out"
               title="Sign out"
               size="medium"
+              className="color-fg-muted"
             />
           ) : authMethod === 'demo' ? (
             <IconButton 
@@ -166,30 +166,19 @@ export function DashboardHeader({
               aria-label="Sign out of demo mode"
               title="Sign out of demo mode"
               size="medium"
+              className="color-fg-muted"
             />
           ) : null}
         </div>
       </div>
       
-      <div className="d-flex flex-wrap flex-items-center" style={{ gap: '8px' }}>
+      <div className="dashboard-filters">
         <ActionMenu>
           <ActionMenu.Anchor>
             <Button 
               size="small" 
               leadingVisual={FilterIcon} 
               trailingAction={ChevronDownIcon}
-              sx={{
-                position: 'relative',
-                color: 'fg.muted',
-                bg: 'transparent',
-                borderWidth: 'thin',
-                borderColor: 'button.default.borderColor.rest',
-                borderRadius: 'medium',
-                '&:hover': {
-                  bg: 'button.default.bgColor.hover',
-                  borderColor: 'button.default.borderColor.hover'
-                }
-              }}
             >
               {sortBy === 'last-run-desc' ? 'Last Run (Newest)' : 
                sortBy === 'last-run-asc' ? 'Last Run (Oldest)' :
@@ -221,18 +210,6 @@ export function DashboardHeader({
                 size="small" 
                 leadingVisual={TagIcon} 
                 trailingAction={ChevronDownIcon}
-                sx={{
-                  position: 'relative',
-                  color: 'fg.muted',
-                  bg: 'transparent',
-                  borderWidth: 'thin',
-                  borderColor: 'button.default.borderColor.rest',
-                  borderRadius: 'medium',
-                  '&:hover': {
-                    bg: 'button.default.bgColor.hover',
-                    borderColor: 'button.default.borderColor.hover'
-                  }
-                }}
               >
                 {filterByLabels.length === 0 
                   ? 'Select topics...' 

@@ -80,6 +80,7 @@ export function HotkeyHelper({ isOpen, onClose }) {
             onClick={onClose}
             aria-label="Close"
             size="medium"
+            className="color-fg-muted"
           />
         </div>
 

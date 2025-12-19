@@ -2,6 +2,7 @@ import { DashboardHeader } from './DashboardHeader'
 import { DashboardGrid } from './DashboardGrid'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
 import { sortRepositories } from '../../utils/gridHelpers'
+import './Dashboard.css'
 
 /**
  * Main dashboard container component
@@ -51,56 +52,52 @@ export function Dashboard({
   const sortedRepos = sortRepositories(filteredRepos, sortBy)
 
   return (
-    <div 
-      className="p-4 height-full d-flex flex-column overflow-hidden"
-      style={{
-        maxWidth: isFullscreen ? 'none' : '1600px',
-        margin: '0 auto'
-      }}
-    >
-      {!isFullscreen && (
-        <DashboardHeader
-          isFullscreen={isFullscreen}
-          toggleFullscreen={toggleFullscreen}
-          authMethod={authMethod}
-          appInfo={appInfo}
-          handleLogout={handleLogout}
-          clearToken={clearToken}
-          theme={theme}
-          setTheme={setTheme}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          autoRefresh={autoRefresh}
-          setAutoRefresh={setAutoRefresh}
-          refreshInterval={refreshInterval}
-          setRefreshInterval={setRefreshInterval}
-          lastUpdate={lastUpdate}
-          fetchAllStatuses={fetchAllStatuses}
-          loading={loading}
-          onOpenSettings={onOpenSettings}
-          filterByLabels={filterByLabels}
-          setFilterByLabels={setFilterByLabels}
-          allTopics={allTopics}
-          isDemoMode={isDemoMode}
-          toggleDemoMode={toggleDemoMode}
-          canToggleDemoMode={canToggleDemoMode}
-          onToggleHotkeyHelper={onToggleHotkeyHelper}
-        />
-      )}
+    <div className="dashboard-wrapper">
+      <div className={`dashboard-content ${isFullscreen ? 'fullscreen' : ''}`}>
+        {!isFullscreen && (
+          <DashboardHeader
+            isFullscreen={isFullscreen}
+            toggleFullscreen={toggleFullscreen}
+            authMethod={authMethod}
+            appInfo={appInfo}
+            handleLogout={handleLogout}
+            clearToken={clearToken}
+            theme={theme}
+            setTheme={setTheme}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            autoRefresh={autoRefresh}
+            setAutoRefresh={setAutoRefresh}
+            refreshInterval={refreshInterval}
+            setRefreshInterval={setRefreshInterval}
+            lastUpdate={lastUpdate}
+            fetchAllStatuses={fetchAllStatuses}
+            loading={loading}
+            onOpenSettings={onOpenSettings}
+            filterByLabels={filterByLabels}
+            setFilterByLabels={setFilterByLabels}
+            allTopics={allTopics}
+            isDemoMode={isDemoMode}
+            toggleDemoMode={toggleDemoMode}
+            canToggleDemoMode={canToggleDemoMode}
+            onToggleHotkeyHelper={onToggleHotkeyHelper}
+          />
+        )}
 
-      {loading && Object.keys(repoStatuses).length === 0 ? (
-        <div className="text-center p-6 color-fg-muted">
-          <div className="mb-2">Loading repository statuses...</div>
-        </div>
-      ) : (
-        <DashboardGrid repositories={sortedRepos} />
-      )}
-      
-      {isFullscreen && (
-        <div className="position-fixed top-0 right-0 m-3" style={{ zIndex: 1000 }}>
-          <FullscreenToggle isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
-        </div>
-      )}
+        {loading && Object.keys(repoStatuses).length === 0 ? (
+          <div className="text-center p-6 color-fg-muted">
+            <div className="mb-2">Loading repository statuses...</div>
+          </div>
+        ) : (
+          <DashboardGrid repositories={sortedRepos} />
+        )}
+        
+        {isFullscreen && (
+          <div className="position-fixed top-0 right-0 m-3" style={{ zIndex: 1000 }}>
+            <FullscreenToggle isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
+          </div>
+        )}
+      </div>
     </div>
   )
 }

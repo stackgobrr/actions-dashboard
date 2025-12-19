@@ -8,6 +8,7 @@ export function FullscreenToggle({ isFullscreen, onToggle }) {
     <IconButton 
       onClick={onToggle}
       size="medium"
+      className="color-fg-muted"
       title={isFullscreen ? "Exit Fullscreen" : "Fullscreen (F)"}
       aria-label={label}
       icon={isFullscreen ? ScreenNormalIcon : ScreenFullIcon}

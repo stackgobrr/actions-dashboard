@@ -1,11 +1,49 @@
 .dashboard-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   grid-auto-rows: minmax(min-content, max-content);
-  gap: 16px;
+  gap: 24px;
   min-height: 0;
   overflow: auto;
   align-content: start;
-  padding: 12px; /* Prevent focus outline and badge clipping */
+  padding: 16px;
+}
+
+/* Initial load animation - only plays once */
+.dashboard-grid.initial-load {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Stagger animation for grid items - only on initial load */
+.dashboard-grid.initial-load > * {
+  animation: fadeInUp 0.4s ease-out backwards;
+}
+
+.dashboard-grid.initial-load > *:nth-child(1) { animation-delay: 0.05s; }
+.dashboard-grid.initial-load > *:nth-child(2) { animation-delay: 0.1s; }
+.dashboard-grid.initial-load > *:nth-child(3) { animation-delay: 0.15s; }
+.dashboard-grid.initial-load > *:nth-child(4) { animation-delay: 0.2s; }
+.dashboard-grid.initial-load > *:nth-child(5) { animation-delay: 0.25s; }
+.dashboard-grid.initial-load > *:nth-child(6) { animation-delay: 0.3s; }
+.dashboard-grid.initial-load > *:nth-child(n+7) { animation-delay: 0.35s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
