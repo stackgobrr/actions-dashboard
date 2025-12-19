@@ -40,7 +40,7 @@ function GitHubAppGuide({ onClose }) {
           <h1 style={{fontSize: '20px', fontWeight: 600, margin: 0}}>GitHub App Setup Guide</h1>
           <IconButton 
             onClick={onClose} 
-            variant="danger"
+            className="color-fg-muted"
             aria-label="Close"
             icon={XIcon}
           />
