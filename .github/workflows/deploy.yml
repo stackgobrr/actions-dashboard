@@ -26,14 +26,14 @@ jobs:
         uses: ./.github/actions/react-component-test
       
       - name: Build application
-        run: npm run build
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: h3ow3d/h3ow3d-github-actions/actions/node-build-test@main
         with:
-          name: dist
-          path: dist/
-          retention-days: 1
+          node-version: ${{ env.NODE_VERSION }}
+          working-directory: '.'
+          build-command: 'npm run build'
+          upload-artifacts: 'true'
+          artifact-name: 'dist'
+          artifact-path: 'dist/'
 
   deploy:
     name: Deploy to AWS
@@ -54,35 +54,20 @@ jobs:
           path: dist/
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: h3ow3d/h3ow3d-github-actions/actions/aws-configure@main
         with:
+          aws-region: ${{ env.AWS_REGION }}
+          auth-method: 'static'
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Deploy infrastructure
+        uses: h3ow3d/h3ow3d-github-actions/actions/terraform-deploy@main
         with:
-          terraform_version: 1.14.1
-          terraform_wrapper: false
-
-      - name: Terraform Init
-        working-directory: infra
-        run: terraform init
-
-      - name: Terraform Plan
-        working-directory: infra
-        env:
-          TF_VAR_domain_name: ${{ secrets.TF_VAR_DOMAIN_NAME }}
-          TF_VAR_hosted_zone_id: ${{ secrets.TF_VAR_HOSTED_ZONE_ID }}
-        run: terraform plan -out=tfplan
-
-      - name: Terraform Apply
-        working-directory: infra
-        env:
-          TF_VAR_domain_name: ${{ secrets.TF_VAR_DOMAIN_NAME }}
-          TF_VAR_hosted_zone_id: ${{ secrets.TF_VAR_HOSTED_ZONE_ID }}
-        run: terraform apply -auto-approve tfplan
+          terraform-version: '1.14.1'
+          working-directory: 'infra'
+          terraform-wrapper: 'false'
+          auto-approve: 'true'
 
       - name: Get S3 bucket name
         id: get-bucket

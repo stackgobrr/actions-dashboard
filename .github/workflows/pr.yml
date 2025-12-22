@@ -22,11 +22,11 @@ jobs:
         uses: ./.github/actions/react-component-test
       
       - name: Build application
-        run: npm run build
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: h3ow3d/h3ow3d-github-actions/actions/node-build-test@main
         with:
-          name: pr-build-${{ github.event.pull_request.number }}
-          path: dist/
-          retention-days: 7
+          node-version: '20'
+          working-directory: '.'
+          build-command: 'npm run build'
+          upload-artifacts: 'true'
+          artifact-name: 'pr-build-${{ github.event.pull_request.number }}'
+          artifact-path: 'dist/'
