@@ -54,12 +54,14 @@ Added support for `shared-app` auth method:
 - [x] SSE automatically connects using installation ID
 - [x] Logout clears shared app credentials
 
-## Step 5: Configure GitHub App Callback URL
+## Step 5: Configure GitHub App Callback URL [DONE]
 
 Add the callback URL to your GitHub App settings:
 1. Navigate to: https://github.com/organizations/stackgobrr/settings/apps/actions-dashboard-by-stackgobrr
 2. Add callback URL: `https://actions.dashboard.stackgobrr.com/auth/github/callback`
 3. Save changes
+
+Status: [x] Callback URL already configured
 
 ## Step 6: Test the Flow
 
@@ -81,8 +83,10 @@ Add the callback URL to your GitHub App settings:
 [x] React Router setup complete
 [x] useAuth shared-app support complete
 [x] GitHub App slug configured (APP_SLUG variable set)
-[ ] GitHub App callback URL configuration (pending)
-[ ] End-to-end testing (pending)
+[x] GitHub App callback URL configured
+[x] AuthSetup prioritizes shared app installation
+[ ] Deployment complete (in progress)
+[ ] End-to-end testing (ready to test)
 
 ## Files Modified
 - `.github/workflows/deploy.yml` - Added `VITE_APP_SLUG` env var (renamed from VITE_GITHUB_APP_SLUG)
