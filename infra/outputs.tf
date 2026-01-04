@@ -5,7 +5,7 @@ output "s3_bucket_name" {
 
 output "s3_bucket_arn" {
   description = "ARN of the S3 bucket"
-  value       = module.frontend.s3_bucket_arn
+  value       = "arn:aws:s3:::${module.frontend.s3_bucket_name}"
 }
 
 output "cloudfront_distribution_id" {
@@ -30,5 +30,5 @@ output "certificate_arn" {
 
 output "route53_record_name" {
   description = "DNS name of the Route53 record (if using custom domain)"
-  value       = module.frontend.route53_record_name
+  value       = module.frontend.domain_name
 }
