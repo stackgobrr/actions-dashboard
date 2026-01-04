@@ -17,7 +17,17 @@ import { logger } from './utils/logger'
 import { DEFAULT_REFRESH_INTERVAL } from './constants/timing'
 
 function App() {
-  const [showLanding, setShowLanding] = useState(true)
+  // Check if user has any auth credentials - if so, skip landing page
+  const hasAuth = () => {
+    return !!(
+      localStorage.getItem('shared_app_installation_id') ||
+      localStorage.getItem('github_token') ||
+      localStorage.getItem('github_app_id') ||
+      localStorage.getItem('demo_mode')
+    )
+  }
+
+  const [showLanding, setShowLanding] = useState(!hasAuth())
   const [showRoadmap, setShowRoadmap] = useState(false)
   const [sortBy, setSortBy] = useState('last-run-desc')
   const [theme, setTheme] = useTheme()
