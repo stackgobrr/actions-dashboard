@@ -5,7 +5,7 @@ aws_region = "eu-west-2"
 environment = "prod"
 
 # Project name (used for resource naming)
-project_name = "h3ow3d-actions-dashboard"
+project_name = "actions-dashboard"
 
 # CloudFront price class (controls edge location distribution)
 # PriceClass_All: All edge locations (most expensive)
@@ -15,8 +15,8 @@ cloudfront_price_class = "PriceClass_100"
 
 # Optional: Custom domain configuration
 # Uncomment and set these to use a custom domain
-# domain_name     = "actions.dashboard.h3ow3d.com"
-# hosted_zone_id  = "Z07170922H7CK1PCDM6NG"
+# domain_name     = "actions.dashboard.stackgobrr.com"
+# hosted_zone_id  = "Z03625632P0KL404I606"
 # Note: ACM certificate will be automatically created and validated via DNS
 
 # Optional: Store GitHub token in SSM Parameter Store

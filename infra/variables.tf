@@ -13,7 +13,7 @@ variable "environment" {
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
-  default     = "h3ow3d-actions-dashboard"
+  default     = "actions-dashboard"
 }
 
 variable "domain_name" {
