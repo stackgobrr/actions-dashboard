@@ -16,6 +16,12 @@ const WEBHOOK_SECRET = process.env.GITHUB_WEBHOOK_SECRET;
  * @returns {boolean} True if signature is valid
  */
 function verifySignature(payload, signature) {
+  // If no webhook secret is configured, skip validation (allow initial setup)
+  if (!WEBHOOK_SECRET) {
+    console.warn('[Webhook] No GITHUB_WEBHOOK_SECRET configured - skipping signature validation');
+    return true;
+  }
+
   if (!signature) {
     console.error('[Webhook] Missing X-Hub-Signature-256 header');
     return false;
@@ -70,11 +76,12 @@ function parseWorkflowRunEvent(payload) {
  * @returns {Object} Normalized event data
  */
 function parseWorkflowJobEvent(payload) {
-  const { workflow_job, repository, action } = payload;
+  const { workflow_job, repository, action, installation } = payload;
 
   return {
     type: 'workflow_job',
     action,
+    installationId: installation.id.toString(),
     repository: repository.name,
     repositoryFullName: repository.full_name,
     owner: repository.owner.login,
@@ -85,6 +92,33 @@ function parseWorkflowJobEvent(payload) {
     conclusion: workflow_job.conclusion,
     url: workflow_job.html_url,
     timestamp: workflow_job.completed_at || workflow_job.started_at,
+  };
+}
+
+/**
+ * Parse pull_request event
+ * @param {Object} payload - GitHub webhook payload
+ * @returns {Object} Normalized event data
+ */
+function parsePullRequestEvent(payload) {
+  const { pull_request, repository, action, installation } = payload;
+
+  return {
+    type: 'pull_request',
+    action,
+    installationId: installation.id.toString(),
+    repository: repository.name,
+    repositoryFullName: repository.full_name,
+    owner: repository.owner.login,
+    prNumber: pull_request.number,
+    prTitle: pull_request.title,
+    prState: pull_request.state,
+    prDraft: pull_request.draft,
+    prMerged: pull_request.merged || false,
+    branch: pull_request.head.ref,
+    baseBranch: pull_request.base.ref,
+    url: pull_request.html_url,
+    timestamp: pull_request.updated_at,
   };
 }
 
@@ -134,6 +168,11 @@ export const handler = async (event) => {
     case 'workflow_job':
       eventData = parseWorkflowJobEvent(payload);
       console.log('[Webhook] Parsed workflow_job:', JSON.stringify(eventData));
+      break;
+
+    case 'pull_request':
+      eventData = parsePullRequestEvent(payload);
+      console.log('[Webhook] Parsed pull_request:', JSON.stringify(eventData));
       break;
 
     case 'ping':
