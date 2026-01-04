@@ -54,8 +54,9 @@ export function SharedAppAuth() {
         setStatus('success')
 
         // Redirect to dashboard after a short delay
+        // Use window.location.href for full page reload to ensure useAuth re-checks localStorage
         setTimeout(() => {
-          navigate('/', { replace: true })
+          window.location.href = '/'
         }, 1500)
 
       } catch (err) {
