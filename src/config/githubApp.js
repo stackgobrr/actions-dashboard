@@ -5,7 +5,7 @@
 
 // GitHub App slug (will be provided after you create the GitHub App)
 // Format: https://github.com/apps/{APP_SLUG}
-export const GITHUB_APP_SLUG = import.meta.env.VITE_GITHUB_APP_SLUG || ''
+export const GITHUB_APP_SLUG = import.meta.env.VITE_APP_SLUG || ''
 
 // GitHub App install URL
 export const GITHUB_APP_INSTALL_URL = `https://github.com/apps/${GITHUB_APP_SLUG}/installations/new`

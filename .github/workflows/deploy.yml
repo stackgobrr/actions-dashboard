@@ -105,7 +105,7 @@ jobs:
           artifact-path: 'dist/'
         env:
           VITE_SSE_ENDPOINT: ${{ needs.deploy-infrastructure.outputs.sse_url }}
-          VITE_GITHUB_APP_SLUG: ${{ vars.GITHUB_APP_SLUG }}
+          VITE_APP_SLUG: ${{ vars.APP_SLUG }}
 
   deploy-frontend:
     name: Deploy Frontend
