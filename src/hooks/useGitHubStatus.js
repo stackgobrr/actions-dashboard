@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { MOCK_REPO_STATUSES } from '../data/mockRepoStatuses'
+import { useSSE } from './useSSE'
+import { getGitHubAppCredentials } from '../services/githubAppAuth'
 
 /**
  * Check if we're in a demo-capable environment
@@ -41,6 +43,15 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
   const [isDemoMode, setIsDemoMode] = useState(isDemoModeEnabled(authMethod))
+
+  // Get installation ID for SSE connection (only for GitHub App auth)
+  const installationId = authMethod === 'github-app'
+    ? getGitHubAppCredentials().installationId
+    : null
+
+  // Setup SSE connection for real-time updates (only for GitHub App)
+  const sseEnabled = authMethod === 'github-app' && !showAuthSetup && !isDemoMode
+  const sse = useSSE(installationId, sseEnabled)
 
   // Create a stable key from repositories to detect real changes
   const reposKey = JSON.stringify(
@@ -153,6 +164,58 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     setIsDemoMode(isDemoModeEnabled(authMethod))
   }, [authMethod])
 
+  // Subscribe to SSE events for real-time updates
+  useEffect(() => {
+    if (!sse.isConnected) {
+      return
+    }
+
+    const unsubscribe = sse.subscribe((event) => {
+      // Update status for the repository that received an event
+      setRepoStatuses(prev => {
+        const repoName = event.repository
+
+        // Find the repository in our list to preserve category/labels
+        const allRepos = [
+          ...repositories.common,
+          ...repositories.modules,
+          ...repositories.infra,
+          ...repositories.services,
+          ...repositories.utils,
+          ...repositories.custom,
+        ]
+
+        const repo = allRepos.find(r => r.name === repoName)
+
+        if (!repo) {
+          // Repository not in our list, ignore the event
+          return prev
+        }
+
+        // Update the repository status with the event data
+        return {
+          ...prev,
+          [repoName]: {
+            ...prev[repoName],
+            status: event.status,
+            conclusion: event.conclusion,
+            workflow: event.workflow,
+            branch: event.branch,
+            commitMessage: event.commitMessage || event.commitSha?.substring(0, 7) || 'No message',
+            url: event.url,
+            updatedAt: event.timestamp,
+            category: repo.category || prev[repoName]?.category,
+            labels: repo.labels || prev[repoName]?.labels || []
+          }
+        }
+      })
+
+      setLastUpdate(new Date())
+    })
+
+    return unsubscribe
+  }, [sse.isConnected, sse.subscribe, repositories])
+
   useEffect(() => {
     // Use demo data when in demo mode (selected as auth or environment-based)
     if (isDemoMode) {
@@ -205,6 +268,10 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     isDemoMode,
     toggleDemoMode,
     // Demo mode can only be selected from the auth page, not toggled from dashboard
-    canToggleDemoMode: false
+    canToggleDemoMode: false,
+    // SSE connection status
+    sseStatus: sse.status,
+    sseConnected: sse.isConnected,
+    sseError: sse.error
   }
 }
