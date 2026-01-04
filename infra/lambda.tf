@@ -37,12 +37,12 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 
 # CloudWatch Log Groups
 resource "aws_cloudwatch_log_group" "webhook_receiver" {
-  name              = "/aws/lambda/${aws_lambda_function.webhook_receiver.function_name}"
+  name              = "/aws/lambda/${var.project_name}-webhook-receiver"
   retention_in_days = 7
 }
 
 resource "aws_cloudwatch_log_group" "sse_handler" {
-  name              = "/aws/lambda/${aws_lambda_function.sse_handler.function_name}"
+  name              = "/aws/lambda/${var.project_name}-sse-handler"
   retention_in_days = 7
 }
 
