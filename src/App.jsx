@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import { Dashboard } from './components/Dashboard/Dashboard'
 import { AuthSetup } from './components/Auth/AuthSetup'
@@ -6,6 +7,7 @@ import { Settings } from './components/Settings/Settings'
 import { HotkeyHelper } from './components/UI/HotkeyHelper'
 import { LandingPage } from './components/LandingPage/LandingPage'
 import { Roadmap } from './components/Roadmap/Roadmap'
+import { SharedAppAuth } from './components/Auth/SharedAppAuth'
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
 import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
@@ -154,103 +156,109 @@ function App() {
     return () => document.removeEventListener('keypress', handleKeyPress)
   }, [theme, loading, fetchAllStatuses, setTheme])
 
-  // Show roadmap page
-  if (showRoadmap) {
-    return <Roadmap
-      onBack={() => {
-        setShowRoadmap(false)
-        setShowLanding(true)
-      }}
-      theme={theme}
-      setTheme={setTheme}
-    />
-  }
-
-  // Show landing page first
-  if (showLanding) {
-    return <LandingPage
-      onGetStarted={handleGetStarted}
-      onViewRoadmap={() => {
-        setShowLanding(false)
-        setShowRoadmap(true)
-      }}
-      theme={theme}
-      setTheme={setTheme}
-    />
-  }
-
-  if (auth.showAuthSetup) {
-    return (
-      <AuthSetup
-        showGuide={showGuide}
-        setShowGuide={setShowGuide}
-        showGitHubAppForm={auth.showGitHubAppForm}
-        setShowGitHubAppForm={auth.setShowGitHubAppForm}
-        githubToken={auth.githubToken}
-        setGithubToken={auth.setGithubToken}
-        saveToken={auth.saveToken}
-        appId={auth.appId}
-        setAppId={auth.setAppId}
-        installationId={auth.installationId}
-        setInstallationId={auth.setInstallationId}
-        privateKey={auth.privateKey}
-        setPrivateKey={auth.setPrivateKey}
-        appFormError={auth.appFormError}
-        handleGitHubAppSetup={auth.handleGitHubAppSetup}
-        handleDemoMode={auth.handleDemoMode}
-        handleLogout={auth.handleLogout}
-        authMethod={auth.authMethod}
-        patError={auth.patError}
-        isValidatingPat={auth.isValidatingPat}
-        isValidatingGitHubApp={auth.isValidatingGitHubApp}
-      />
-    )
-  }
-
   return (
-    <ErrorBoundary>
-      <div className="dashboard-mode">
-        <Dashboard
-          repoStatuses={repoStatuses}
-          loading={loading}
-          lastUpdate={lastUpdate}
-          fetchAllStatuses={fetchAllStatuses}
-          isFullscreen={isFullscreen}
-          toggleFullscreen={toggleFullscreen}
-          authMethod={auth.authMethod}
-          appInfo={auth.appInfo}
-          handleLogout={auth.handleLogout}
-          clearToken={auth.clearToken}
-          theme={theme}
-          setTheme={setTheme}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          autoRefresh={autoRefresh}
-          setAutoRefresh={setAutoRefresh}
-          refreshInterval={refreshInterval}
-          setRefreshInterval={setRefreshInterval}
-          onOpenSettings={() => setShowSettings(true)}
-          filterByLabels={filterByLabels}
-          setFilterByLabels={setFilterByLabels}
-          isDemoMode={isDemoMode}
-          toggleDemoMode={toggleDemoMode}
-          canToggleDemoMode={canToggleDemoMode}
-          onToggleHotkeyHelper={() => setShowHotkeyHelper(prev => !prev)}
-        />
-        {showSettings && (
-          <Settings
-            onClose={() => setShowSettings(false)}
-            getActiveToken={auth.getActiveToken}
-            selectedRepos={selectedRepos}
-            onSaveRepos={handleSaveRepos}
-          />
-        )}
-        <HotkeyHelper 
-          isOpen={showHotkeyHelper} 
-          onClose={() => setShowHotkeyHelper(false)} 
-        />
-      </div>
-    </ErrorBoundary>
+    <Routes>
+      {/* OAuth callback route for shared GitHub App */}
+      <Route path="/auth/github/callback" element={<SharedAppAuth />} />
+
+      {/* Main app route */}
+      <Route path="*" element={
+        <>
+          {/* Show roadmap page */}
+          {showRoadmap ? (
+            <Roadmap
+              onBack={() => {
+                setShowRoadmap(false)
+                setShowLanding(true)
+              }}
+              theme={theme}
+              setTheme={setTheme}
+            />
+          ) : showLanding ? (
+            /* Show landing page first */
+            <LandingPage
+              onGetStarted={handleGetStarted}
+              onViewRoadmap={() => {
+                setShowLanding(false)
+                setShowRoadmap(true)
+              }}
+              theme={theme}
+              setTheme={setTheme}
+            />
+          ) : auth.showAuthSetup ? (
+            /* Show auth setup */
+            <AuthSetup
+              showGuide={showGuide}
+              setShowGuide={setShowGuide}
+              showGitHubAppForm={auth.showGitHubAppForm}
+              setShowGitHubAppForm={auth.setShowGitHubAppForm}
+              githubToken={auth.githubToken}
+              setGithubToken={auth.setGithubToken}
+              saveToken={auth.saveToken}
+              appId={auth.appId}
+              setAppId={auth.setAppId}
+              installationId={auth.installationId}
+              setInstallationId={auth.setInstallationId}
+              privateKey={auth.privateKey}
+              setPrivateKey={auth.setPrivateKey}
+              appFormError={auth.appFormError}
+              handleGitHubAppSetup={auth.handleGitHubAppSetup}
+              handleDemoMode={auth.handleDemoMode}
+              handleLogout={auth.handleLogout}
+              authMethod={auth.authMethod}
+              patError={auth.patError}
+              isValidatingPat={auth.isValidatingPat}
+              isValidatingGitHubApp={auth.isValidatingGitHubApp}
+            />
+          ) : (
+            /* Show dashboard */
+            <ErrorBoundary>
+              <div className="dashboard-mode">
+                <Dashboard
+                  repoStatuses={repoStatuses}
+                  loading={loading}
+                  lastUpdate={lastUpdate}
+                  fetchAllStatuses={fetchAllStatuses}
+                  isFullscreen={isFullscreen}
+                  toggleFullscreen={toggleFullscreen}
+                  authMethod={auth.authMethod}
+                  appInfo={auth.appInfo}
+                  handleLogout={auth.handleLogout}
+                  clearToken={auth.clearToken}
+                  theme={theme}
+                  setTheme={setTheme}
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                  autoRefresh={autoRefresh}
+                  setAutoRefresh={setAutoRefresh}
+                  refreshInterval={refreshInterval}
+                  setRefreshInterval={setRefreshInterval}
+                  onOpenSettings={() => setShowSettings(true)}
+                  filterByLabels={filterByLabels}
+                  setFilterByLabels={setFilterByLabels}
+                  isDemoMode={isDemoMode}
+                  toggleDemoMode={toggleDemoMode}
+                  canToggleDemoMode={canToggleDemoMode}
+                  onToggleHotkeyHelper={() => setShowHotkeyHelper(prev => !prev)}
+                />
+                {showSettings && (
+                  <Settings
+                    onClose={() => setShowSettings(false)}
+                    getActiveToken={auth.getActiveToken}
+                    selectedRepos={selectedRepos}
+                    onSaveRepos={handleSaveRepos}
+                  />
+                )}
+                <HotkeyHelper
+                  isOpen={showHotkeyHelper}
+                  onClose={() => setShowHotkeyHelper(false)}
+                />
+              </div>
+            </ErrorBoundary>
+          )}
+        </>
+      } />
+    </Routes>
   )
 }
 

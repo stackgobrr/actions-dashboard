@@ -32,7 +32,12 @@ export function useAuth() {
   // Check authentication on mount
   useEffect(() => {
     const checkAuth = async () => {
-      if (isGitHubAppConfigured()) {
+      // Check for shared app installation first (highest priority)
+      if (localStorage.getItem('shared_app_installation_id')) {
+        setAuthMethod('shared-app')
+        setInstallationId(localStorage.getItem('shared_app_installation_id'))
+        logger.info('[useAuth] Found shared app installation')
+      } else if (isGitHubAppConfigured()) {
         setAuthMethod('github-app')
         try {
           const info = await getAppInstallationInfo()
@@ -121,7 +126,11 @@ export function useAuth() {
    * Clears credentials and resets to initial auth state
    */
   const handleLogout = () => {
-    if (authMethod === 'github-app') {
+    if (authMethod === 'shared-app') {
+      localStorage.removeItem('shared_app_installation_id')
+      localStorage.removeItem('auth_method')
+      setInstallationId('')
+    } else if (authMethod === 'github-app') {
       clearGitHubAppAuth()
       setAppInfo(null)
     } else if (authMethod === 'demo') {
