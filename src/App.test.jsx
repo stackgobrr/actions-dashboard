@@ -62,7 +62,7 @@ describe('App Component - Smoke Tests', () => {
     await user.click(getStartedButtons[0])
     
     // Should show both GitHub App and PAT options
-    expect(screen.getByText(/GitHub App \(Recommended\)/i)).toBeInTheDocument()
+    expect(screen.getByText(/Self-Hosted GitHub App/i)).toBeInTheDocument()
     expect(screen.getByText(/Personal Access Token/i)).toBeInTheDocument()
   })
 })

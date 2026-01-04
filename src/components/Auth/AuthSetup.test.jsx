@@ -42,7 +42,7 @@ describe('AuthSetup Component', () => {
 
     it('shows both authentication options initially', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('GitHub App (Recommended)')).toBeInTheDocument()
+      expect(screen.getByText('Self-Hosted GitHub App')).toBeInTheDocument()
       expect(screen.getByText('Personal Access Token')).toBeInTheDocument()
     })
 
@@ -56,7 +56,7 @@ describe('AuthSetup Component', () => {
   describe('GitHub App Option', () => {
     it('displays GitHub App description', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Enhanced security with automatic token refresh, ideal for professional use.')).toBeInTheDocument()
+      expect(screen.getByText('Configure your own GitHub App for advanced control and customization.')).toBeInTheDocument()
     })
 
     it('shows Configure GitHub App button', () => {
