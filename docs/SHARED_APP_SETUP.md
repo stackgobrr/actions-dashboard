@@ -58,10 +58,12 @@ Added support for `shared-app` auth method:
 
 Add the callback URL to your GitHub App settings:
 1. Navigate to: https://github.com/organizations/stackgobrr/settings/apps/actions-dashboard-by-stackgobrr
-2. Add callback URL: `https://actions.dashboard.stackgobrr.com/auth/github/callback`
+2. Add callback URL: `https://actions.dashboard.stackgobrr.com`
 3. Save changes
 
-Status: [x] Callback URL already configured
+Status: [x] Callback URL configured (root domain)
+
+Note: GitHub App installations redirect to the root URL with `?installation_id=...&setup_action=install` query parameters, which are handled in App.jsx.
 
 ## Step 6: Test the Flow
 
@@ -69,7 +71,7 @@ Status: [x] Callback URL already configured
 2. Visit landing page - should see "Install GitHub App" button
 3. Click button → redirected to GitHub
 4. Install app to your account/repos
-5. GitHub redirects back to `/auth/github/callback?installation_id=XXX`
+5. GitHub redirects back to `/?installation_id=XXX&setup_action=install`
 6. App stores installation_id and redirects to dashboard
 7. Dashboard connects via SSE using installation_id
 8. Trigger a workflow → webhook → SSE → instant dashboard update!

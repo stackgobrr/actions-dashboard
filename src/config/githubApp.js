@@ -11,7 +11,8 @@ export const GITHUB_APP_SLUG = import.meta.env.VITE_APP_SLUG || ''
 export const GITHUB_APP_INSTALL_URL = `https://github.com/apps/${GITHUB_APP_SLUG}/installations/new`
 
 // OAuth callback URL (must be registered in GitHub App settings)
-export const GITHUB_APP_CALLBACK_URL = window.location.origin + '/auth/github/callback'
+// GitHub App installations redirect to the root URL with query params
+export const GITHUB_APP_CALLBACK_URL = window.location.origin
 
 /**
  * Check if shared GitHub App is configured

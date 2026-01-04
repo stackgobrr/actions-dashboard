@@ -56,6 +56,30 @@ function App() {
 
   const auth = useAuth()
 
+  // Handle GitHub App installation callback on root URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const installationId = params.get('installation_id')
+    const setupAction = params.get('setup_action')
+
+    if (installationId && setupAction === 'install') {
+      logger.info('[App] Processing GitHub App installation', { installationId })
+
+      // Store installation ID in localStorage
+      localStorage.setItem('shared_app_installation_id', installationId)
+      localStorage.setItem('auth_method', 'shared-app')
+
+      // Clear any existing self-hosted GitHub App credentials
+      localStorage.removeItem('github_app_id')
+      localStorage.removeItem('github_app_private_key')
+      localStorage.removeItem('github_app_installation_id')
+
+      // Clean up URL and reload to apply auth
+      window.history.replaceState({}, '', '/')
+      window.location.reload()
+    }
+  }, [])
+
   // Check if user is already authenticated on mount - wait for auth to initialize
   useEffect(() => {
     // Only hide landing if we have a definite auth method (not 'none')
