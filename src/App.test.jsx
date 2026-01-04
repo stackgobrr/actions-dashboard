@@ -1,7 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { BrowserRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import App from './App'
+
+// Helper to render App with Router context
+const renderApp = () => {
+  return render(
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  )
+}
 
 describe('App Component - Smoke Tests', () => {
   beforeEach(() => {
@@ -12,14 +22,14 @@ describe('App Component - Smoke Tests', () => {
   })
 
   it('should render without crashing', () => {
-    render(<App />)
+    renderApp()
     expect(document.body).toBeTruthy()
   })
 
   it('should show landing page when no token is present', () => {
     localStorage.getItem.mockReturnValue(null)
-    render(<App />)
-    
+    renderApp()
+
     // Should show landing page with header button
     const getStartedButtons = screen.getAllByRole('button', { name: /Get Started/i })
     expect(getStartedButtons.length).toBeGreaterThan(0)
@@ -31,12 +41,12 @@ describe('App Component - Smoke Tests', () => {
   it('should show authentication setup after clicking Get Started', async () => {
     localStorage.getItem.mockReturnValue(null)
     const user = userEvent.setup()
-    render(<App />)
-    
+    renderApp()
+
     // Click the first Get Started button (header button)
     const getStartedButtons = screen.getAllByRole('button', { name: /Get Started/i })
     await user.click(getStartedButtons[0])
-    
+
     // Should now show authentication setup
     expect(screen.getByText(/GitHub Authentication/i)).toBeInTheDocument()
     expect(screen.getByText(/Choose an authentication method/i)).toBeInTheDocument()
@@ -45,7 +55,7 @@ describe('App Component - Smoke Tests', () => {
   it('should have both auth options visible after clicking Get Started', async () => {
     localStorage.getItem.mockReturnValue(null)
     const user = userEvent.setup()
-    render(<App />)
+    renderApp()
     
     // Click the first Get Started button (header button)
     const getStartedButtons = screen.getAllByRole('button', { name: /Get Started/i })
