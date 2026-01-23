@@ -22,19 +22,36 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
   const fetchUserRepos = async () => {
     setLoading(true)
     setError(null)
+    setAvailableRepos([])
+
     try {
       const token = await getActiveToken()
       const headers = token ? { 'Authorization': `token ${token}` } : {}
-      
-      // Fetch user's accessible repositories
-      const response = await fetch('https://api.github.com/user/repos?per_page=100&sort=updated', { headers })
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch repositories: ${response.status}`)
+
+      let allRepos = []
+      let page = 1
+      let hasMore = true
+
+      // Fetch all repositories the user has access to (personal + orgs + collaborator)
+      while (hasMore) {
+        const response = await fetch(
+          `https://api.github.com/user/repos?per_page=100&page=${page}&sort=updated`,
+          { headers }
+        )
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch repositories: ${response.status}`)
+        }
+
+        const data = await response.json()
+        allRepos = [...allRepos, ...data]
+
+        // Check if there are more pages
+        hasMore = data.length === 100
+        page++
       }
-      
-      const data = await response.json()
-      setAvailableRepos(data)
+
+      setAvailableRepos(allRepos)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -77,8 +94,9 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
     onClose()
   }
 
-  const filteredAvailable = availableRepos.filter(repo => 
+  const filteredAvailable = availableRepos.filter(repo =>
     repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    repo.owner.login.toLowerCase().includes(searchQuery.toLowerCase()) ||
     repo.description?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
