@@ -23,7 +23,7 @@ import { buildInstallUrl, isSharedAppConfigured } from '../../config/githubApp'
 import '../../styles/shared.css'
 import './LandingPage.css'
 
-export function LandingPage({ onGetStarted, onViewRoadmap, theme, setTheme }) {
+export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, setTheme }) {
   const sharedAppConfigured = isSharedAppConfigured()
   const [activeFeature, setActiveFeature] = useState(0)
   const [demoStatusIndex, setDemoStatusIndex] = useState(0)
@@ -244,10 +244,7 @@ export function LandingPage({ onGetStarted, onViewRoadmap, theme, setTheme }) {
                 variant="default"
                 size="large"
                 leadingVisual={EyeIcon}
-                onClick={() => {
-                  // Handle demo mode
-                  console.log('View demo clicked')
-                }}
+                onClick={onViewDemo}
               >
                 View demo
               </Button>
