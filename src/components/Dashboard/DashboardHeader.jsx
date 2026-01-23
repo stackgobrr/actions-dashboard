@@ -1,6 +1,5 @@
-import { 
+import {
   MarkGithubIcon,
-  GearIcon,
   SignOutIcon,
   FilterIcon,
   ClockIcon,
@@ -9,7 +8,9 @@ import {
   ChevronDownIcon,
   BugIcon,
   QuestionIcon,
-  HeartIcon
+  HeartIcon,
+  RepoIcon,
+  GearIcon
 } from '@primer/octicons-react'
 import { Button, IconButton, Select, Checkbox, Label, ActionMenu, ActionList } from '@primer/react'
 import { ThemeToggle } from '../UI/ThemeToggle'
@@ -129,14 +130,6 @@ export function DashboardHeader({
           />
           <FullscreenToggle isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <IconButton
-            icon={GearIcon}
-            onClick={onOpenSettings}
-            aria-label="Settings"
-            title="Repository Configuration"
-            size="medium"
-            className="color-fg-muted"
-          />
           {authMethod === 'github-app' && appInfo ? (
             <div className="d-flex flex-items-center gap-2 border rounded-2 px-3 py-1">
               <GearIcon size={16} className="color-fg-muted" />
@@ -186,6 +179,15 @@ export function DashboardHeader({
       </div>
       
       <div className="dashboard-filters">
+        <Button
+          leadingVisual={RepoIcon}
+          onClick={onOpenSettings}
+          aria-label="Configure Repositories"
+          title="Configure Repositories"
+          size="small"
+        >
+          Configure Repositories
+        </Button>
         <ActionMenu>
           <ActionMenu.Anchor>
             <Button 
