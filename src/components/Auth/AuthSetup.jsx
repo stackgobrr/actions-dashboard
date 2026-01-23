@@ -1,4 +1,4 @@
-import { MarkGithubIcon, GearIcon, LinkExternalIcon, BeakerIcon, SignOutIcon, LightBulbIcon, ShieldLockIcon, DownloadIcon } from '@primer/octicons-react'
+import { MarkGithubIcon, GearIcon, LinkExternalIcon, ShieldLockIcon, DownloadIcon } from '@primer/octicons-react'
 import { Button, Flash } from '@primer/react'
 import GitHubAppGuide from './GitHubAppGuide'
 import { GitHubAppForm } from './GitHubAppForm'
@@ -82,8 +82,35 @@ export function AuthSetup({
         
         {!showGitHubAppForm && (
           <>
+            {/* Option 1: Personal Access Token - Simplest */}
+            <div style={{
+              boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
+              border: '1px solid var(--borderColor-default)',
+              borderRadius: '6px'
+            }}>
+              <PatForm
+                githubToken={githubToken}
+                setGithubToken={setGithubToken}
+                onSubmit={saveToken}
+                patError={patError}
+                isValidatingPat={isValidatingPat}
+              />
+              <div style={{padding: '0 40px 16px 40px'}}>
+                <p className="f6 color-fg-muted mb-0" style={{fontStyle: 'italic'}}>
+                  <strong>When to use:</strong> Quick setup for personal projects. Updates every 10 seconds via polling.
+                </p>
+              </div>
+            </div>
+
             {isSharedAppConfigured() && (
               <>
+                <div className="d-flex flex-items-center my-5">
+                  <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
+                  <span className="px-4 f5 text-semibold color-fg-muted">OR</span>
+                  <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
+                </div>
+
+                {/* Option 2: Managed GitHub App - Recommended */}
                 <div style={{
                   boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
                   border: '2px solid var(--borderColor-accent-emphasis)',
@@ -97,12 +124,13 @@ export function AuthSetup({
                   }}>
                     <h2 className="f4 text-semibold mb-0" style={{display: 'flex', alignItems: 'center'}}>
                       <DownloadIcon size={20} style={{marginRight: '8px'}} />
-                      Install GitHub App (Recommended)
+                      Managed GitHub App
+                      <span className="Label Label--success ml-2" style={{fontSize: '12px'}}>Recommended</span>
                     </h2>
                   </div>
                   <div style={{padding: '32px 40px 16px 40px'}}>
                     <p className="color-fg-muted f5 mb-3">
-                      One-click installation with real-time updates via webhooks. The easiest way to get started.
+                      One-click installation with instant live updates via webhooks. No configuration needed.
                     </p>
                     <Button
                       as="a"
@@ -114,20 +142,21 @@ export function AuthSetup({
                     >
                       Install GitHub App
                     </Button>
-                    <p className="f6 color-fg-muted mt-3 mb-0 text-center">
-                      Instant setup with real-time webhook notifications
+                    <p className="f6 color-fg-muted mt-3 mb-0" style={{fontStyle: 'italic'}}>
+                      <strong>When to use:</strong> Best for most users. Get instant updates when workflows start, complete, or fail.
                     </p>
                   </div>
                 </div>
-
-                <div className="d-flex flex-items-center my-5">
-                  <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
-                  <span className="px-4 f5 text-semibold color-fg-muted">OR</span>
-                  <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
-                </div>
               </>
             )}
+            
+            <div className="d-flex flex-items-center my-5">
+              <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
+              <span className="px-4 f5 text-semibold color-fg-muted">OR</span>
+              <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
+            </div>
 
+            {/* Option 3: Self-Hosted GitHub App - Advanced */}
             <div style={{
               boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
               border: '1px solid var(--borderColor-default)',
@@ -142,10 +171,11 @@ export function AuthSetup({
                 <h2 className="f4 text-semibold mb-0" style={{display: 'flex', alignItems: 'center'}}>
                   <GearIcon size={20} style={{marginRight: '8px'}} />
                   Self-Hosted GitHub App
+                  <span className="Label ml-2" style={{fontSize: '12px'}}>Advanced</span>
                 </h2>
               </div>
               <div style={{padding: '32px 40px 16px 40px'}}>
-                <p className="color-fg-muted f5 mb-3">Configure your own GitHub App for advanced control and customization.</p>
+                <p className="color-fg-muted f5 mb-3">Create and configure your own GitHub App with full control over permissions and webhooks.</p>
                 <Button
                   onClick={() => setShowGitHubAppForm(true)}
                   variant="default"
@@ -155,7 +185,7 @@ export function AuthSetup({
                 >
                   Configure GitHub App
                 </Button>
-                <p className="f6 color-fg-muted mt-3 mb-0 text-center">
+                <p className="f6 color-fg-muted mt-3 mb-2 text-center">
                   <button
                     onClick={(e) => { e.preventDefault(); setShowGuide(true); }}
                     style={{
@@ -170,85 +200,13 @@ export function AuthSetup({
                     onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
                     onMouseOut={(e) => e.target.style.textDecoration = 'none'}
                   >
-                    Need help?
+                    Need help setting up?
                     <LinkExternalIcon size={14} style={{display: 'inline', marginLeft: '4px', verticalAlign: 'text-bottom'}} />
                   </button>
                 </p>
-              </div>
-            </div>
-            
-            <div className="d-flex flex-items-center my-5">
-              <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
-              <span className="px-4 f5 text-semibold color-fg-muted">OR</span>
-              <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
-            </div>
-            
-            <div style={{
-              boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
-              border: '1px solid var(--borderColor-default)',
-              borderRadius: '6px'
-            }}>
-              <PatForm
-                githubToken={githubToken}
-                setGithubToken={setGithubToken}
-                onSubmit={saveToken}
-                patError={patError}
-                isValidatingPat={isValidatingPat}
-              />
-            </div>
-            
-            <div className="d-flex flex-items-center my-5">
-              <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
-              <span className="px-4 f5 text-semibold color-fg-muted">OR</span>
-              <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
-            </div>
-            
-            <div style={{
-              boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
-              border: '1px solid var(--borderColor-default)',
-              borderRadius: '6px'
-            }}>
-              <div style={{
-                background: 'var(--bgColor-muted)',
-                borderBottom: '1px solid var(--borderColor-default)',
-                borderRadius: '6px 6px 0 0',
-                padding: '16px 24px'
-              }}>
-                <h2 className="f4 text-semibold mb-0" style={{display: 'flex', alignItems: 'center'}}>
-                  <BeakerIcon size={20} style={{marginRight: '8px'}} />
-                  Demo Mode
-                </h2>
-              </div>
-              <div style={{padding: '32px 40px 16px'}}>
-                {authMethod === 'demo' ? (
-                  <>
-                    <p className="color-fg-muted f5 mb-3">You are currently viewing sample data.</p>
-                    <Button 
-                      onClick={handleLogout} 
-                      variant="danger"
-                      block
-                      size="large"
-                      leadingVisual={SignOutIcon}
-                    >
-                      Sign Out
-                    </Button>
-                    <p className="f6 color-fg-muted mt-3 mb-0 text-center">Sign out to use real GitHub data.</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="color-fg-muted f5 mb-3">Explore the dashboard with demo data, discover what this app can do.</p>
-                    <Button 
-                      onClick={handleDemoMode} 
-                      variant="default"
-                      block
-                      size="large"
-                      leadingVisual={LightBulbIcon}
-                    >
-                      Explore Demo
-                    </Button>
-                    <p className="f6 color-fg-muted mt-3 mb-0 text-center">No authentication required. Demo data only.</p>
-                  </>
-                )}
+                <p className="f6 color-fg-muted mb-0" style={{fontStyle: 'italic'}}>
+                  <strong>When to use:</strong> Enterprise use, custom webhook endpoints, or when you need complete control.
+                </p>
               </div>
             </div>
           </>
