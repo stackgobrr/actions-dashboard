@@ -216,6 +216,7 @@ function App() {
                 setShowLanding(false)
                 setShowRoadmap(true)
               }}
+              onViewDemo={auth.handleDemoMode}
               theme={theme}
               setTheme={setTheme}
             />

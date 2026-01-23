@@ -4,7 +4,7 @@
   min-height: 100vh;
   background: var(--bgColor-default);
   color: var(--fgColor-default);
-  overflow-x: hidden;
+  overflow-x: clip; /* Use clip instead of hidden to allow sticky positioning */
 }
 
 /* Header */
