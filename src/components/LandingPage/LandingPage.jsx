@@ -19,12 +19,10 @@ import {
 } from '@primer/octicons-react'
 import { Button, IconButton, Label, Text, Heading } from '@primer/react'
 import { RepoCard } from '../Dashboard/RepoCard'
-import { buildInstallUrl, isSharedAppConfigured } from '../../config/githubApp'
 import '../../styles/shared.css'
 import './LandingPage.css'
 
 export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, setTheme }) {
-  const sharedAppConfigured = isSharedAppConfigured()
   const [activeFeature, setActiveFeature] = useState(0)
   const [demoStatusIndex, setDemoStatusIndex] = useState(0)
 
