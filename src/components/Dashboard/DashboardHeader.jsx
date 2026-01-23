@@ -9,7 +9,8 @@ import {
   BugIcon,
   QuestionIcon,
   HeartIcon,
-  RepoIcon
+  RepoIcon,
+  GearIcon
 } from '@primer/octicons-react'
 import { Button, IconButton, Select, Checkbox, Label, ActionMenu, ActionList } from '@primer/react'
 import { ThemeToggle } from '../UI/ThemeToggle'
