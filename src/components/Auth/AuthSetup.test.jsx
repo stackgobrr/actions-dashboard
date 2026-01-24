@@ -56,7 +56,7 @@ describe('AuthSetup Component', () => {
   describe('GitHub App Option', () => {
     it('displays GitHub App description', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Configure your own GitHub App for advanced control and customization.')).toBeInTheDocument()
+      expect(screen.getByText('Create and configure your own GitHub App with full control over permissions and webhooks.')).toBeInTheDocument()
     })
 
     it('shows Configure GitHub App button', () => {
@@ -75,8 +75,7 @@ describe('AuthSetup Component', () => {
 
     it('shows setup guide link', () => {
       render(<AuthSetup {...defaultProps} />)
-      const guideLinks = screen.getAllByText('Need help?')
-      expect(guideLinks.length).toBeGreaterThan(0)
+      expect(screen.getByText(/Need help setting up\?/i)).toBeInTheDocument()
     })
 
     it('opens guide when Need help link clicked', async () => {
@@ -84,8 +83,8 @@ describe('AuthSetup Component', () => {
       const setShowGuide = vi.fn()
       render(<AuthSetup {...defaultProps} setShowGuide={setShowGuide} />)
       
-      const guideLinks = screen.getAllByText('Need help?')
-      await user.click(guideLinks[0])
+      const guideLink = screen.getByText(/Need help setting up\?/i)
+      await user.click(guideLink)
       expect(setShowGuide).toHaveBeenCalledWith(true)
     })
   })
@@ -93,7 +92,7 @@ describe('AuthSetup Component', () => {
   describe('Personal Access Token Option', () => {
     it('displays PAT description', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Simple authentication with your GitHub token, perfect for individual use.')).toBeInTheDocument()
+      expect(screen.getByText('Quick setup with just your GitHub token. Perfect for getting started.')).toBeInTheDocument()
     })
 
     it('shows Create a new token link', () => {
