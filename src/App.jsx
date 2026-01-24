@@ -198,7 +198,6 @@ function App() {
       {/* Main app route */}
       <Route path="*" element={
         <>
-          {/* Show roadmap page */}
           {showRoadmap ? (
             <Roadmap
               onBack={() => {

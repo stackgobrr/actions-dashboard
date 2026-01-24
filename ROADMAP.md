@@ -1,103 +1,45 @@
-# Feature Roadmap
+# Roadmap
 
-This document outlines planned features and enhancements for the GitHub Actions Dashboard.
+## Planned Features
 
-## Upcoming Features
+### 1. Focus View
+Click on repository cards to expand and see detailed workflow information.
 
-### 1. Webhook Support
-**Priority: Medium**
+**Features:**
+- Expandable card view with full workflow details
+- Pin important repositories to the top
+- Show individual job statuses within workflows
+- Quick actions (re-run workflows, view logs)
+- Keyboard shortcuts for navigation
 
-Real-time updates through GitHub webhooks instead of polling:
+**Status:** In Progress
 
-- **Webhook Receiver**: Lightweight backend service to receive GitHub webhook events
-- **Push Notifications**: Browser notifications when workflow status changes
-- **Instant Updates**: No polling delay - updates appear immediately
-- **Event Filtering**: Configure which events trigger updates
-- **Webhook Management**: Setup guide and testing tools in the dashboard
-- **Fallback Polling**: Automatic fallback to polling if webhooks unavailable
-- **Multi-Repository**: Support webhooks for multiple repositories simultaneously
+---
 
-### 2. Focus View
-**Priority: Medium**
+### 2. GitHub SSO & User Profiles
+User authentication and profiles to unlock premium features.
 
-Distraction-free monitoring mode for critical workflows:
+**Features:**
+- Sign in with GitHub
+- User profile and preferences
+- Save custom dashboard configurations
+- Required for paid tier features
 
-- **Fullscreen Mode**: Clean, minimal interface showing only essential information
-- **Custom Layouts**: Arrange cards in custom grid/list configurations
-- **Pin Workflows**: Keep important workflows always visible at the top
-- **Hide Completed**: Option to hide successful runs and focus on active/failed
-- **Color Coding**: Enhanced visual indicators for quick status recognition
-- **Keyboard Navigation**: Navigate between workflows without touching mouse
-- **TV/Display Mode**: Large text and high contrast for wall-mounted displays
-- **Auto-Refresh Control**: Configurable refresh rates for focus mode
+**Status:** Planned
 
-### 3. Workflow Highlights
-**Priority: Medium**
+---
 
-Enhanced visibility and insights for workflow runs:
+### 3. Real-Time Updates (Paid Tier)
+Instant workflow updates via webhooks instead of polling.
 
-- **Execution Timeline**: Visual timeline showing job duration and dependencies
-- **Performance Metrics**: Track average run time, success rate, and trends
-- **Cost Estimates**: Approximate GitHub Actions minutes consumed per workflow
-- **Failure Analysis**: Quick view of error messages and failure patterns
-- **Job Details**: Expandable view showing individual job status within workflows
-- **Annotations**: Display GitHub checks annotations and warnings inline
-- **Quick Actions**: Restart failed workflows directly from the dashboard
-- **Compare Runs**: Side-by-side comparison of workflow runs
-- **Custom Tags**: Add custom tags/labels to workflows for better organization
+**Features:**
+- Live updates when workflows start/complete/fail
+- No polling delay - instant status changes
+- Browser notifications for status changes
+- Automatic fallback to polling if disconnected
+- Premium feature for paid users
 
-### 4. Deployment Tracking
-**Priority: High**
-
-Monitor GitHub deployment status across environments:
-
-- **Environment Overview**: View current deployment status for each environment (production, staging, dev)
-- **Deployment History**: Timeline of deployments with commit SHAs and timestamps
-- **Active Deployments**: See which version is currently deployed to each environment
-- **Environment Health**: Track deployment success/failure rates per environment
-- **Deployment Cards**: Dedicated cards showing deployment status alongside workflow runs
-- **Approval Status**: Display pending approvals for protected environments
-- **Rollback Detection**: Identify when deployments are rolled back to previous versions
-- **Deployment Links**: Direct links to deployed applications/environments
-- **Multi-Environment**: Support for multiple environments per repository
-- **Deployment Comparison**: Compare what's deployed between environments (staging vs prod)
-- **Time in Environment**: How long has the current version been deployed
-
-**Use Cases**:
-- Know exactly what version is in production right now
-- Track deployment frequency and stability
-- Monitor environment-specific deployment health
-- Quick identification of which environments need updates
-
-### 5. Roadmap Page
-**Priority: Low**
-
-Interactive roadmap visible to users within the application:
-
-- **Feature Voting**: Allow users to upvote features they want
-- **Status Indicators**: Show what's planned, in-progress, and completed
-- **Progress Tracking**: Visual progress bars for features under development
-- **Release Notes**: Link completed features to their release notes
-- **GitHub Integration**: Pull issues/milestones directly from GitHub
-- **Community Input**: Easy way to suggest new features
-
-### 6. TypeScript Migration
-**Priority: Medium**
-
-Migrate the codebase from JavaScript to TypeScript:
-
-- **Type Safety**: Catch errors at compile time instead of runtime
-- **Better IDE Support**: Enhanced autocomplete and intellisense
-- **Refactoring Confidence**: Safer refactoring with type checking
-- **API Contracts**: Type-safe GitHub API responses
-- **Component Props**: Strictly typed React component props
-- **Gradual Migration**: Migrate incrementally, starting with utility functions
-- **Documentation**: Types serve as inline documentation
-
-### 7. Workflow Analytics
-**Priority: Low**
-
-Historical data and insights about workflow performance:
+**Status:** Infrastructure ready, needs integration
 
 - **Success Rate Trends**: Track workflow reliability over time
 - **Duration Analysis**: Identify slow or degrading workflows
