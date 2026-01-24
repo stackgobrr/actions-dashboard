@@ -125,8 +125,8 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
   const features = [
     {
       icon: <RocketIcon size={24} />,
-      title: "Real-time Status",
-      description: "Monitor all your GitHub Actions workflows in one unified dashboard with live updates every 10 seconds."
+      title: "Workflow Monitoring",
+      description: "Monitor all your GitHub Actions workflows in one unified dashboard with automatic status updates."
     },
     {
       icon: <WorkflowIcon size={24} />,
@@ -140,8 +140,8 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
     },
     {
       icon: <EyeIcon size={24} />,
-      title: "Demo Mode",
-      description: "Explore the dashboard with realistic sample data before connecting your repositories."
+      title: "Visual Status Indicators",
+      description: "Clear color-coded status for success, failure, and in-progress workflows with detailed workflow information."
     },
     {
       icon: <FilterIcon size={24} />,
@@ -218,11 +218,11 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
             <div className="hero-badge" sx={{ mb: 4 }}>
               <Label variant="accent" size="large" sx={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
                 <ZapIcon size={14} />
-                Open Source & Free Forever
+                Open source
               </Label>
             </div>
             <Heading as="h1" sx={{ fontSize: [6, 7, 8], fontWeight: 'bold', lineHeight: 'condensed', mb: 4 }}>
-              Monitor Your GitHub Actions in Real-Time
+              Monitor Your GitHub Actions with Live Updates
             </Heading>
             <p className="hero-description">
               A beautiful, powerful dashboard for monitoring GitHub Actions workflows across all your repositories. 
@@ -246,16 +246,6 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
               >
                 View demo
               </Button>
-            </div>
-            
-            {/* Stats Bar */}
-            <div className="stats-bar">
-              {stats.map((stat, idx) => (
-                <div key={idx} className="stat">
-                  <span className="stat-value">{stat.value}</span>
-                  <span className="stat-label">{stat.label}</span>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -369,35 +359,11 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
               <div className="step-number">3</div>
               <div className="step-content">
                 <h3>Monitor Workflows</h3>
-                <p>Watch your workflows update in real-time</p>
+                <p>Watch your workflows update live</p>
                 <div className="step-visual">
                   <RocketIcon size={40} />
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Security & Privacy */}
-      <section className="security-section">
-        <div className="container">
-          <div className="security-content">
-            <div className="security-icon">
-              <ShieldLockIcon size={48} />
-            </div>
-            <div className="security-text">
-              <h2>Privacy First</h2>
-              <p>
-                Your credentials never leave your browser. All authentication tokens are stored locally 
-                using browser storage. No data is sent to any third-party servers.
-              </p>
-              <ul className="security-features">
-                <li><CheckIcon size={16} /> Local-only credential storage</li>
-                <li><CheckIcon size={16} /> Direct GitHub API communication</li>
-                <li><CheckIcon size={16} /> No backend servers required</li>
-                <li><CheckIcon size={16} /> Open source and auditable</li>
-              </ul>
             </div>
           </div>
         </div>

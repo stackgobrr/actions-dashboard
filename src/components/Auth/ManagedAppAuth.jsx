@@ -5,8 +5,8 @@ import { CheckIcon, XIcon } from '@primer/octicons-react'
 import { logger } from '../../utils/logger'
 
 /**
- * SharedAppAuth Component
- * Handles the OAuth callback after a user installs the shared GitHub App
+ * ManagedAppAuth Component
+ * Handles the OAuth callback after a user installs the managed GitHub App
  *
  * Flow:
  * 1. User clicks "Install App" → redirected to GitHub
@@ -14,7 +14,7 @@ import { logger } from '../../utils/logger'
  * 3. This component extracts installation_id and stores it
  * 4. Redirects to dashboard
  */
-export function SharedAppAuth() {
+export function ManagedAppAuth() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [status, setStatus] = useState('processing')

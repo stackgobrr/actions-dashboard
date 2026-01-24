@@ -7,7 +7,7 @@ import { Settings } from './components/Settings/Settings'
 import { HotkeyHelper } from './components/UI/HotkeyHelper'
 import { LandingPage } from './components/LandingPage/LandingPage'
 import { Roadmap } from './components/Roadmap/Roadmap'
-import { SharedAppAuth } from './components/Auth/SharedAppAuth'
+import { ManagedAppAuth } from './components/Auth/ManagedAppAuth'
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
 import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
@@ -193,7 +193,7 @@ function App() {
   return (
     <Routes>
       {/* OAuth callback route for shared GitHub App */}
-      <Route path="/auth/github/callback" element={<SharedAppAuth />} />
+      <Route path="/auth/github/callback" element={<ManagedAppAuth />} />
 
       {/* Main app route */}
       <Route path="*" element={

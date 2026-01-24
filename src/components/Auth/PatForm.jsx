@@ -57,7 +57,7 @@ export function PatForm({
         </h2>
       </div>
       <div style={{padding: '32px 40px 16px 40px'}}>
-        <p className="color-fg-muted f5 mb-3">Simple authentication with your GitHub token, perfect for individual use.</p>
+        <p className="color-fg-muted f5 mb-3">Quick setup with just your GitHub token. Perfect for getting started.</p>
         <TextInput
           type="password"
           placeholder="ghp_xxxxxxxxxxxx"

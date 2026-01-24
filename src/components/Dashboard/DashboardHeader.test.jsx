@@ -36,7 +36,7 @@ describe('DashboardHeader Component', () => {
 
     it('renders description', () => {
       render(<DashboardHeader {...defaultProps} />)
-      expect(screen.getByText('Real-time GitHub Actions status for all repositories')).toBeInTheDocument()
+      expect(screen.getByText('Live GitHub Actions status for all repositories')).toBeInTheDocument()
     })
 
     it('renders refresh button', () => {

@@ -93,7 +93,7 @@ export function DashboardHeader({
               ? canToggleDemoMode
                 ? "Showing demo data - click badge to connect to real repositories"
                 : "Showing demo data - logout to connect to real repositories"
-              : "Real-time GitHub Actions status for all repositories"}
+              : "Live GitHub Actions status for all repositories"}
           </p>
         </div>
         
