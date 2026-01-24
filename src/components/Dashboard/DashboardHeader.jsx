@@ -253,8 +253,13 @@ export function DashboardHeader({
             </ActionMenu>
         )}
         
+        <RefreshButton 
+          onRefresh={fetchAllStatuses}
+          loading={loading}
+          disabled={false}
+        />
+        
         <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
-          <ClockIcon size={16} className="color-fg-muted" />
           <Checkbox
             checked={autoRefresh}
             onChange={(e) => setAutoRefresh(e.target.checked)}
@@ -262,15 +267,8 @@ export function DashboardHeader({
           <span className="f6">Auto-refresh (10s)</span>
         </div>
         
-        <RefreshButton 
-          onRefresh={fetchAllStatuses}
-          loading={loading}
-          disabled={false}
-        />
-        
         {lastUpdate && (
           <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
-            <ClockIcon size={14} className="color-fg-muted" />
             <span className="f6 color-fg-muted">Last updated: {lastUpdate.toLocaleTimeString()}</span>
           </div>
         )}
