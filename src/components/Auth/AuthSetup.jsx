@@ -54,28 +54,13 @@ export function AuthSetup({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div>
                   <ShieldLockIcon size={16} style={{marginRight: '8px', verticalAlign: 'text-bottom'}} />
-                  <strong>Your data is protected:</strong>
+                  <strong>Your credentials stay secure:</strong>
                 </div>
                 <ul className="f5 mb-0" style={{ paddingLeft: '28px' }}>
-                  <li>Credentials stored locally in your browser only</li>
-                  <li>Content Security Policy blocks unauthorized scripts</li>
-                  <li>Direct connection to GitHub API (PAT) or secure webhook relay (GitHub App)</li>
-                  <li>Same-origin policy prevents access from other sites</li>
+                  <li>Stored locally in your browser only, never sent to our servers</li>
+                  <li>Direct API calls from your browser to GitHub, no middleman</li>
+                  <li>CSP and same-origin policies prevent unauthorized access</li>
                 </ul>
-                <div className="f6 mt-1">
-                  <a 
-                    href="https://github.com/h3ow3d/h3ow3d-actions-dashboard/blob/main/docs/SECURITY.md" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style={{
-                      color: 'var(--fgColor-accent)',
-                      textDecoration: 'underline'
-                    }}
-                  >
-                    View our security practices
-                    <LinkExternalIcon size={12} style={{display: 'inline', marginLeft: '2px', verticalAlign: 'text-bottom'}} />
-                  </a>
-                </div>
               </div>
             </Flash>
           </div>
