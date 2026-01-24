@@ -48,8 +48,8 @@ describe('App Component - Smoke Tests', () => {
     await user.click(getStartedButtons[0])
 
     // Should now show authentication setup
-    expect(screen.getByText(/GitHub Authentication/i)).toBeInTheDocument()
-    expect(screen.getByText(/Choose an authentication method/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /authentication/i })).toBeInTheDocument()
+    expect(screen.getByText(/choose.*authentication.*method/i)).toBeInTheDocument()
   })
 
   it('should have both auth options visible after clicking Get Started', async () => {
@@ -61,8 +61,8 @@ describe('App Component - Smoke Tests', () => {
     const getStartedButtons = screen.getAllByRole('button', { name: /Get Started/i })
     await user.click(getStartedButtons[0])
     
-    // Should show both GitHub App and PAT options
-    expect(screen.getByText(/Self-Hosted GitHub App/i)).toBeInTheDocument()
-    expect(screen.getByText(/Personal Access Token/i)).toBeInTheDocument()
+    // Should show both GitHub App and PAT options by their configure buttons
+    expect(screen.getByRole('button', { name: /configure.*github app/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /save.*token/i })).toBeInTheDocument()
   })
 })

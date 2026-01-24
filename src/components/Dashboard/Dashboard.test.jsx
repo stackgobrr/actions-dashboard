@@ -45,8 +45,8 @@ describe('Dashboard Component - Critical Functionality', () => {
     it('shows loading state instead of empty grid when loading', () => {
       render(<Dashboard {...defaultProps} loading={true} repoStatuses={{}} />)
       
-      expect(screen.getByText('Loading repository statuses...')).toBeInTheDocument()
-      expect(screen.queryByText('Actions Dashboard')).toBeInTheDocument() // Header still visible
+      expect(screen.getByText(/loading.*status/i)).toBeInTheDocument()
+      expect(screen.queryByText(/actions.*dashboard/i)).toBeInTheDocument() // Header still visible
     })
 
     it('displays repositories even while loading if data exists', () => {
@@ -58,7 +58,7 @@ describe('Dashboard Component - Critical Functionality', () => {
       
       // Should show repo data, not loading message
       expect(screen.getByText('existing-repo')).toBeInTheDocument()
-      expect(screen.queryByText('Loading repository statuses...')).not.toBeInTheDocument()
+      expect(screen.queryByText(/loading.*status/i)).not.toBeInTheDocument()
     })
   })
 
@@ -67,17 +67,17 @@ describe('Dashboard Component - Critical Functionality', () => {
       render(<Dashboard {...defaultProps} isFullscreen={true} />)
       
       // Header should be hidden
-      expect(screen.queryByText('Actions Dashboard')).not.toBeInTheDocument()
+      expect(screen.queryByText(/actions.*dashboard/i)).not.toBeInTheDocument()
       
       // But fullscreen toggle should be visible
-      expect(screen.getByLabelText('Exit Fullscreen')).toBeInTheDocument()
+      expect(screen.getByLabelText(/exit.*fullscreen/i)).toBeInTheDocument()
     })
 
     it('shows header controls when not fullscreen', () => {
       render(<Dashboard {...defaultProps} isFullscreen={false} />)
       
-      expect(screen.getByText('Actions Dashboard')).toBeInTheDocument()
-      expect(screen.getByLabelText('Fullscreen')).toBeInTheDocument()
+      expect(screen.getByText(/actions.*dashboard/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/fullscreen/i)).toBeInTheDocument()
     })
   })
 

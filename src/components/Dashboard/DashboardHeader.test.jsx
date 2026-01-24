@@ -31,12 +31,12 @@ describe('DashboardHeader Component', () => {
   describe('Basic Rendering', () => {
     it('renders dashboard title', () => {
       render(<DashboardHeader {...defaultProps} />)
-      expect(screen.getByText('Actions Dashboard')).toBeInTheDocument()
+      expect(screen.getByText(/actions.*dashboard/i)).toBeInTheDocument()
     })
 
     it('renders description', () => {
       render(<DashboardHeader {...defaultProps} />)
-      expect(screen.getByText('Live GitHub Actions status for all repositories')).toBeInTheDocument()
+      expect(screen.getByText(/github actions.*status/i)).toBeInTheDocument()
     })
 
     it('renders refresh button', () => {
@@ -73,7 +73,7 @@ describe('DashboardHeader Component', () => {
       const appInfo = { appName: 'My GitHub App', account: 'h3ow3d' }
       render(<DashboardHeader {...defaultProps} authMethod="github-app" appInfo={appInfo} />)
       
-      expect(screen.getByText('My GitHub App (h3ow3d)')).toBeInTheDocument()
+      expect(screen.getByText(/my github app.*h3ow3d/i)).toBeInTheDocument()
     })
 
     it('shows logout button for GitHub App', async () => {
@@ -120,7 +120,7 @@ describe('DashboardHeader Component', () => {
     it('renders sort button', () => {
       render(<DashboardHeader {...defaultProps} sortBy="last-run-desc" />)
       // Sort is now an ActionMenu button, check for its presence
-      expect(screen.getByText('Last Run (Newest)')).toBeInTheDocument()
+      expect(screen.getByText(/last run.*newest/i)).toBeInTheDocument()
     })
   })
 

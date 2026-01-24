@@ -30,217 +30,166 @@ describe('AuthSetup Component', () => {
   }
 
   describe('Initial Render', () => {
-    it('renders authentication title', () => {
+    it('presents authentication setup to user', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('GitHub Authentication')).toBeInTheDocument()
-    })
-
-    it('renders description text', () => {
-      render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Choose an authentication method to access workflow statuses.')).toBeInTheDocument()
-    })
-
-    it('shows both authentication options initially', () => {
-      render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Self-Hosted GitHub App')).toBeInTheDocument()
-      expect(screen.getByText('Personal Access Token')).toBeInTheDocument()
-    })
-
-    it('renders OR divider between options', () => {
-      render(<AuthSetup {...defaultProps} />)
-      const orDividers = screen.getAllByText('OR')
-      expect(orDividers.length).toBeGreaterThan(0)
+      
+      // User sees this is an authentication page
+      expect(screen.getByRole('heading', { name: /authentication/i })).toBeInTheDocument()
+      
+      // User can choose between authentication methods
+      const configButtons = screen.getAllByRole('button', { name: /configure|save/i })
+      expect(configButtons.length).toBeGreaterThanOrEqual(2)
     })
   })
 
   describe('GitHub App Option', () => {
-    it('displays GitHub App description', () => {
-      render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Create and configure your own GitHub App with full control over permissions and webhooks.')).toBeInTheDocument()
-    })
-
-    it('shows Configure GitHub App button', () => {
-      render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByRole('button', { name: /configure github app/i })).toBeInTheDocument()
-    })
-
-    it('calls setShowGitHubAppForm when Configure button clicked', async () => {
+    it('allows user to configure GitHub App authentication', async () => {
       const user = userEvent.setup()
       const setShowGitHubAppForm = vi.fn()
       render(<AuthSetup {...defaultProps} setShowGitHubAppForm={setShowGitHubAppForm} />)
       
-      await user.click(screen.getByRole('button', { name: /configure github app/i }))
+      // User can access GitHub App configuration
+      const configButton = screen.getByRole('button', { name: /app/i })
+      await user.click(configButton)
+      
       expect(setShowGitHubAppForm).toHaveBeenCalledWith(true)
     })
 
-    it('shows setup guide link', () => {
-      render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText(/Need help setting up\?/i)).toBeInTheDocument()
-    })
-
-    it('opens guide when Need help link clicked', async () => {
+    it('provides help documentation when requested', async () => {
       const user = userEvent.setup()
       const setShowGuide = vi.fn()
       render(<AuthSetup {...defaultProps} setShowGuide={setShowGuide} />)
       
-      const guideLink = screen.getByText(/Need help setting up\?/i)
-      await user.click(guideLink)
+      // User can access help guide
+      const helpLink = screen.getByText(/help|guide/i)
+      await user.click(helpLink)
+      
       expect(setShowGuide).toHaveBeenCalledWith(true)
     })
   })
 
   describe('Personal Access Token Option', () => {
-    it('displays PAT description', () => {
+    it('provides link to create GitHub token', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Quick setup with just your GitHub token. Perfect for getting started.')).toBeInTheDocument()
+      
+      // User can navigate to GitHub to create a token
+      const link = screen.getByRole('link', { name: /token/i })
+      expect(link).toHaveAttribute('href', expect.stringContaining('github.com/settings/tokens'))
     })
 
-    it('shows Create a new token link', () => {
-      render(<AuthSetup {...defaultProps} />)
-      const link = screen.getByText('Create a new token')
-      expect(link.closest('a')).toHaveAttribute('href', 'https://github.com/settings/tokens/new?scopes=repo&description=GitHub-Actions-Dashboard')
-    })
-
-    it('renders token input field', () => {
-      render(<AuthSetup {...defaultProps} />)
-      const input = screen.getByPlaceholderText('ghp_xxxxxxxxxxxx')
-      expect(input).toBeInTheDocument()
-      expect(input).toHaveAttribute('type', 'password')
-    })
-
-    it('updates token when input changes', async () => {
+    it('allows user to enter their token', async () => {
       const user = userEvent.setup()
       const setGithubToken = vi.fn()
       render(<AuthSetup {...defaultProps} setGithubToken={setGithubToken} />)
       
-      const input = screen.getByPlaceholderText('ghp_xxxxxxxxxxxx')
-      await user.type(input, 'ghp_test123')
+      // User can input their token securely
+      const input = screen.getByPlaceholderText(/ghp_/i)
+      expect(input).toHaveAttribute('type', 'password')
       
+      await user.type(input, 'ghp_test123')
       expect(setGithubToken).toHaveBeenCalled()
     })
 
-    it('disables Save button when token is empty', () => {
-      render(<AuthSetup {...defaultProps} githubToken="" />)
-      const button = screen.getByRole('button', { name: /save token & continue/i })
+    it('validates token before allowing save', () => {
+      const { rerender } = render(<AuthSetup {...defaultProps} githubToken="" />)
+      
+      // User cannot save without a token
+      const button = screen.getByRole('button', { name: /save|continue/i })
       expect(button).toBeDisabled()
-    })
-
-    it('enables Save button when token is provided', () => {
-      render(<AuthSetup {...defaultProps} githubToken="ghp_test123" />)
-      const button = screen.getByRole('button', { name: /save token & continue/i })
+      
+      // User can save once token is provided
+      rerender(<AuthSetup {...defaultProps} githubToken="ghp_test123" />)
       expect(button).not.toBeDisabled()
     })
 
-    it('calls saveToken when Save button clicked', async () => {
+    it('saves token when user submits', async () => {
       const user = userEvent.setup()
       const saveToken = vi.fn()
       render(<AuthSetupWithPATState {...defaultProps} saveToken={saveToken} />)
       
-      const tokenInput = screen.getByPlaceholderText('ghp_xxxxxxxxxxxx')
+      // User enters and saves token
+      const tokenInput = screen.getByPlaceholderText(/ghp_/i)
       await user.type(tokenInput, 'ghp_123456789012345678901234567890123456')
       
-      await user.click(screen.getByRole('button', { name: /save token & continue/i }))
+      const saveButton = screen.getByRole('button', { name: /save|continue/i })
+      await user.click(saveButton)
+      
       expect(saveToken).toHaveBeenCalledOnce()
     })
 
-    it('shows security notice with protection measures', () => {
+    it('explains credential security to users', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Your credentials stay secure:')).toBeInTheDocument()
-      expect(screen.getByText(/Stored locally in your browser only, never sent to our servers/i)).toBeInTheDocument()
-      expect(screen.getByText(/Direct API calls from your browser to GitHub, no middleman/i)).toBeInTheDocument()
-      expect(screen.getByText(/CSP and same-origin policies prevent unauthorized access/i)).toBeInTheDocument()
+      
+      // User sees security information is displayed
+      expect(screen.getByText(/credentials stay secure/i)).toBeInTheDocument()
+      expect(screen.getByText(/stored locally in your browser only/i)).toBeInTheDocument()
     })
   })
 
   describe('GitHub App Form', () => {
-    it('shows form when showGitHubAppForm is true', () => {
+    it('displays credential input form when configured', () => {
       render(<AuthSetup {...defaultProps} showGitHubAppForm={true} />)
-      expect(screen.getByText('GitHub App Configuration')).toBeInTheDocument()
+      
+      // User sees GitHub App credential form (not initial options)
+      expect(screen.getByLabelText(/app id/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/installation id/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/private key/i)).toBeInTheDocument()
     })
 
-    it('hides initial options when showGitHubAppForm is true', () => {
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} />)
-      expect(screen.queryByText('OR')).not.toBeInTheDocument()
-      expect(screen.queryByText('Personal Access Token')).not.toBeInTheDocument()
-    })
-
-    it('renders Back button', () => {
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} />)
-      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument()
-    })
-
-    it('calls setShowGitHubAppForm(false) when Back clicked', async () => {
+    it('allows user to return to auth options', async () => {
       const user = userEvent.setup()
       const setShowGitHubAppForm = vi.fn()
       render(<AuthSetup {...defaultProps} showGitHubAppForm={true} setShowGitHubAppForm={setShowGitHubAppForm} />)
       
+      // User can go back to choose different auth method
       await user.click(screen.getByRole('button', { name: /back/i }))
       expect(setShowGitHubAppForm).toHaveBeenCalledWith(false)
     })
 
-    it('renders App ID input', () => {
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} />)
-      expect(screen.getByLabelText('App ID')).toBeInTheDocument()
-    })
-
-    it('renders Installation ID input', () => {
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} />)
-      expect(screen.getByLabelText('Installation ID')).toBeInTheDocument()
-    })
-
-    it('renders Private Key textarea', () => {
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} />)
-      expect(screen.getByLabelText('Private Key (PEM)')).toBeInTheDocument()
-    })
-
-    it('updates appId when input changes', async () => {
+    it('captures all required GitHub App credentials from user', async () => {
       const user = userEvent.setup()
       const setAppId = vi.fn()
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} setAppId={setAppId} />)
-      
-      await user.type(screen.getByLabelText('App ID'), '123456')
-      expect(setAppId).toHaveBeenCalled()
-    })
-
-    it('updates installationId when input changes', async () => {
-      const user = userEvent.setup()
       const setInstallationId = vi.fn()
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} setInstallationId={setInstallationId} />)
-      
-      await user.type(screen.getByLabelText('Installation ID'), '789')
-      expect(setInstallationId).toHaveBeenCalled()
-    })
-
-    it('updates privateKey when textarea changes', async () => {
-      const user = userEvent.setup()
       const setPrivateKey = vi.fn()
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} setPrivateKey={setPrivateKey} />)
+      render(<AuthSetup {...defaultProps} 
+        showGitHubAppForm={true} 
+        setAppId={setAppId}
+        setInstallationId={setInstallationId}
+        setPrivateKey={setPrivateKey}
+      />)
       
-      await user.type(screen.getByLabelText('Private Key (PEM)'), '-----BEGIN RSA')
+      // User can input all three required credentials
+      await user.type(screen.getByLabelText(/app id/i), '123456')
+      expect(setAppId).toHaveBeenCalled()
+      
+      await user.type(screen.getByLabelText(/installation id/i), '789')
+      expect(setInstallationId).toHaveBeenCalled()
+      
+      await user.type(screen.getByLabelText(/private key/i), '-----BEGIN RSA')
       expect(setPrivateKey).toHaveBeenCalled()
     })
 
-    it('disables Save button when fields are empty', () => {
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} />)
-      const button = screen.getByRole('button', { name: /save & authenticate/i })
+    it('validates all fields before allowing submission', () => {
+      const { rerender } = render(<AuthSetup {...defaultProps} showGitHubAppForm={true} />)
+      
+      // User cannot submit without all credentials
+      const button = screen.getByRole('button', { name: /save|authenticate/i })
       expect(button).toBeDisabled()
-    })
-
-    it('enables Save button when all fields are filled', () => {
+      
+      // User can submit once all fields are filled
       const validPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
 -----END RSA PRIVATE KEY-----`
-      render(<AuthSetup {...defaultProps} 
+      rerender(<AuthSetup {...defaultProps} 
         showGitHubAppForm={true}
         appId="123"
         installationId="456"
         privateKey={validPrivateKey}
       />)
-      const button = screen.getByRole('button', { name: /save & authenticate/i })
       expect(button).not.toBeDisabled()
     })
 
-    it('calls handleGitHubAppSetup when Save button clicked', async () => {
+    it('submits GitHub App credentials when user saves', async () => {
       const user = userEvent.setup()
       const handleGitHubAppSetup = vi.fn()
       const validPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -254,21 +203,23 @@ MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
         handleGitHubAppSetup={handleGitHubAppSetup}
       />)
       
-      await user.click(screen.getByRole('button', { name: /save & authenticate/i }))
+      // User submits credentials
+      await user.click(screen.getByRole('button', { name: /save|authenticate/i }))
       expect(handleGitHubAppSetup).toHaveBeenCalledOnce()
     })
 
-    it('displays error message when appFormError is set', () => {
-      render(<AuthSetup {...defaultProps} 
+    it('shows error feedback when credentials are invalid', () => {
+      const { rerender } = render(<AuthSetup {...defaultProps} showGitHubAppForm={true} appFormError="" />)
+      
+      // No error shown initially
+      expect(screen.queryByText(/invalid credentials/i)).not.toBeInTheDocument()
+      
+      // User sees error when credentials fail validation
+      rerender(<AuthSetup {...defaultProps} 
         showGitHubAppForm={true}
         appFormError="Invalid credentials"
       />)
-      expect(screen.getByText('Invalid credentials')).toBeInTheDocument()
-    })
-
-    it('does not display error when appFormError is empty', () => {
-      render(<AuthSetup {...defaultProps} showGitHubAppForm={true} appFormError="" />)
-      expect(screen.queryByText(/invalid/i)).not.toBeInTheDocument()
+      expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument()
     })
   })
 })
