@@ -149,7 +149,7 @@ describe('AuthSetup Component', () => {
       expect(screen.getByText('Your data is protected:')).toBeInTheDocument()
       expect(screen.getByText(/Credentials stored locally in your browser only/i)).toBeInTheDocument()
       expect(screen.getByText(/Content Security Policy blocks unauthorized scripts/i)).toBeInTheDocument()
-      expect(screen.getByText(/No data transmission to external servers/i)).toBeInTheDocument()
+      expect(screen.getByText(/Direct connection to GitHub API \(PAT\) or secure webhook relay \(GitHub App\)/i)).toBeInTheDocument()
       expect(screen.getByText(/Same-origin policy prevents access from other sites/i)).toBeInTheDocument()
       expect(screen.getByText('View our security practices')).toBeInTheDocument()
     })

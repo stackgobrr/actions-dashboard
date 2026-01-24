@@ -1,6 +1,6 @@
 # h3ow3d Actions Dashboard
 
-Real-time GitHub Actions status dashboard for all h3ow3d repositories.
+Live GitHub Actions status dashboard for all h3ow3d repositories.
 
 ## Features
 

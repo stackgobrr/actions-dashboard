@@ -51,7 +51,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     ? localStorage.getItem('shared_app_installation_id')
     : null
 
-  // Setup SSE connection for real-time updates (for both GitHub App and shared app)
+  // Setup SSE connection for live updates (for both GitHub App and shared app)
   const sseEnabled = (authMethod === 'github-app' || authMethod === 'shared-app') && !showAuthSetup && !isDemoMode
   const sse = useSSE(installationId, sseEnabled)
 
@@ -166,7 +166,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     setIsDemoMode(isDemoModeEnabled(authMethod))
   }, [authMethod])
 
-  // Subscribe to SSE events for real-time updates
+  // Subscribe to SSE events for live updates
   useEffect(() => {
     if (!sse.isConnected) {
       return

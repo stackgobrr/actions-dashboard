@@ -56,7 +56,7 @@
 
 /* Hero Section */
 .hero {
-  padding: 100px 0 140px;
+  padding: 100px 0 40px;
   position: relative;
   overflow: hidden;
 }
@@ -199,7 +199,8 @@
 
 /* Hero Visual */
 .hero-visual {
-  margin-top: 100px;
+  margin-top: 40px;
+  margin-bottom: 40px;
   position: relative;
   z-index: 1;
   animation: fadeInUp 0.8s ease-out 0.5s backwards;
@@ -301,6 +302,7 @@
 /* Use Cases Section */
 .use-cases-section {
   padding: 100px 0;
+  background: var(--bgColor-default);
 }
 
 .use-cases-grid {
@@ -491,7 +493,7 @@
 /* CTA Section */
 .cta-section {
   padding: 120px 0;
-  background: var(--bgColor-muted);
+  background: var(--bgColor-default);
   text-align: center;
   position: relative;
   overflow: hidden;

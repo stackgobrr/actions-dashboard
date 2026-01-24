@@ -17,7 +17,7 @@ export const SSE_STATUS = {
 }
 
 /**
- * Custom hook to manage Server-Sent Events (SSE) connection for real-time workflow updates
+ * Custom hook to manage Server-Sent Events (SSE) connection for live workflow updates
  *
  * @param {string|null} installationId - GitHub App installation ID for multi-tenant filtering
  * @param {boolean} enabled - Whether SSE connection should be active

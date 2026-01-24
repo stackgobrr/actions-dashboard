@@ -59,7 +59,7 @@ export function AuthSetup({
                 <ul className="f5 mb-0" style={{ paddingLeft: '28px' }}>
                   <li>Credentials stored locally in your browser only</li>
                   <li>Content Security Policy blocks unauthorized scripts</li>
-                  <li>No data transmission to external servers</li>
+                  <li>Direct connection to GitHub API (PAT) or secure webhook relay (GitHub App)</li>
                   <li>Same-origin policy prevents access from other sites</li>
                 </ul>
                 <div className="f6 mt-1">

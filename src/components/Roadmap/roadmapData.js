@@ -19,8 +19,8 @@ export const roadmapFeatures = [
     title: "Webhook Support",
     priority: "medium",
     status: "planned",
-    category: "Real-time Updates",
-    description: "Real-time updates through GitHub webhooks instead of polling",
+    category: "Live Updates",
+    description: "Live updates through GitHub webhooks instead of polling",
     icon: BellIcon,
     features: [
       "Webhook Receiver: Lightweight backend service",
