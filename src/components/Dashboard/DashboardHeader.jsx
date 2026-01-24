@@ -271,7 +271,7 @@ export function DashboardHeader({
         {lastUpdate && (
           <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
             <ClockIcon size={14} className="color-fg-muted" />
-            <span className="f6 color-fg-muted">{lastUpdate.toLocaleTimeString()}</span>
+            <span className="f6 color-fg-muted">Last updated: {lastUpdate.toLocaleTimeString()}</span>
           </div>
         )}
       </div>
