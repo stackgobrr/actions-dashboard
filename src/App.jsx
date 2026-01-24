@@ -7,7 +7,6 @@ import { Settings } from './components/Settings/Settings'
 import { HotkeyHelper } from './components/UI/HotkeyHelper'
 import { LandingPage } from './components/LandingPage/LandingPage'
 import { Roadmap } from './components/Roadmap/Roadmap'
-import { ManagedAppAuth } from './components/Auth/ManagedAppAuth'
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
 import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
@@ -20,7 +19,6 @@ function App() {
   // Check if user has any auth credentials - if so, skip landing page
   const hasAuth = () => {
     return !!(
-      localStorage.getItem('shared_app_installation_id') ||
       localStorage.getItem('github_token') ||
       localStorage.getItem('github_app_id') ||
       localStorage.getItem('demo_mode')
@@ -55,30 +53,6 @@ function App() {
   })
 
   const auth = useAuth()
-
-  // Handle GitHub App installation callback on root URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const installationId = params.get('installation_id')
-    const setupAction = params.get('setup_action')
-
-    if (installationId && setupAction === 'install') {
-      logger.info('[App] Processing GitHub App installation', { installationId })
-
-      // Store installation ID in localStorage
-      localStorage.setItem('shared_app_installation_id', installationId)
-      localStorage.setItem('auth_method', 'shared-app')
-
-      // Clear any existing self-hosted GitHub App credentials
-      localStorage.removeItem('github_app_id')
-      localStorage.removeItem('github_app_private_key')
-      localStorage.removeItem('github_app_installation_id')
-
-      // Clean up URL and reload to apply auth
-      window.history.replaceState({}, '', '/')
-      window.location.reload()
-    }
-  }, [])
 
   // Check if user is already authenticated on mount - wait for auth to initialize
   useEffect(() => {
@@ -192,9 +166,6 @@ function App() {
 
   return (
     <Routes>
-      {/* OAuth callback route for shared GitHub App */}
-      <Route path="/auth/github/callback" element={<ManagedAppAuth />} />
-
       {/* Main app route */}
       <Route path="*" element={
         <>

@@ -143,19 +143,6 @@ export function DashboardHeader({
                 className="color-fg-muted"
               />
             </div>
-          ) : authMethod === 'shared-app' ? (
-            <div className="d-flex flex-items-center gap-2 border rounded-2 px-3 py-1">
-              <MarkGithubIcon size={16} className="color-fg-muted" />
-              <span className="f6">Actions Dashboard App</span>
-              <IconButton
-                onClick={handleLogout}
-                aria-label="Sign out"
-                title="Sign out"
-                icon={SignOutIcon}
-                size="medium"
-                className="color-fg-muted"
-              />
-            </div>
           ) : authMethod === 'pat' ? (
             <IconButton
               icon={SignOutIcon}
