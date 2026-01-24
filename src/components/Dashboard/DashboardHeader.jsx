@@ -17,6 +17,7 @@ import { ThemeToggle } from '../UI/ThemeToggle'
 import { RefreshButton } from '../UI/RefreshButton'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
 import { getTopicColor } from '../../utils/statusHelpers'
+import { trackEvent } from '../../utils/analytics'
 import './DashboardHeader.css'
 
 export function DashboardHeader({
@@ -52,12 +53,26 @@ export function DashboardHeader({
   const toggleLabelFilter = (topicName) => {
     if (filterByLabels.includes(topicName)) {
       setFilterByLabels(filterByLabels.filter(l => l !== topicName))
+      trackEvent('Filter Changed', { 
+        filterType: 'topic',
+        action: 'removed',
+        value: topicName
+      })
     } else {
       setFilterByLabels([...filterByLabels, topicName])
+      trackEvent('Filter Changed', { 
+        filterType: 'topic',
+        action: 'added',
+        value: topicName
+      })
     }
   }
   
   const clearLabelFilters = () => {
+    trackEvent('Filter Changed', { 
+      filterType: 'topic',
+      action: 'cleared'
+    })
     setFilterByLabels([])
   }
 
@@ -187,16 +202,28 @@ export function DashboardHeader({
           </ActionMenu.Anchor>
           <ActionMenu.Overlay>
             <ActionList>
-              <ActionList.Item selected={sortBy === 'last-run-desc'} onSelect={() => setSortBy('last-run-desc')}>
+              <ActionList.Item selected={sortBy === 'last-run-desc'} onSelect={() => {
+                setSortBy('last-run-desc')
+                trackEvent('Sort Changed', { sortBy: 'last-run-desc' })
+              }}>
                 Last Run (Newest)
               </ActionList.Item>
-              <ActionList.Item selected={sortBy === 'last-run-asc'} onSelect={() => setSortBy('last-run-asc')}>
+              <ActionList.Item selected={sortBy === 'last-run-asc'} onSelect={() => {
+                setSortBy('last-run-asc')
+                trackEvent('Sort Changed', { sortBy: 'last-run-asc' })
+              }}>
                 Last Run (Oldest)
               </ActionList.Item>
-              <ActionList.Item selected={sortBy === 'pr-count'} onSelect={() => setSortBy('pr-count')}>
+              <ActionList.Item selected={sortBy === 'pr-count'} onSelect={() => {
+                setSortBy('pr-count')
+                trackEvent('Sort Changed', { sortBy: 'pr-count' })
+              }}>
                 PR Count
               </ActionList.Item>
-              <ActionList.Item selected={sortBy === 'status'} onSelect={() => setSortBy('status')}>
+              <ActionList.Item selected={sortBy === 'status'} onSelect={() => {
+                setSortBy('status')
+                trackEvent('Sort Changed', { sortBy: 'status' })
+              }}>
                 Status
               </ActionList.Item>
             </ActionList>
