@@ -281,7 +281,10 @@ export function DashboardHeader({
         )}
         
         <RefreshButton 
-          onRefresh={fetchAllStatuses}
+          onRefresh={() => {
+            trackEvent('Manual Refresh')
+            fetchAllStatuses()
+          }}
           loading={loading}
           disabled={false}
         />
