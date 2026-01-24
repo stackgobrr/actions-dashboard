@@ -97,9 +97,26 @@
 .card-description {
   font-size: 14px;
   color: var(--fgColor-muted);
-  margin: 0;
+  margin: 0 0 12px 0;
   line-height: 1.6;
   font-weight: 400;
+}
+
+.card-benefits {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.card-benefits li {
+  font-size: 13px;
+  color: var(--fgColor-muted);
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+
+.card-benefits li:last-child {
+  margin-bottom: 0;
 }
 
 /* Responsive */

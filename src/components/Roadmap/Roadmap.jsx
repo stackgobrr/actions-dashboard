@@ -52,6 +52,13 @@ export function Roadmap({ onBack, theme, setTheme }) {
                   </Label>
                 </div>
                 <p className="card-description">{item.description}</p>
+                {item.benefits && (
+                  <ul className="card-benefits">
+                    {item.benefits.map((benefit, idx) => (
+                      <li key={idx}>{benefit}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             )
           })}
