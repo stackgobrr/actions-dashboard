@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { XIcon, SearchIcon, PlusIcon, TrashIcon } from '@primer/octicons-react'
 import { Button, IconButton, TextInput } from '@primer/react'
+import { trackEvent } from '../../utils/analytics'
 import './Settings.css'
 
 export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, onSaveRepos }) {
@@ -64,6 +65,10 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
         description: repo.description,
         category: 'custom'
       }])
+      trackEvent('Repository Added', { 
+        source: 'search',
+        repo: `${repo.owner.login}/${repo.name}`
+      })
     }
   }
 
@@ -80,6 +85,10 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
           description: '',
           category: 'custom'
         }])
+        trackEvent('Repository Added', { 
+          source: 'manual',
+          repo: `${manualOwner}/${manualName}`
+        })
         setManualOwner('')
         setManualName('')
       }
