@@ -32,8 +32,6 @@ export function DashboardHeader({
   setSortBy,
   autoRefresh,
   setAutoRefresh,
-  refreshInterval,
-  setRefreshInterval,
   lastUpdate,
   fetchAllStatuses,
   loading,
@@ -255,38 +253,23 @@ export function DashboardHeader({
             </ActionMenu>
         )}
         
-        <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
-          <ClockIcon size={16} className="color-fg-muted" />
-          <Checkbox
-            checked={autoRefresh}
-            onChange={(e) => setAutoRefresh(e.target.checked)}
-          />
-          <span className="f6">Auto-refresh</span>
-          {autoRefresh && (
-            <Select 
-              value={refreshInterval} 
-              onChange={(e) => setRefreshInterval(Number(e.target.value))}
-              size="small"
-            >
-              <Select.Option value="5">5s</Select.Option>
-              <Select.Option value="10">10s</Select.Option>
-              <Select.Option value="30">30s</Select.Option>
-              <Select.Option value="60">1m</Select.Option>
-              <Select.Option value="300">5m</Select.Option>
-            </Select>
-          )}
-        </div>
-        
         <RefreshButton 
           onRefresh={fetchAllStatuses}
           loading={loading}
           disabled={false}
         />
         
+        <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
+          <Checkbox
+            checked={autoRefresh}
+            onChange={(e) => setAutoRefresh(e.target.checked)}
+          />
+          <span className="f6">Auto-refresh (10s)</span>
+        </div>
+        
         {lastUpdate && (
           <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
-            <ClockIcon size={14} className="color-fg-muted" />
-            <span className="f6 color-fg-muted">{lastUpdate.toLocaleTimeString()}</span>
+            <span className="f6 color-fg-muted">Last updated: {lastUpdate.toLocaleTimeString()}</span>
           </div>
         )}
       </div>

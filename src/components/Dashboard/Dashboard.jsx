@@ -24,8 +24,6 @@ export function Dashboard({
   setSortBy,
   autoRefresh,
   setAutoRefresh,
-  refreshInterval,
-  setRefreshInterval,
   onOpenSettings,
   filterByLabels,
   setFilterByLabels,
@@ -68,8 +66,6 @@ export function Dashboard({
             setSortBy={setSortBy}
             autoRefresh={autoRefresh}
             setAutoRefresh={setAutoRefresh}
-            refreshInterval={refreshInterval}
-            setRefreshInterval={setRefreshInterval}
             lastUpdate={lastUpdate}
             fetchAllStatuses={fetchAllStatuses}
             loading={loading}
