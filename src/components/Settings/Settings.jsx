@@ -73,7 +73,13 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
   }
 
   const removeRepository = (repoName) => {
+    const repo = repos.find(r => r.name === repoName)
     setRepos(repos.filter(r => r.name !== repoName))
+    if (repo) {
+      trackEvent('Repository Removed', { 
+        repo: `${repo.owner}/${repo.name}`
+      })
+    }
   }
 
   const addManualRepository = () => {
