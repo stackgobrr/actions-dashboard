@@ -55,7 +55,7 @@ MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
     it('displays validation error to user', () => {
       render(<GitHubAppForm {...defaultProps} appFormError="Invalid App ID format" />)
       
-      const errorMessage = screen.getByText('Invalid App ID format')
+      const errorMessage = screen.getByText(/invalid.*app id/i)
       expect(errorMessage).toBeInTheDocument()
       expect(errorMessage.closest('.flash-error')).toBeInTheDocument()
     })
@@ -67,13 +67,13 @@ MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
       
       render(<GitHubAppForm {...defaultProps} setAppId={setAppId} setInstallationId={setInstallationId} setPrivateKey={setPrivateKey} />)
       
-      await userEvent.type(screen.getByLabelText('App ID'), 'a')
+      await userEvent.type(screen.getByLabelText(/app id/i), 'a')
       expect(setAppId).toHaveBeenCalled()
       
-      await userEvent.type(screen.getByLabelText('Installation ID'), 'b')
+      await userEvent.type(screen.getByLabelText(/installation id/i), 'b')
       expect(setInstallationId).toHaveBeenCalled()
       
-      await userEvent.type(screen.getByLabelText('Private Key (PEM)'), 'c')
+      await userEvent.type(screen.getByLabelText(/private key/i), 'c')
       expect(setPrivateKey).toHaveBeenCalled()
     })
   })
@@ -91,7 +91,7 @@ MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
       const onShowGuide = vi.fn()
       render(<GitHubAppForm {...defaultProps} onShowGuide={onShowGuide} />)
       
-      await userEvent.click(screen.getByText('Need help setting up?'))
+      await userEvent.click(screen.getByText(/need help.*setting up/i))
       expect(onShowGuide).toHaveBeenCalledOnce()
     })
   })
@@ -100,9 +100,9 @@ MIIEpAIBAAKCAQEA1234567890abcdefghijklmnopqrstuvwxyz
     it('renders all three required credential fields', () => {
       render(<GitHubAppForm {...defaultProps} />)
       
-      expect(screen.getByLabelText('App ID')).toBeInTheDocument()
-      expect(screen.getByLabelText('Installation ID')).toBeInTheDocument()
-      expect(screen.getByLabelText('Private Key (PEM)')).toBeInTheDocument()
+      expect(screen.getByLabelText(/app id/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/installation id/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/private key/i)).toBeInTheDocument()
     })
   })
 })
