@@ -1,5 +1,5 @@
 import { ChevronLeftIcon, MoonIcon, SunIcon, RocketIcon } from '@primer/octicons-react'
-import { Button, IconButton, Text } from '@primer/react'
+import { Button, IconButton, Text, Label } from '@primer/react'
 import { roadmapItems, statusConfig } from './roadmapData'
 import './Roadmap.css'
 
@@ -47,19 +47,9 @@ export function Roadmap({ onBack, theme, setTheme }) {
               <div key={item.id} className="roadmap-card">
                 <div className="card-header">
                   <h3 className="card-title">{item.title}</h3>
-                  <div className="card-meta">
-                    <span 
-                      className="status-badge"
-                      style={{ 
-                        backgroundColor: `${status.color}20`,
-                        color: status.color,
-                        borderColor: `${status.color}40`
-                      }}
-                    >
-                      {status.label}
-                    </span>
-                    <span className="card-quarter">{item.quarter}</span>
-                  </div>
+                  <Label variant={status.variant} size="small">
+                    {status.label}
+                  </Label>
                 </div>
                 <p className="card-description">{item.description}</p>
               </div>
