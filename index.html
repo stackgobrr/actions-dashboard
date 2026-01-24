@@ -8,11 +8,11 @@
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://plausible.io;
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: https:;
       font-src 'self' data:;
-      connect-src 'self' https://api.github.com https://*.lambda-url.eu-west-2.on.aws;
+      connect-src 'self' https://api.github.com https://*.lambda-url.eu-west-2.on.aws https://plausible.io;
       frame-ancestors 'none';
       base-uri 'self';
       form-action 'self';
@@ -21,6 +21,9 @@
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta name="description" content="Monitor GitHub Actions workflow statuses across multiple repositories">
+    
+    <!-- Plausible Analytics -->
+    <script defer data-domain="%VITE_PLAUSIBLE_DOMAIN%" src="https://plausible.io/js/script.hash.js"></script>
     
     <title>Actions Dashboard</title>
   </head>

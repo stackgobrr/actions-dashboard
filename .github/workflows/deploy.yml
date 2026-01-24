@@ -106,6 +106,7 @@ jobs:
         env:
           VITE_SSE_ENDPOINT: ${{ needs.deploy-infrastructure.outputs.sse_url }}
           VITE_APP_SLUG: ${{ vars.APP_SLUG }}
+          VITE_PLAUSIBLE_DOMAIN: ${{ vars.DOMAIN_NAME }}
 
   deploy-frontend:
     name: Deploy Frontend
