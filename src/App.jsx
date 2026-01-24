@@ -8,6 +8,7 @@ import { HotkeyHelper } from './components/UI/HotkeyHelper'
 import { LandingPage } from './components/LandingPage/LandingPage'
 import { Roadmap } from './components/Roadmap/Roadmap'
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
+import { Analytics } from './components/Analytics/Analytics'
 import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
 import { useAuth } from './hooks/useAuth'
@@ -168,6 +169,7 @@ function App() {
       {/* Main app route */}
       <Route path="*" element={
         <>
+          <Analytics />
           {showRoadmap ? (
             <Roadmap
               onBack={() => {

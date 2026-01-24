@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { Button } from '@primer/react'
 import { AlertIcon } from '@primer/octicons-react'
+import { trackEvent } from '../../utils/analytics'
 import './ErrorBoundary.css'
 
 /**
@@ -27,6 +28,13 @@ export class ErrorBoundary extends Component {
     this.setState({
       error,
       errorInfo
+    })
+    
+    // Track error event in Plausible
+    trackEvent('Error Occurred', {
+      errorMessage: error.toString(),
+      errorType: error.name || 'Unknown',
+      componentStack: errorInfo?.componentStack?.split('\n')[1]?.trim() || 'Unknown'
     })
     
     // Future: Send error to error tracking service
