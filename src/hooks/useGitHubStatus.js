@@ -44,15 +44,13 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   const [lastUpdate, setLastUpdate] = useState(null)
   const [isDemoMode, setIsDemoMode] = useState(isDemoModeEnabled(authMethod))
 
-  // Get installation ID for SSE connection (for both GitHub App and shared app auth)
+  // Get installation ID for SSE connection (for GitHub App auth)
   const installationId = authMethod === 'github-app'
     ? getGitHubAppCredentials().installationId
-    : authMethod === 'shared-app'
-    ? localStorage.getItem('shared_app_installation_id')
     : null
 
-  // Setup SSE connection for live updates (for both GitHub App and shared app)
-  const sseEnabled = (authMethod === 'github-app' || authMethod === 'shared-app') && !showAuthSetup && !isDemoMode
+  // Setup SSE connection for live updates (for GitHub App)
+  const sseEnabled = authMethod === 'github-app' && !showAuthSetup && !isDemoMode
   const sse = useSSE(installationId, sseEnabled)
 
   // Create a stable key from repositories to detect real changes

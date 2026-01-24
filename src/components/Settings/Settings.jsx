@@ -13,10 +13,7 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
   const [manualName, setManualName] = useState('')
 
   useEffect(() => {
-    // Only fetch repos if not using shared app (no API token available)
-    if (authMethod !== 'shared-app') {
-      fetchUserRepos()
-    }
+    fetchUserRepos()
   }, [authMethod])
 
   const fetchUserRepos = async () => {
@@ -142,42 +139,13 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
           </div>
 
           <div className="settings-section">
-            <h3 className="f4 mb-2">
-              {authMethod === 'shared-app' ? 'Add Repository' : 'Available Repositories'}
-            </h3>
+            <h3 className="f4 mb-2">Available Repositories</h3>
 
-            {authMethod === 'shared-app' ? (
-              <div>
-                <p className="f6 color-fg-muted mb-3">
-                  Enter the owner and repository name to add a repository to your dashboard.
-                </p>
-                <div className="d-flex flex-column" style={{ gap: '12px' }}>
-                  <TextInput
-                    placeholder="Owner (e.g., facebook)"
-                    value={manualOwner}
-                    onChange={(e) => setManualOwner(e.target.value)}
-                  />
-                  <TextInput
-                    placeholder="Repository name (e.g., react)"
-                    value={manualName}
-                    onChange={(e) => setManualName(e.target.value)}
-                  />
-                  <Button
-                    leadingVisual={PlusIcon}
-                    onClick={addManualRepository}
-                    disabled={!manualOwner || !manualName}
-                  >
-                    Add Repository
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <TextInput
-                  leadingVisual={SearchIcon}
-                  placeholder="Search repositories..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+            <TextInput
+              leadingVisual={SearchIcon}
+              placeholder="Search repositories..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
                   sx={{ mb: 2 }}
                 />
 
@@ -210,8 +178,6 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
                     })}
                   </div>
                 )}
-              </>
-            )}
           </div>
         </div>
 
