@@ -102,6 +102,9 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
   }
 
   const handleSave = () => {
+    trackEvent('Settings Saved', { 
+      repoCount: repos.length
+    })
     onSaveRepos(repos)
     onClose()
   }
