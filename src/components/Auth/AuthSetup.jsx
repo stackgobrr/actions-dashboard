@@ -75,7 +75,10 @@ export function AuthSetup({
               <PatForm
                 githubToken={githubToken}
                 setGithubToken={setGithubToken}
-                onSubmit={saveToken}
+                onSubmit={(token) => {
+                  window.plausible?.('Auth Method Selected', { props: { method: 'pat' } })
+                  saveToken(token)
+                }}
                 patError={patError}
                 isValidatingPat={isValidatingPat}
               />
@@ -157,7 +160,10 @@ export function AuthSetup({
             privateKey={privateKey}
             setPrivateKey={setPrivateKey}
             appFormError={appFormError}
-            onSubmit={handleGitHubAppSetup}
+            onSubmit={(data) => {
+              window.plausible?.('Auth Method Selected', { props: { method: 'github-app' } })
+              handleGitHubAppSetup(data)
+            }}
             onBack={() => setShowGitHubAppForm(false)}
             onShowGuide={() => setShowGuide(true)}
             isValidatingGitHubApp={isValidatingGitHubApp}

@@ -22,8 +22,8 @@
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta name="description" content="Monitor GitHub Actions workflow statuses across multiple repositories">
     
-    <!-- Plausible Analytics -->
-    <script defer data-domain="%VITE_PLAUSIBLE_DOMAIN%" src="https://plausible.io/js/script.hash.js"></script>
+    <!-- Plausible Analytics - Only injected if VITE_PLAUSIBLE_DOMAIN is set -->
+    %VITE_PLAUSIBLE_SCRIPT%
     
     <title>Actions Dashboard</title>
   </head>

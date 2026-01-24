@@ -242,7 +242,10 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
                 variant="default"
                 size="large"
                 leadingVisual={EyeIcon}
-                onClick={onViewDemo}
+                onClick={() => {
+                  window.plausible?.('Auth Method Selected', { props: { method: 'demo' } })
+                  onViewDemo()
+                }}
               >
                 View demo
               </Button>
