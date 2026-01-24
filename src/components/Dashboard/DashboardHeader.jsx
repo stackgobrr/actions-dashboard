@@ -289,7 +289,11 @@ export function DashboardHeader({
         <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
           <Checkbox
             checked={autoRefresh}
-            onChange={(e) => setAutoRefresh(e.target.checked)}
+            onChange={(e) => {
+              const newValue = e.target.checked
+              setAutoRefresh(newValue)
+              trackEvent('Auto-refresh Toggled', { enabled: newValue })
+            }}
           />
           <span className="f6">Auto-refresh (10s)</span>
         </div>
