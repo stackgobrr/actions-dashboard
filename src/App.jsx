@@ -31,7 +31,6 @@ function App() {
   const [theme, setTheme] = useTheme()
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [refreshInterval, setRefreshInterval] = useState(DEFAULT_REFRESH_INTERVAL)
   const [showGuide, setShowGuide] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showHotkeyHelper, setShowHotkeyHelper] = useState(false)
@@ -85,7 +84,7 @@ function App() {
     auth.authMethod,
     auth.showAuthSetup,
     autoRefresh,
-    refreshInterval
+    DEFAULT_REFRESH_INTERVAL
   )
 
   const handleSaveRepos = (repos) => {
@@ -236,8 +235,6 @@ function App() {
                   setSortBy={setSortBy}
                   autoRefresh={autoRefresh}
                   setAutoRefresh={setAutoRefresh}
-                  refreshInterval={refreshInterval}
-                  setRefreshInterval={setRefreshInterval}
                   onOpenSettings={() => setShowSettings(true)}
                   filterByLabels={filterByLabels}
                   setFilterByLabels={setFilterByLabels}

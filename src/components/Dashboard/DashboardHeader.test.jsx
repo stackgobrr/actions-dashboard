@@ -139,20 +139,6 @@ describe('DashboardHeader Component', () => {
       await user.click(screen.getByRole('checkbox'))
       expect(setAutoRefresh).toHaveBeenCalled()
     })
-
-    it('shows interval selector when auto-refresh enabled', () => {
-      render(<DashboardHeader {...defaultProps} autoRefresh={true} />)
-      const select = screen.getByRole('combobox')
-      // Should have refresh interval select
-      expect(select).toBeInTheDocument()
-    })
-
-    it('hides interval selector when auto-refresh disabled', () => {
-      render(<DashboardHeader {...defaultProps} autoRefresh={false} />)
-      const select = screen.queryByRole('combobox')
-      // Should have no selects when auto-refresh is disabled
-      expect(select).not.toBeInTheDocument()
-    })
   })
 
   describe('Last Update Display', () => {

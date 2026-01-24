@@ -20,8 +20,6 @@ describe('Dashboard Component - Critical Functionality', () => {
     setSortBy: vi.fn(),
     autoRefresh: true,
     setAutoRefresh: vi.fn(),
-    refreshInterval: 10,
-    setRefreshInterval: vi.fn(),
     onOpenSettings: vi.fn(),
     filterByLabels: [],
     setFilterByLabels: vi.fn()

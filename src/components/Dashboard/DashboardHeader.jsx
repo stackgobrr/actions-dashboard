@@ -32,8 +32,6 @@ export function DashboardHeader({
   setSortBy,
   autoRefresh,
   setAutoRefresh,
-  refreshInterval,
-  setRefreshInterval,
   lastUpdate,
   fetchAllStatuses,
   loading,
@@ -261,20 +259,7 @@ export function DashboardHeader({
             checked={autoRefresh}
             onChange={(e) => setAutoRefresh(e.target.checked)}
           />
-          <span className="f6">Auto-refresh</span>
-          {autoRefresh && (
-            <Select 
-              value={refreshInterval} 
-              onChange={(e) => setRefreshInterval(Number(e.target.value))}
-              size="small"
-            >
-              <Select.Option value="5">5s</Select.Option>
-              <Select.Option value="10">10s</Select.Option>
-              <Select.Option value="30">30s</Select.Option>
-              <Select.Option value="60">1m</Select.Option>
-              <Select.Option value="300">5m</Select.Option>
-            </Select>
-          )}
+          <span className="f6">Auto-refresh (10s)</span>
         </div>
         
         <RefreshButton 
