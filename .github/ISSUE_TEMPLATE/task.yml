@@ -1,0 +1,75 @@
+name: Task / Planned Work
+description: Create a task for planned development work
+title: "[Task]: "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for planned development work and internal tasks.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be done and why?
+      placeholder: Describe the task and its purpose...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What defines this task as complete?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task-area
+    attributes:
+      label: Task Area
+      description: Which area does this work relate to?
+      options:
+        - Frontend / UI
+        - Authentication
+        - API / Data Fetching
+        - Testing
+        - Infrastructure / DevOps
+        - Documentation
+        - Performance
+        - Refactoring
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Technical Implementation
+      description: Technical details, approach, or implementation notes
+      placeholder: |
+        - File changes needed
+        - Dependencies or libraries
+        - Configuration updates
+        - Testing approach
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Other issues or work that must be completed first
+      placeholder: |
+        - Depends on #123
+        - Blocked by infrastructure changes
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other relevant information
+      placeholder: Links, references, edge cases to consider...
