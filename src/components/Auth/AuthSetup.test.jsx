@@ -145,12 +145,10 @@ describe('AuthSetup Component', () => {
 
     it('shows security notice with protection measures', () => {
       render(<AuthSetup {...defaultProps} />)
-      expect(screen.getByText('Your data is protected:')).toBeInTheDocument()
-      expect(screen.getByText(/Credentials stored locally in your browser only/i)).toBeInTheDocument()
-      expect(screen.getByText(/Content Security Policy blocks unauthorized scripts/i)).toBeInTheDocument()
-      expect(screen.getByText(/Direct connection to GitHub API \(PAT\) or secure webhook relay \(GitHub App\)/i)).toBeInTheDocument()
-      expect(screen.getByText(/Same-origin policy prevents access from other sites/i)).toBeInTheDocument()
-      expect(screen.getByText('View our security practices')).toBeInTheDocument()
+      expect(screen.getByText('Your credentials stay secure:')).toBeInTheDocument()
+      expect(screen.getByText(/Stored locally in your browser only, never sent to our servers/i)).toBeInTheDocument()
+      expect(screen.getByText(/Direct API calls from your browser to GitHub, no middleman/i)).toBeInTheDocument()
+      expect(screen.getByText(/CSP and same-origin policies prevent unauthorized access/i)).toBeInTheDocument()
     })
   })
 
