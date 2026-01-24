@@ -12,7 +12,7 @@ Click on repository cards to expand and see detailed workflow information.
 - Quick actions (re-run workflows, view logs)
 - Keyboard shortcuts for navigation
 
-**Status:** Planned
+**Status:** In Progress
 
 ---
 

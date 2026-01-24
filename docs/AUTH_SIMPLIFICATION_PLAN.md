@@ -4,7 +4,7 @@
 
 ### What's Currently Implemented
 
-Your actions-dashboard currently has **3 authentication methods**:
+Your actions-dashboard currently has **3 authentication methods**, plus a demo mode for testing:
 
 1. **PAT (Personal Access Token)** ✅
    - Solo user approach
@@ -29,9 +29,9 @@ Your actions-dashboard currently has **3 authentication methods**:
    - Lambda webhook receiver
    - **This is the foundation for real-time updates!**
 
-4. **Demo Mode** ✅
-   - Fake data for testing
-   - No authentication required
+**Demo Mode** ✅
+- Fake data for testing
+- No authentication required
 
 ### Infrastructure Currently Deployed
 
