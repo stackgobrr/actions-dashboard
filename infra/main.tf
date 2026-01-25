@@ -8,7 +8,7 @@ module "frontend" {
 
   project_name   = var.project_name
   environment    = var.environment
-  domain_name    = var.domain_name
+  domain_name    = local.domain_name
   hosted_zone_id = var.hosted_zone_id
 
   # Add Lambda Function URLs as additional origins

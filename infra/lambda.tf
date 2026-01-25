@@ -48,7 +48,7 @@ locals {
 
 resource "aws_secretsmanager_secret" "secrets" {
   for_each = local.secrets
-  
+
   name        = each.value.name
   description = each.value.description
 }
@@ -56,7 +56,7 @@ resource "aws_secretsmanager_secret" "secrets" {
 # Secrets Manager secret values
 resource "aws_secretsmanager_secret_version" "secrets" {
   for_each = local.secrets
-  
+
   secret_id = aws_secretsmanager_secret.secrets[each.key].id
   secret_string = lookup({
     app_private_key     = var.app_private_key
@@ -119,11 +119,11 @@ locals {
       timeout     = 30
       memory_size = 256
       environment = {
-        ACTIONS_DASHBOARD_APP_ID                       = var.actions_dashboard_app_id
-        ACTIONS_DASHBOARD_PRIVATE_KEY_SECRET_NAME      = aws_secretsmanager_secret.secrets["app_private_key"].name
-        ACTIONS_DASHBOARD_WEBHOOK_SECRET_NAME          = aws_secretsmanager_secret.secrets["webhook_secret"].name
-        AWS_REGION_NAME                                = var.aws_region
-        NODE_ENV                                       = var.environment
+        ACTIONS_DASHBOARD_APP_ID                  = var.actions_dashboard_app_id
+        ACTIONS_DASHBOARD_PRIVATE_KEY_SECRET_NAME = aws_secretsmanager_secret.secrets["app_private_key"].name
+        ACTIONS_DASHBOARD_WEBHOOK_SECRET_NAME     = aws_secretsmanager_secret.secrets["webhook_secret"].name
+        AWS_REGION_NAME                           = var.aws_region
+        NODE_ENV                                  = var.environment
       }
     }
     sse_handler = {
@@ -138,7 +138,7 @@ locals {
       memory_size = 128
       environment = {
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name
-        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "https://${var.domain_name}/api/oauth/callback"
+        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "https://${local.domain_name}/api/oauth/callback"
         AWS_REGION_NAME                               = var.aws_region
       }
     }
@@ -146,9 +146,9 @@ locals {
       timeout     = 10
       memory_size = 128
       environment = {
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME  = aws_secretsmanager_secret.secrets["oauth_client_id"].name
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name
         ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name
-        AWS_REGION_NAME                                = var.aws_region
+        AWS_REGION_NAME                                   = var.aws_region
         # Redirect URI is self-referencing - no need to set
       }
     }
@@ -166,10 +166,10 @@ locals {
 
 resource "aws_cloudwatch_log_group" "lambda" {
   for_each = local.lambda_functions
-  
+
   name              = "/aws/lambda/${var.project_name}-${replace(each.key, "_", "-")}"
   retention_in_days = 7
-  
+
   lifecycle {
     prevent_destroy = false
   }
@@ -178,15 +178,15 @@ resource "aws_cloudwatch_log_group" "lambda" {
 # Lambda Functions
 resource "aws_lambda_function" "lambda" {
   for_each = local.lambda_functions
-  
-  s3_bucket        = aws_s3_bucket.lambda_artifacts.id
-  s3_key           = "${replace(each.key, "_", "-")}.zip"
-  function_name    = "${var.project_name}-${replace(each.key, "_", "-")}"
-  role             = aws_iam_role.lambda_execution.arn
-  handler          = "index.handler"
-  runtime          = "nodejs20.x"
-  timeout          = each.value.timeout
-  memory_size      = each.value.memory_size
+
+  s3_bucket     = aws_s3_bucket.lambda_artifacts.id
+  s3_key        = "${replace(each.key, "_", "-")}.zip"
+  function_name = "${var.project_name}-${replace(each.key, "_", "-")}"
+  role          = aws_iam_role.lambda_execution.arn
+  handler       = "index.handler"
+  runtime       = "nodejs20.x"
+  timeout       = each.value.timeout
+  memory_size   = each.value.memory_size
 
   environment {
     variables = each.value.environment
@@ -226,7 +226,7 @@ locals {
       invoke_mode = "BUFFERED"
       cors = {
         allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_origins     = ["https://${local.domain_name}"]
         allow_methods     = ["GET"]
         allow_headers     = ["*"]
         expose_headers    = []
@@ -237,7 +237,7 @@ locals {
       invoke_mode = "BUFFERED"
       cors = {
         allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_origins     = ["https://${local.domain_name}"]
         allow_methods     = ["GET"]
         allow_headers     = ["*"]
         expose_headers    = []
@@ -248,7 +248,7 @@ locals {
       invoke_mode = "BUFFERED"
       cors = {
         allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_origins     = ["https://${local.domain_name}"]
         allow_methods     = ["POST"]
         allow_headers     = ["*"]
         expose_headers    = []
@@ -260,10 +260,10 @@ locals {
 
 resource "aws_lambda_function_url" "lambda" {
   for_each = local.function_url_configs
-  
+
   function_name      = aws_lambda_function.lambda[each.key].function_name
   authorization_type = "NONE"
-  
+
   invoke_mode = each.value.invoke_mode
 
   cors {
@@ -279,7 +279,7 @@ resource "aws_lambda_function_url" "lambda" {
 # Allow Function URL to invoke Lambda functions
 resource "aws_lambda_permission" "function_url" {
   for_each = local.function_url_configs
-  
+
   statement_id           = "AllowExecutionFromFunctionURL"
   action                 = "lambda:InvokeFunctionUrl"
   function_name          = aws_lambda_function.lambda[each.key].function_name

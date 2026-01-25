@@ -1,14 +1,9 @@
-# Example Terraform variables file
-# Copy this to terraform.tfvars and fill in your values
-# DO NOT commit terraform.tfvars to git (it's in .gitignore)
-
 # AWS Configuration
 aws_region  = "eu-west-2"
 environment = "prod"
 
 # Domain Configuration
-domain_name    = "actions.dashboard.stackgobrr.com"
-hosted_zone_id = "your-route53-hosted-zone-id"
+#hosted_zone_id = "your-route53-hosted-zone-id"
 
 # GitHub App Configuration
 # Note: App ID is passed via GitHub Actions secret as TF_VAR_actions_dashboard_app_id

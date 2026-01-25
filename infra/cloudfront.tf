@@ -6,7 +6,7 @@ locals {
     for key in keys(aws_lambda_function.lambda) :
     key => replace(replace(aws_lambda_function_url.lambda[key].function_url, "https://", ""), "/", "")
   }
-  
+
   # Map Lambda functions to their path patterns
   lambda_path_patterns = {
     webhook_receiver = "/api/webhook"
