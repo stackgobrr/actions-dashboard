@@ -1,6 +1,6 @@
 # Frontend Module (S3 + CloudFront + Custom Domain)
 module "frontend" {
-  source = "../../../_modules/tf-module-aws-frontend"
+  source = "git::https://github.com/stackgobrr/tf-module-aws-frontend.git?ref=main"
 
   providers = {
     aws.us_east_1 = aws.us_east_1
