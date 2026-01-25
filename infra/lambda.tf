@@ -225,8 +225,8 @@ locals {
     oauth_start = {
       invoke_mode = "BUFFERED"
       cors = {
-        allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_credentials = false
+        allow_origins     = ["*"]
         allow_methods     = ["GET"]
         allow_headers     = ["content-type"]
         expose_headers    = []
@@ -236,8 +236,8 @@ locals {
     oauth_callback = {
       invoke_mode = "BUFFERED"
       cors = {
-        allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_credentials = false
+        allow_origins     = ["*"]
         allow_methods     = ["GET"]
         allow_headers     = ["content-type"]
         expose_headers    = []
@@ -247,8 +247,8 @@ locals {
     github_token = {
       invoke_mode = "BUFFERED"
       cors = {
-        allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_credentials = false
+        allow_origins     = ["*"]
         allow_methods     = ["POST"]
         allow_headers     = ["content-type"]
         expose_headers    = []
@@ -285,4 +285,7 @@ resource "aws_lambda_permission" "function_url" {
   function_name          = aws_lambda_function.lambda[each.key].function_name
   principal              = "*"
   function_url_auth_type = "NONE"
+  
+  # Ensure CloudFront can access via Function URL
+  source_arn = "*"
 }
