@@ -225,10 +225,10 @@ locals {
     oauth_start = {
       invoke_mode = "BUFFERED"
       cors = {
-        allow_credentials = false
-        allow_origins     = ["*"]
+        allow_credentials = true
+        allow_origins     = ["https://${var.domain_name}"]
         allow_methods     = ["GET"]
-        allow_headers     = ["content-type"]
+        allow_headers     = ["*"]
         expose_headers    = []
         max_age           = 86400
       }
@@ -236,10 +236,10 @@ locals {
     oauth_callback = {
       invoke_mode = "BUFFERED"
       cors = {
-        allow_credentials = false
-        allow_origins     = ["*"]
+        allow_credentials = true
+        allow_origins     = ["https://${var.domain_name}"]
         allow_methods     = ["GET"]
-        allow_headers     = ["content-type"]
+        allow_headers     = ["*"]
         expose_headers    = []
         max_age           = 86400
       }
@@ -247,10 +247,10 @@ locals {
     github_token = {
       invoke_mode = "BUFFERED"
       cors = {
-        allow_credentials = false
-        allow_origins     = ["*"]
+        allow_credentials = true
+        allow_origins     = ["https://${var.domain_name}"]
         allow_methods     = ["POST"]
-        allow_headers     = ["content-type"]
+        allow_headers     = ["*"]
         expose_headers    = []
         max_age           = 86400
       }
