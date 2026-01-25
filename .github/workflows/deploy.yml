@@ -23,6 +23,7 @@ jobs:
       environment: ${{ steps.env.outputs.environment }}
     steps:
       - name: Set environment
+        id: env
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             echo "environment=prod" >> "$GITHUB_OUTPUT"
@@ -81,8 +82,8 @@ jobs:
         run: |
           cd infra
           terraform init \
-          -backend-config="key=utils/actions-dashboard/${{ needs.setup.outputs.environment }}/terraform.tfstate"
-          terraform apply -auto-approve -var-file=env/${{ needs.setup.outputs.environment }}.tfvars \
+          -backend-config="key=utils/actions-dashboard/${{ steps.env.outputs.environment }}/terraform.tfstate"
+          terraform apply -auto-approve -var-file=env/${{ steps.env.outputs.environment }}.tfvars \
             -target=aws_s3_bucket.lambda_artifacts \
             -target=aws_s3_bucket_versioning.lambda_artifacts \
             -target=aws_s3_bucket_lifecycle_configuration.lambda_artifacts
