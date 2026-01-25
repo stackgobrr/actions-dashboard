@@ -11,9 +11,6 @@ domain_name    = "actions.dashboard.stackgobrr.com"
 hosted_zone_id = "your-route53-hosted-zone-id"
 
 # GitHub App Configuration
-# Get these values from your GitHub App settings
-webhook_secret = "your-webhook-secret-here"
-
-# Optional: GitHub App credentials (for future features)
-# github_app_id         = "123456"
-# github_app_private_key = "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+# Note: App ID is passed via GitHub Actions secret as TF_VAR_actions_dashboard_app_id
+# Secrets (private key, webhook secret, OAuth credentials) are managed via AWS Secrets Manager
+# and uploaded by the deployment workflow before Terraform runs

@@ -39,6 +39,8 @@ jobs:
     outputs:
       sse_url: ${{ steps.get-outputs.outputs.sse_url }}
       webhook_url: ${{ steps.get-outputs.outputs.webhook_url }}
+      oauth_start_url: ${{ steps.get-outputs.outputs.oauth_start_url }}
+      oauth_callback_url: ${{ steps.get-outputs.outputs.oauth_callback_url }}
       website_url: ${{ steps.get-outputs.outputs.website_url }}
       s3_bucket: ${{ steps.get-outputs.outputs.s3_bucket }}
       distribution_id: ${{ steps.get-outputs.outputs.distribution_id }}
@@ -55,6 +57,66 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.14.1'
+          terraform_wrapper: false
+
+      - name: Create S3 bucket for Lambda artifacts
+        run: |
+          cd infra
+          terraform init
+          terraform apply -auto-approve \
+            -target=aws_s3_bucket.lambda_artifacts \
+            -target=aws_s3_bucket_versioning.lambda_artifacts \
+            -target=aws_s3_bucket_lifecycle_configuration.lambda_artifacts
+        env:
+          TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
+          TF_VAR_hosted_zone_id: ${{ vars.HOSTED_ZONE_ID }}
+          TF_VAR_actions_dashboard_app_id: ${{ secrets.ACTIONS_DASHBOARD_APP_ID }}
+          TF_VAR_app_private_key: ${{ secrets.ACTIONS_DASHBOARD_APP_PRIVATE_KEY }}
+          TF_VAR_webhook_secret: ${{ secrets.ACTIONS_DASHBOARD_WEBHOOK_SECRET }}
+          TF_VAR_oauth_client_id: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_ID }}
+          TF_VAR_oauth_client_secret: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET }}
+
+      - name: Get Lambda artifacts bucket name
+        id: bucket
+        run: |
+          cd infra
+          BUCKET_NAME=$(terraform output -raw lambda_artifacts_bucket)
+          echo "name=$BUCKET_NAME" >> $GITHUB_OUTPUT
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Package and upload Lambda functions
+        run: |
+          cd api
+          
+          for dir in */; do
+            func_name=$(basename "$dir")
+            echo "Packaging ${func_name}..."
+            
+            cd "$dir"
+            
+            # Install dependencies if package.json exists
+            if [ -f package.json ]; then
+              npm install --production
+              rm -rf package-lock.json
+            fi
+            
+            # Create zip archive
+            zip -r "${func_name}.zip" . -x "*.git*" -x "node_modules/.cache/*"
+            
+            # Upload to S3
+            aws s3 cp "${func_name}.zip" "s3://${{ steps.bucket.outputs.name }}/${func_name}.zip"
+            
+            cd ..
+          done
+
       - name: Deploy infrastructure
         uses: stackgobrr/common-github-actions/actions/terraform-deploy@main
         with:
@@ -65,7 +127,11 @@ jobs:
         env:
           TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
           TF_VAR_hosted_zone_id: ${{ vars.HOSTED_ZONE_ID }}
-          TF_VAR_webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+          TF_VAR_actions_dashboard_app_id: ${{ secrets.ACTIONS_DASHBOARD_APP_ID }}
+          TF_VAR_app_private_key: ${{ secrets.ACTIONS_DASHBOARD_APP_PRIVATE_KEY }}
+          TF_VAR_webhook_secret: ${{ secrets.ACTIONS_DASHBOARD_WEBHOOK_SECRET }}
+          TF_VAR_oauth_client_id: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_ID }}
+          TF_VAR_oauth_client_secret: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET }}
 
       - name: Get Terraform outputs
         id: get-outputs
@@ -73,12 +139,16 @@ jobs:
           cd infra
           SSE_URL=$(terraform output -raw sse_handler_url)
           WEBHOOK_URL=$(terraform output -raw webhook_receiver_url)
+          OAUTH_START_URL=$(terraform output -raw oauth_start_url)
+          OAUTH_CALLBACK_URL=$(terraform output -raw oauth_callback_url)
           WEBSITE_URL=$(terraform output -raw website_url)
           S3_BUCKET=$(terraform output -raw s3_bucket_name)
           DISTRIBUTION_ID=$(terraform output -raw cloudfront_distribution_id)
 
           echo "sse_url=$SSE_URL" >> $GITHUB_OUTPUT
           echo "webhook_url=$WEBHOOK_URL" >> $GITHUB_OUTPUT
+          echo "oauth_start_url=$OAUTH_START_URL" >> $GITHUB_OUTPUT
+          echo "oauth_callback_url=$OAUTH_CALLBACK_URL" >> $GITHUB_OUTPUT
           echo "website_url=$WEBSITE_URL" >> $GITHUB_OUTPUT
           echo "s3_bucket=$S3_BUCKET" >> $GITHUB_OUTPUT
           echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
@@ -104,7 +174,7 @@ jobs:
           artifact-name: 'dist'
           artifact-path: 'dist/'
         env:
-          VITE_SSE_ENDPOINT: ${{ needs.deploy-infrastructure.outputs.sse_url }}
+          VITE_SSE_ENDPOINT: /api/sse
           VITE_APP_SLUG: ${{ vars.APP_SLUG }}
           VITE_PLAUSIBLE_DOMAIN: ${{ vars.DOMAIN_NAME }}
 
@@ -156,5 +226,12 @@ jobs:
         run: |
           echo "🚀 Dashboard deployed successfully!"
           echo "📍 Website URL: ${{ needs.deploy-infrastructure.outputs.website_url }}"
-          echo "🔗 Webhook URL: ${{ needs.deploy-infrastructure.outputs.webhook_url }}"
-          echo "📡 SSE URL: ${{ needs.deploy-infrastructure.outputs.sse_url }}"
+          echo "🔗 Webhook URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/webhook"
+          echo "📡 SSE URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/sse"
+          echo "🔐 OAuth Start URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/oauth/start"
+          echo "🔐 OAuth Callback URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/oauth/callback"
+          echo ""
+          echo "⚠️  MANUAL STEP: Update GitHub App webhook URL to:"
+          echo "   ${{ needs.deploy-infrastructure.outputs.website_url }}api/webhook"
+          echo "   Visit: https://github.com/settings/apps/actions-dashboard-by-stackgobrr"
+
