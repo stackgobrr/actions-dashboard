@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 concurrency:
@@ -15,6 +17,18 @@ env:
   NODE_VERSION: '20'
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+    steps:
+      - name: Set environment
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "environment=prod" >> "$GITHUB_OUTPUT"
+          else
+            echo "environment=dev" >> "$GITHUB_OUTPUT"
+          fi
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -66,7 +80,8 @@ jobs:
       - name: Create S3 bucket for Lambda artifacts
         run: |
           cd infra
-          terraform init
+          terraform init -backend-config=env/${{ needs.setup.outputs.environment }}.tfvars \
+          -backend-config="key=utils/actions-dashboard/${needs.setup.outputs.environment}/terraform.tfstate"
           terraform apply -auto-approve \
             -target=aws_s3_bucket.lambda_artifacts \
             -target=aws_s3_bucket_versioning.lambda_artifacts \
@@ -124,6 +139,7 @@ jobs:
           working-directory: 'infra'
           terraform-wrapper: 'false'
           auto-approve: 'true'
+          environment: ${{ needs.setup.outputs.environment }}
         env:
           TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
           TF_VAR_hosted_zone_id: ${{ vars.HOSTED_ZONE_ID }}
