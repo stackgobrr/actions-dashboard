@@ -80,9 +80,9 @@ jobs:
       - name: Create S3 bucket for Lambda artifacts
         run: |
           cd infra
-          terraform init -var-file=env/${{ needs.setup.outputs.environment }}.tfvars \
+          terraform init \
           -backend-config="key=utils/actions-dashboard/${needs.setup.outputs.environment}/terraform.tfstate"
-          terraform apply -auto-approve \
+          terraform apply -auto-approve -var-file=env/${{ needs.setup.outputs.environment }}.tfvars \
             -target=aws_s3_bucket.lambda_artifacts \
             -target=aws_s3_bucket_versioning.lambda_artifacts \
             -target=aws_s3_bucket_lifecycle_configuration.lambda_artifacts
