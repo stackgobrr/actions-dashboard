@@ -285,7 +285,4 @@ resource "aws_lambda_permission" "function_url" {
   function_name          = aws_lambda_function.lambda[each.key].function_name
   principal              = "*"
   function_url_auth_type = "NONE"
-  
-  # Ensure CloudFront can access via Function URL
-  source_arn = "*"
 }
