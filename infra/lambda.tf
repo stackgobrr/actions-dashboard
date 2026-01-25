@@ -138,8 +138,8 @@ locals {
       memory_size = 128
       environment = {
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name
+        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "https://${var.domain_name}/api/oauth/callback"
         AWS_REGION_NAME                               = var.aws_region
-        # Redirect URI will be the oauth-callback Lambda URL - update after first deploy
       }
     }
     oauth_callback = {
@@ -191,36 +191,6 @@ resource "aws_lambda_function" "lambda" {
   depends_on = [
     aws_cloudwatch_log_group.lambda
   ]
-}
-
-# Update oauth-start Lambda with callback URL after Function URLs are created
-resource "aws_lambda_function" "oauth_start_with_redirect" {
-  function_name = aws_lambda_function.lambda["oauth_start"].function_name
-  
-  environment {
-    variables = merge(
-      local.lambda_functions["oauth_start"].environment,
-      {
-        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI = "https://${var.domain_name}/api/oauth/callback"
-      }
-    )
-  }
-
-  depends_on = [
-    aws_lambda_function_url.lambda
-  ]
-  
-  lifecycle {
-    ignore_changes = [
-      filename,
-      handler,
-      role,
-      runtime,
-      source_code_hash,
-      timeout,
-      memory_size
-    ]
-  }
 }
 
 # Lambda Function URLs
