@@ -21,7 +21,7 @@ variable "project_name" {
   default     = "actions-dashboard"
 }
 
-variable "base_domain_name" {
+variable "domain_name" {
   description = "Custom domain name for the dashboard (optional)"
   type        = string
   default     = "actions.dashboard.stackgobrr.com"

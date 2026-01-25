@@ -33,7 +33,3 @@ module "frontend" {
     Name = "${var.project_name}-${var.environment}"
   }
 }
-
-locals {
-  domain_name = var.environment == "prod" ? var.base_domain_name : "${var.environment}.${var.base_domain_name}"
-}
