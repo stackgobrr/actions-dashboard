@@ -61,32 +61,3 @@ resource "aws_cloudfront_origin_request_policy" "lambda_api" {
   }
 }
 
-# Response headers policy for CORS
-resource "aws_cloudfront_response_headers_policy" "lambda_api" {
-  name    = "${var.project_name}-${var.environment}-lambda-api-cors"
-  comment = "CORS policy for Lambda API endpoints"
-
-  cors_config {
-    access_control_allow_credentials = true
-    
-    access_control_allow_headers {
-      items = ["*"]
-    }
-    
-    access_control_allow_methods {
-      items = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    }
-    
-    access_control_allow_origins {
-      items = ["https://${var.domain_name}"]
-    }
-    
-    access_control_expose_headers {
-      items = ["*"]
-    }
-    
-    access_control_max_age_sec = 86400
-    origin_override = true
-  }
-}
-
