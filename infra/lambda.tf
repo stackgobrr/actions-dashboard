@@ -169,6 +169,10 @@ resource "aws_cloudwatch_log_group" "lambda" {
   
   name              = "/aws/lambda/${var.project_name}-${replace(each.key, "_", "-")}"
   retention_in_days = 7
+  
+  lifecycle {
+    prevent_destroy = false
+  }
 }
 
 # Lambda Functions
