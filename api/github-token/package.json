@@ -1,0 +1,9 @@
+{
+  "name": "github-token",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.713.0",
+    "@octokit/auth-app": "^8.1.2"
+  }
+}

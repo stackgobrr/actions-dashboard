@@ -5,29 +5,44 @@
  */
 
 import crypto from 'crypto';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { eventBroadcaster } from './eventBroadcaster.js';
 
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+// Cache webhook secret during Lambda warm start
+let cachedWebhookSecret = null;
+
+/**
+ * Fetch webhook secret from AWS Secrets Manager
+ * @returns {Promise<string>} Webhook secret
+ */
+async function getWebhookSecret() {
+  if (cachedWebhookSecret) return cachedWebhookSecret;
+
+  const secretName = process.env.ACTIONS_DASHBOARD_WEBHOOK_SECRET_NAME;
+  if (!secretName) {
+    throw new Error('ACTIONS_DASHBOARD_WEBHOOK_SECRET_NAME not configured');
+  }
+
+  const client = new SecretsManagerClient({ region: process.env.AWS_REGION_NAME || 'eu-west-2' });
+  const response = await client.send(new GetSecretValueCommand({ SecretId: secretName }));
+  cachedWebhookSecret = response.SecretString;
+  return cachedWebhookSecret;
+}
 
 /**
  * Verify GitHub webhook signature
  * @param {string} payload - Raw request body
  * @param {string} signature - X-Hub-Signature-256 header value
+ * @param {string} secret - Webhook secret
  * @returns {boolean} True if signature is valid
  */
-function verifySignature(payload, signature) {
-  // If no webhook secret is configured, skip validation (allow initial setup)
-  if (!WEBHOOK_SECRET) {
-    console.warn('[Webhook] No WEBHOOK_SECRET configured - skipping signature validation');
-    return true;
-  }
-
+function verifySignature(payload, signature, secret) {
   if (!signature) {
     console.error('[Webhook] Missing X-Hub-Signature-256 header');
     return false;
   }
 
-  const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
+  const hmac = crypto.createHmac('sha256', secret);
   const digest = 'sha256=' + hmac.update(payload).digest('hex');
 
   const isValid = crypto.timingSafeEqual(
@@ -130,11 +145,23 @@ function parsePullRequestEvent(payload) {
 export const handler = async (event) => {
   console.log('[Webhook] Received event');
 
+  // Fetch webhook secret from Secrets Manager
+  let secret;
+  try {
+    secret = await getWebhookSecret();
+  } catch (error) {
+    console.error('[Webhook] Failed to fetch webhook secret:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Webhook secret not configured' }),
+    };
+  }
+
   // Verify webhook signature
   const signature = event.headers['x-hub-signature-256'] || event.headers['X-Hub-Signature-256'];
   const body = event.body;
 
-  if (!verifySignature(body, signature)) {
+  if (!verifySignature(body, signature, secret)) {
     return {
       statusCode: 401,
       body: JSON.stringify({ error: 'Invalid signature' }),
