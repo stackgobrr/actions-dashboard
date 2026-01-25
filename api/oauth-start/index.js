@@ -19,6 +19,9 @@ async function getClientId() {
 }
 
 exports.handler = async (event) => {
+  // Log all headers for debugging
+  console.log('Incoming headers:', JSON.stringify(event.headers, null, 2))
+  
   let clientId
   try {
     clientId = await getClientId()
