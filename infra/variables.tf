@@ -21,10 +21,10 @@ variable "project_name" {
   default     = "actions-dashboard"
 }
 
-variable "domain_name" {
+variable "base_domain_name" {
   description = "Custom domain name for the dashboard (optional)"
   type        = string
-  default     = ""
+  default     = "actions.dashboard.stackgobrr.com"
 }
 
 variable "hosted_zone_id" {

@@ -138,7 +138,7 @@ locals {
       memory_size = 128
       environment = {
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name
-        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "https://${var.domain_name}/api/oauth/callback"
+        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "https://${local.domain_name}/api/oauth/callback"
         AWS_REGION_NAME                               = var.aws_region
       }
     }
@@ -226,7 +226,7 @@ locals {
       invoke_mode = "BUFFERED"
       cors = {
         allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_origins     = ["https://${local.domain_name}"]
         allow_methods     = ["GET"]
         allow_headers     = ["content-type"]
         expose_headers    = []
@@ -237,7 +237,7 @@ locals {
       invoke_mode = "BUFFERED"
       cors = {
         allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_origins     = ["https://${local.domain_name}"]
         allow_methods     = ["GET"]
         allow_headers     = ["content-type"]
         expose_headers    = []
@@ -248,7 +248,7 @@ locals {
       invoke_mode = "BUFFERED"
       cors = {
         allow_credentials = true
-        allow_origins     = ["https://${var.domain_name}"]
+        allow_origins     = ["https://${local.domain_name}"]
         allow_methods     = ["POST"]
         allow_headers     = ["content-type"]
         expose_headers    = []

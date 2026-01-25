@@ -8,7 +8,7 @@ module "frontend" {
 
   project_name   = var.project_name
   environment    = var.environment
-  domain_name    = var.domain_name
+  domain_name    = local.domain_name
   hosted_zone_id = var.hosted_zone_id
 
   # Add Lambda Function URLs as additional origins
@@ -32,4 +32,8 @@ module "frontend" {
   tags = {
     Name = "${var.project_name}-${var.environment}"
   }
+}
+
+locals {
+  domain_name = var.environment == "prod" ? var.base_domain_name : "${var.environment}.${var.base_domain_name}"
 }
