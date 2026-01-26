@@ -237,6 +237,6 @@ jobs:
         run: |
           echo "🚀 Dashboard deployed successfully!"
           echo "📍 Website URL: ${{ needs.deploy-infrastructure.outputs.website_url }}"
-          echo "� OAuth Start URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/oauth/start"
-          echo "🔐 OAuth Callback URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/oauth/callback"
+          echo "🔐 OAuth Start URL: ${{ needs.deploy-infrastructure.outputs.website_url }}/api/oauth/start"
+          echo "🔐 OAuth Callback URL: ${{ needs.deploy-infrastructure.outputs.website_url }}/api/oauth/callback"
 
