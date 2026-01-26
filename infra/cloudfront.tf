@@ -1,22 +1,5 @@
 # CloudFront cache policies and origins for Lambda Function URLs
 
-# Extract Lambda Function URL domains (without https:// and trailing /)
-locals {
-  lambda_url_domains = {
-    for key in keys(aws_lambda_function.lambda) :
-    key => replace(replace(aws_lambda_function_url.lambda[key].function_url, "https://", ""), "/", "")
-  }
-
-  # Map Lambda functions to their path patterns
-  lambda_path_patterns = {
-    webhook_receiver = "/api/webhook"
-    sse_handler      = "/api/sse"
-    oauth_start      = "/api/oauth/start"
-    oauth_callback   = "/api/oauth/callback"
-    github_token     = "/api/github/token"
-  }
-}
-
 # Create cache policy for API requests (no caching)
 resource "aws_cloudfront_cache_policy" "lambda_api" {
   name        = "${var.project_name}-${var.environment}-lambda-api"
@@ -68,25 +51,25 @@ resource "aws_cloudfront_response_headers_policy" "lambda_api" {
 
   cors_config {
     access_control_allow_credentials = true
-    
+
     access_control_allow_headers {
       items = ["*"]
     }
-    
+
     access_control_allow_methods {
       items = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     }
-    
+
     access_control_allow_origins {
       items = ["https://${var.domain_name}"]
     }
-    
+
     access_control_expose_headers {
       items = ["*"]
     }
-    
+
     access_control_max_age_sec = 86400
-    origin_override = true
+    origin_override            = true
   }
 }
 

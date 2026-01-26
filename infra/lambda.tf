@@ -26,24 +26,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_artifacts" {
 
 # Secrets Manager secrets
 locals {
-  secrets = {
-    app_private_key = {
-      name        = var.private_key_secret_name
-      description = "GitHub App private key for Actions Dashboard"
-    }
-    webhook_secret = {
-      name        = var.webhook_secret_name
-      description = "Webhook secret for Actions Dashboard GitHub App"
-    }
-    oauth_client_id = {
-      name        = var.oauth_client_id_secret_name
-      description = "OAuth client ID for Actions Dashboard"
-    }
-    oauth_client_secret = {
-      name        = var.oauth_client_secret_secret_name
-      description = "OAuth client secret for Actions Dashboard"
-    }
-  }
+
 }
 
 resource "aws_secretsmanager_secret" "secrets" {
@@ -59,8 +42,6 @@ resource "aws_secretsmanager_secret_version" "secrets" {
 
   secret_id = aws_secretsmanager_secret.secrets[each.key].id
   secret_string = lookup({
-    app_private_key     = var.app_private_key
-    webhook_secret      = var.webhook_secret
     oauth_client_id     = var.oauth_client_id
     oauth_client_secret = var.oauth_client_secret
   }, each.key)
@@ -115,24 +96,6 @@ resource "aws_iam_role_policy" "lambda_secrets_access" {
 # CloudWatch Log Groups
 locals {
   lambda_functions = {
-    webhook_receiver = {
-      timeout     = 30
-      memory_size = 256
-      environment = {
-        ACTIONS_DASHBOARD_APP_ID                  = var.actions_dashboard_app_id
-        ACTIONS_DASHBOARD_PRIVATE_KEY_SECRET_NAME = aws_secretsmanager_secret.secrets["app_private_key"].name
-        ACTIONS_DASHBOARD_WEBHOOK_SECRET_NAME     = aws_secretsmanager_secret.secrets["webhook_secret"].name
-        AWS_REGION_NAME                           = var.aws_region
-        NODE_ENV                                  = var.environment
-      }
-    }
-    sse_handler = {
-      timeout     = 900
-      memory_size = 256
-      environment = {
-        NODE_ENV = var.environment
-      }
-    }
     oauth_start = {
       timeout     = 10
       memory_size = 128
@@ -149,16 +112,6 @@ locals {
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name
         ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name
         AWS_REGION_NAME                                   = var.aws_region
-        # Redirect URI is self-referencing - no need to set
-      }
-    }
-    github_token = {
-      timeout     = 10
-      memory_size = 128
-      environment = {
-        ACTIONS_DASHBOARD_APP_ID                  = var.actions_dashboard_app_id
-        ACTIONS_DASHBOARD_PRIVATE_KEY_SECRET_NAME = aws_secretsmanager_secret.secrets["app_private_key"].name
-        AWS_REGION_NAME                           = var.aws_region
       }
     }
   }
@@ -167,7 +120,7 @@ locals {
 resource "aws_cloudwatch_log_group" "lambda" {
   for_each = local.lambda_functions
 
-  name              = "/aws/lambda/${var.project_name}-${replace(each.key, "_", "-")}"
+  name              = "/aws/lambda/${var.environment}-${var.project_name}-${replace(each.key, "_", "-")}"
   retention_in_days = 7
 
   lifecycle {
@@ -181,7 +134,7 @@ resource "aws_lambda_function" "lambda" {
 
   s3_bucket     = aws_s3_bucket.lambda_artifacts.id
   s3_key        = "${replace(each.key, "_", "-")}.zip"
-  function_name = "${var.project_name}-${replace(each.key, "_", "-")}"
+  function_name = "${var.environment}-${var.project_name}-${replace(each.key, "_", "-")}"
   role          = aws_iam_role.lambda_execution.arn
   handler       = "index.handler"
   runtime       = "nodejs20.x"
@@ -200,28 +153,6 @@ resource "aws_lambda_function" "lambda" {
 # Lambda Function URLs
 locals {
   function_url_configs = {
-    webhook_receiver = {
-      invoke_mode = "BUFFERED"
-      cors = {
-        allow_credentials = false
-        allow_origins     = ["*"]
-        allow_methods     = ["POST"]
-        allow_headers     = ["content-type", "x-github-event", "x-hub-signature-256"]
-        expose_headers    = []
-        max_age           = 86400
-      }
-    }
-    sse_handler = {
-      invoke_mode = "RESPONSE_STREAM"
-      cors = {
-        allow_credentials = false
-        allow_origins     = ["*"]
-        allow_methods     = ["GET"]
-        allow_headers     = ["content-type"]
-        expose_headers    = ["content-type"]
-        max_age           = 86400
-      }
-    }
     oauth_start = {
       invoke_mode = "BUFFERED"
       cors = {
@@ -239,17 +170,6 @@ locals {
         allow_credentials = true
         allow_origins     = ["https://${local.domain_name}"]
         allow_methods     = ["GET"]
-        allow_headers     = ["*"]
-        expose_headers    = []
-        max_age           = 86400
-      }
-    }
-    github_token = {
-      invoke_mode = "BUFFERED"
-      cors = {
-        allow_credentials = true
-        allow_origins     = ["https://${local.domain_name}"]
-        allow_methods     = ["POST"]
         allow_headers     = ["*"]
         expose_headers    = []
         max_age           = 86400

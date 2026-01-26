@@ -39,24 +39,7 @@ variable "cloudfront_price_class" {
   default     = "PriceClass_100" # US, Canada, Europe
 }
 
-# GitHub App Configuration (for webhook support)
-variable "actions_dashboard_app_id" {
-  description = "GitHub App ID for Actions Dashboard"
-  type        = string
-}
-
-variable "private_key_secret_name" {
-  description = "Secrets Manager secret name for GitHub App private key"
-  type        = string
-  default     = "actions-dashboard/app-private-key"
-}
-
-variable "webhook_secret_name" {
-  description = "Secrets Manager secret name for webhook secret"
-  type        = string
-  default     = "actions-dashboard/webhook-secret"
-}
-
+# OAuth Configuration
 variable "oauth_client_id_secret_name" {
   description = "Secrets Manager secret name for OAuth client ID"
   type        = string
@@ -70,18 +53,6 @@ variable "oauth_client_secret_secret_name" {
 }
 
 # Secret values (passed from GitHub Actions secrets)
-variable "app_private_key" {
-  description = "GitHub App private key (PEM format)"
-  type        = string
-  sensitive   = true
-}
-
-variable "webhook_secret" {
-  description = "GitHub App webhook secret"
-  type        = string
-  sensitive   = true
-}
-
 variable "oauth_client_id" {
   description = "OAuth client ID"
   type        = string
