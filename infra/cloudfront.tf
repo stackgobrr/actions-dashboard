@@ -53,7 +53,7 @@ resource "aws_cloudfront_response_headers_policy" "lambda_api" {
     access_control_allow_credentials = true
 
     access_control_allow_headers {
-      items = ["*"]
+      items = ["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"]
     }
 
     access_control_allow_methods {
@@ -65,7 +65,7 @@ resource "aws_cloudfront_response_headers_policy" "lambda_api" {
     }
 
     access_control_expose_headers {
-      items = ["*"]
+      items = ["Content-Length", "Content-Type", "Date", "ETag", "X-Amzn-RequestId"]
     }
 
     access_control_max_age_sec = 86400
