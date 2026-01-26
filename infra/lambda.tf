@@ -40,7 +40,7 @@ locals {
       invoke_mode = "BUFFERED"
       cors = {
         allow_credentials = true
-        allow_origins     = [local.base_url]
+        allow_origins     = ["*"]
         allow_methods     = ["GET"]
         allow_headers     = ["*"]
         expose_headers    = []
@@ -51,7 +51,7 @@ locals {
       invoke_mode = "BUFFERED"
       cors = {
         allow_credentials = true
-        allow_origins     = [local.base_url]
+        allow_origins     = ["*"]
         allow_methods     = ["GET"]
         allow_headers     = ["*"]
         expose_headers    = []
