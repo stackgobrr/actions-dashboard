@@ -1,3 +1,17 @@
+locals {
+  # Extract Lambda Function URL domains (strip https:// and trailing /) for CloudFront origins
+  lambda_url_domains = {
+    for key in keys(aws_lambda_function.lambda) :
+    key => replace(replace(aws_lambda_function_url.lambda[key].function_url, "https://", ""), "/", "")
+  }
+
+  # Map OAuth Lambda functions to their CloudFront path patterns
+  lambda_path_patterns = {
+    oauth_start    = "/api/oauth/start"
+    oauth_callback = "/api/oauth/callback"
+  }
+}
+
 # Frontend Module (S3 + CloudFront + Custom Domain)
 module "frontend" {
   source = "git::https://github.com/stackgobrr/tf-module-aws-frontend.git?ref=main"
