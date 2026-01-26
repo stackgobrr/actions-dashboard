@@ -36,7 +36,10 @@ resource "aws_cloudfront_origin_request_policy" "lambda_api" {
   }
 
   headers_config {
-    header_behavior = "allViewerExceptHostHeader"
+    header_behavior = "allExcept"
+    headers {
+      items = ["Host"]
+    }
   }
 
   query_strings_config {
