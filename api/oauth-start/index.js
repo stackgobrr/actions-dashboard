@@ -19,12 +19,14 @@ async function getClientId() {
 }
 
 exports.handler = async (event) => {
-  // Log all headers for debugging
+  // Log all headers and environment for debugging
   console.log('Incoming headers:', JSON.stringify(event.headers, null, 2))
-  
+  console.log('Lambda environment:', JSON.stringify(process.env, null, 2))
+
   let clientId
   try {
     clientId = await getClientId()
+    console.log('Fetched OAuth client ID:', clientId)
   } catch (err) {
     console.error('Failed to fetch OAuth client ID', err)
     return {
@@ -34,8 +36,10 @@ exports.handler = async (event) => {
   }
 
   const redirectUri = process.env.ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI
+  console.log('Using redirectUri:', redirectUri)
 
   if (!clientId || !redirectUri) {
+    console.error('Missing clientId or redirectUri')
     return {
       statusCode: 500,
       body: 'OAuth not configured'
@@ -46,6 +50,7 @@ exports.handler = async (event) => {
 
   const scope = encodeURIComponent('read:user repo')
   const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`
+  console.log('OAuth authorize URL:', url)
 
   return {
     statusCode: 302,
