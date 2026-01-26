@@ -52,8 +52,6 @@ jobs:
       id-token: write
       contents: read
     outputs:
-      sse_url: ${{ steps.get-outputs.outputs.sse_url }}
-      webhook_url: ${{ steps.get-outputs.outputs.webhook_url }}
       oauth_start_url: ${{ steps.get-outputs.outputs.oauth_start_url }}
       oauth_callback_url: ${{ steps.get-outputs.outputs.oauth_callback_url }}
       website_url: ${{ steps.get-outputs.outputs.website_url }}
@@ -154,16 +152,12 @@ jobs:
         id: get-outputs
         run: |
           cd infra
-          SSE_URL=$(terraform output -raw sse_handler_url)
-          WEBHOOK_URL=$(terraform output -raw webhook_receiver_url)
           OAUTH_START_URL=$(terraform output -raw oauth_start_url)
           OAUTH_CALLBACK_URL=$(terraform output -raw oauth_callback_url)
           WEBSITE_URL=$(terraform output -raw website_url)
           S3_BUCKET=$(terraform output -raw s3_bucket_name)
           DISTRIBUTION_ID=$(terraform output -raw cloudfront_distribution_id)
 
-          echo "sse_url=$SSE_URL" >> $GITHUB_OUTPUT
-          echo "webhook_url=$WEBHOOK_URL" >> $GITHUB_OUTPUT
           echo "oauth_start_url=$OAUTH_START_URL" >> $GITHUB_OUTPUT
           echo "oauth_callback_url=$OAUTH_CALLBACK_URL" >> $GITHUB_OUTPUT
           echo "website_url=$WEBSITE_URL" >> $GITHUB_OUTPUT
@@ -243,12 +237,6 @@ jobs:
         run: |
           echo "🚀 Dashboard deployed successfully!"
           echo "📍 Website URL: ${{ needs.deploy-infrastructure.outputs.website_url }}"
-          echo "🔗 Webhook URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/webhook"
-          echo "📡 SSE URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/sse"
-          echo "🔐 OAuth Start URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/oauth/start"
+          echo "� OAuth Start URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/oauth/start"
           echo "🔐 OAuth Callback URL: ${{ needs.deploy-infrastructure.outputs.website_url }}api/oauth/callback"
-          echo ""
-          echo "⚠️  MANUAL STEP: Update GitHub App webhook URL to:"
-          echo "   ${{ needs.deploy-infrastructure.outputs.website_url }}api/webhook"
-          echo "   Visit: https://github.com/settings/apps/actions-dashboard-by-stackgobrr"
 
