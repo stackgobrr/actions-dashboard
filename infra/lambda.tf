@@ -34,29 +34,14 @@ locals {
     }
   }
 
-  # Lambda Function URL CORS configurations
+  # Lambda Function URL configurations
+  # No CORS needed - these only return redirects, not data consumed by JavaScript
   function_url_configs = {
     oauth_start = {
       invoke_mode = "BUFFERED"
-      cors = {
-        allow_credentials = true
-        allow_origins     = ["*"]
-        allow_methods     = ["GET"]
-        allow_headers     = ["*"]
-        expose_headers    = []
-        max_age           = 86400
-      }
     }
     oauth_callback = {
       invoke_mode = "BUFFERED"
-      cors = {
-        allow_credentials = true
-        allow_origins     = ["*"]
-        allow_methods     = ["GET"]
-        allow_headers     = ["*"]
-        expose_headers    = []
-        max_age           = 86400
-      }
     }
   }
 }
@@ -192,13 +177,17 @@ resource "aws_lambda_function_url" "lambda" {
 
   invoke_mode = each.value.invoke_mode
 
-  cors {
-    allow_credentials = each.value.cors.allow_credentials
-    allow_origins     = each.value.cors.allow_origins
-    allow_methods     = each.value.cors.allow_methods
-    allow_headers     = each.value.cors.allow_headers
-    expose_headers    = each.value.cors.expose_headers
-    max_age           = each.value.cors.max_age
+  # CORS is optional - only add if configured
+  dynamic "cors" {
+    for_each = lookup(each.value, "cors", null) != null ? [each.value.cors] : []
+    content {
+      allow_credentials = cors.value.allow_credentials
+      allow_origins     = cors.value.allow_origins
+      allow_methods     = cors.value.allow_methods
+      allow_headers     = cors.value.allow_headers
+      expose_headers    = cors.value.expose_headers
+      max_age           = cors.value.max_age
+    }
   }
 }
 
