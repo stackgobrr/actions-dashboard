@@ -1,6 +1,6 @@
 # S3 bucket for Lambda deployment artifacts
 resource "aws_s3_bucket" "lambda_artifacts" {
-  bucket = "${var.project_name}-lambda-artifacts"
+  bucket = "${var.environment}-${var.project_name}-lambda-artifacts"
 }
 
 resource "aws_s3_bucket_versioning" "lambda_artifacts" {
