@@ -1,25 +1,11 @@
 locals {
+  # Domain name with environment prefix (dev.domain.com for non-prod, domain.com for prod)
+  # Used across multiple files: lambda.tf, cloudfront.tf
   domain_name = var.environment != "prod" ? "${var.environment}.${var.domain_name}" : var.domain_name
 
-  secrets = {
-    oauth_client_id = {
-      name        = var.environment != "prod" ? "${var.environment}-${var.oauth_client_id_secret_name}" : var.oauth_client_id_secret_name
-      description = "OAuth client ID for Actions Dashboard"
-    }
-    oauth_client_secret = {
-      name        = var.environment != "prod" ? "${var.environment}-${var.oauth_client_secret_secret_name}" : var.oauth_client_secret_secret_name
-      description = "OAuth client secret for Actions Dashboard"
-    }
-  }
+  # Base HTTPS URL for the dashboard
+  base_url = "https://${local.domain_name}"
 
-  lambda_url_domains = {
-    for key in keys(aws_lambda_function.lambda) :
-    key => replace(replace(aws_lambda_function_url.lambda[key].function_url, "https://", ""), "/", "")
-  }
-
-  # Map OAuth Lambda functions to their path patterns
-  lambda_path_patterns = {
-    oauth_start    = "/api/oauth/start"
-    oauth_callback = "/api/oauth/callback"
-  }
+  # Resource naming prefix (project-environment)
+  resource_prefix = "${var.project_name}-${var.environment}"
 }

@@ -2,7 +2,7 @@
 
 # Create cache policy for API requests (no caching)
 resource "aws_cloudfront_cache_policy" "lambda_api" {
-  name        = "${var.project_name}-${var.environment}-lambda-api"
+  name        = "${local.resource_prefix}-lambda-api"
   comment     = "No caching for API requests"
   default_ttl = 0
   max_ttl     = 0
@@ -28,7 +28,7 @@ resource "aws_cloudfront_cache_policy" "lambda_api" {
 
 # Create origin request policy to forward all headers/cookies/query strings
 resource "aws_cloudfront_origin_request_policy" "lambda_api" {
-  name    = "${var.project_name}-${var.environment}-lambda-api"
+  name    = "${local.resource_prefix}-lambda-api"
   comment = "Forward all headers, cookies, and query strings to Lambda"
 
   cookies_config {
@@ -46,7 +46,7 @@ resource "aws_cloudfront_origin_request_policy" "lambda_api" {
 
 # Response headers policy for CORS
 resource "aws_cloudfront_response_headers_policy" "lambda_api" {
-  name    = "${var.project_name}-${var.environment}-lambda-api-cors"
+  name    = "${local.resource_prefix}-lambda-api-cors"
   comment = "CORS policy for Lambda API endpoints"
 
   cors_config {
@@ -61,7 +61,7 @@ resource "aws_cloudfront_response_headers_policy" "lambda_api" {
     }
 
     access_control_allow_origins {
-      items = ["https://${var.domain_name}"]
+      items = [local.base_url]
     }
 
     access_control_expose_headers {

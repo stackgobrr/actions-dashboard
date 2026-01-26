@@ -1,6 +1,69 @@
+# Lambda function configurations
+locals {
+  # Secrets Manager secret names with environment prefix for non-prod environments
+  secrets = {
+    oauth_client_id = {
+      name        = var.environment != "prod" ? "${var.environment}-${var.oauth_client_id_secret_name}" : var.oauth_client_id_secret_name
+      description = "OAuth client ID for Actions Dashboard"
+    }
+    oauth_client_secret = {
+      name        = var.environment != "prod" ? "${var.environment}-${var.oauth_client_secret_secret_name}" : var.oauth_client_secret_secret_name
+      description = "OAuth client secret for Actions Dashboard"
+    }
+  }
+
+  # Lambda function runtime settings and environment variables
+  lambda_functions = {
+    oauth_start = {
+      timeout     = 10
+      memory_size = 128
+      environment = {
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name
+        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "${local.base_url}/api/oauth/callback"
+        AWS_REGION_NAME                               = var.aws_region
+      }
+    }
+    oauth_callback = {
+      timeout     = 10
+      memory_size = 128
+      environment = {
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name
+        AWS_REGION_NAME                                   = var.aws_region
+      }
+    }
+  }
+
+  # Lambda Function URL CORS configurations
+  function_url_configs = {
+    oauth_start = {
+      invoke_mode = "BUFFERED"
+      cors = {
+        allow_credentials = true
+        allow_origins     = [local.base_url]
+        allow_methods     = ["GET"]
+        allow_headers     = ["*"]
+        expose_headers    = []
+        max_age           = 86400
+      }
+    }
+    oauth_callback = {
+      invoke_mode = "BUFFERED"
+      cors = {
+        allow_credentials = true
+        allow_origins     = [local.base_url]
+        allow_methods     = ["GET"]
+        allow_headers     = ["*"]
+        expose_headers    = []
+        max_age           = 86400
+      }
+    }
+  }
+}
+
 # S3 bucket for Lambda deployment artifacts
 resource "aws_s3_bucket" "lambda_artifacts" {
-  bucket = "${var.environment}-${var.project_name}-lambda-artifacts"
+  bucket = "${local.resource_prefix}-lambda-artifacts"
 }
 
 resource "aws_s3_bucket_versioning" "lambda_artifacts" {
@@ -24,11 +87,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_artifacts" {
   }
 }
 
-# Secrets Manager secrets
-locals {
-
-}
-
 resource "aws_secretsmanager_secret" "secrets" {
   for_each = local.secrets
 
@@ -49,7 +107,7 @@ resource "aws_secretsmanager_secret_version" "secrets" {
 
 # IAM Role for Lambda functions
 resource "aws_iam_role" "lambda_execution" {
-  name = "${var.project_name}-lambda-execution-role"
+  name = "${local.resource_prefix}-lambda-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -75,7 +133,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role_policy" "lambda_secrets_access" {
-  name = "${var.project_name}-lambda-secrets-access"
+  name = "${local.resource_prefix}-lambda-secrets-access"
   role = aws_iam_role.lambda_execution.id
 
   policy = jsonencode({
@@ -93,34 +151,10 @@ resource "aws_iam_role_policy" "lambda_secrets_access" {
   })
 }
 
-# CloudWatch Log Groups
-locals {
-  lambda_functions = {
-    oauth_start = {
-      timeout     = 10
-      memory_size = 128
-      environment = {
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name
-        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "https://${local.domain_name}/api/oauth/callback"
-        AWS_REGION_NAME                               = var.aws_region
-      }
-    }
-    oauth_callback = {
-      timeout     = 10
-      memory_size = 128
-      environment = {
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name
-        AWS_REGION_NAME                                   = var.aws_region
-      }
-    }
-  }
-}
-
 resource "aws_cloudwatch_log_group" "lambda" {
   for_each = local.lambda_functions
 
-  name              = "/aws/lambda/${var.environment}-${var.project_name}-${replace(each.key, "_", "-")}"
+  name              = "/aws/lambda/${local.resource_prefix}-${replace(each.key, "_", "-")}"
   retention_in_days = 7
 
   lifecycle {
@@ -134,7 +168,7 @@ resource "aws_lambda_function" "lambda" {
 
   s3_bucket     = aws_s3_bucket.lambda_artifacts.id
   s3_key        = "${replace(each.key, "_", "-")}.zip"
-  function_name = "${var.environment}-${var.project_name}-${replace(each.key, "_", "-")}"
+  function_name = "${local.resource_prefix}-${replace(each.key, "_", "-")}"
   role          = aws_iam_role.lambda_execution.arn
   handler       = "index.handler"
   runtime       = "nodejs20.x"
@@ -148,34 +182,6 @@ resource "aws_lambda_function" "lambda" {
   depends_on = [
     aws_cloudwatch_log_group.lambda
   ]
-}
-
-# Lambda Function URLs
-locals {
-  function_url_configs = {
-    oauth_start = {
-      invoke_mode = "BUFFERED"
-      cors = {
-        allow_credentials = true
-        allow_origins     = ["https://${local.domain_name}"]
-        allow_methods     = ["GET"]
-        allow_headers     = ["*"]
-        expose_headers    = []
-        max_age           = 86400
-      }
-    }
-    oauth_callback = {
-      invoke_mode = "BUFFERED"
-      cors = {
-        allow_credentials = true
-        allow_origins     = ["https://${local.domain_name}"]
-        allow_methods     = ["GET"]
-        allow_headers     = ["*"]
-        expose_headers    = []
-        max_age           = 86400
-      }
-    }
-  }
 }
 
 resource "aws_lambda_function_url" "lambda" {
