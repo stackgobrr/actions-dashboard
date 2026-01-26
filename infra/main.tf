@@ -44,6 +44,11 @@ module "frontend" {
     }
   ]
 
+  # Enable CloudFront access logging
+  enable_logging      = true
+  logging_prefix      = "cf-logs/"
+  log_retention_days  = 30
+
   tags = {
     Name = "${var.project_name}-${var.environment}"
   }
