@@ -131,12 +131,12 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
     {
       icon: <WorkflowIcon size={24} />,
       title: "Multi-Repository Support",
-      description: "Track workflows across multiple repositories, organized by categories like modules, services, and infrastructure."
+      description: "Track workflows across multiple repositories, organised by categories like modules, services, and infrastructure."
     },
     {
       icon: <ShieldLockIcon size={24} />,
       title: "Secure Authentication",
-      description: "Support for Personal Access Tokens and GitHub Apps. All credentials stored locally in your browser."
+      description: "Multiple authentication options with secure credential storage. Your data stays private and protected."
     },
     {
       icon: <EyeIcon size={24} />,
@@ -146,7 +146,7 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
     {
       icon: <FilterIcon size={24} />,
       title: "Smart Filtering",
-      description: "Filter workflows by status, search by name, or organize by workflow labels and categories."
+      description: "Filter workflows by status, search by name, or organise by workflow labels and categories."
     },
     {
       icon: <CommandPaletteIcon size={24} />,
@@ -237,14 +237,6 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
                 onClick={onGetStarted}
               >
                 Get started
-              </Button>
-              <Button
-                variant="outline"
-                size="large"
-                leadingVisual={MarkGithubIcon}
-                onClick={() => { window.location.href = '/api/oauth/start' }}
-              >
-                Sign in with GitHub
               </Button>
               <Button
                 variant="default"

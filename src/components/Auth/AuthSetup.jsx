@@ -66,7 +66,51 @@ export function AuthSetup({
         
         {!showGitHubAppForm && (
           <>
-            {/* Option 1: Personal Access Token - Simplest */}
+            {/* Option 1: OAuth - Easiest & Most Secure */}
+            <div style={{
+              boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
+              border: '1px solid var(--borderColor-default)',
+              borderRadius: '6px'
+            }}>
+              <div style={{
+                background: 'var(--bgColor-muted)',
+                borderBottom: '1px solid var(--borderColor-default)',
+                borderRadius: '6px 6px 0 0',
+                padding: '16px 24px'
+              }}>
+                <h2 className="f4 text-semibold mb-0" style={{display: 'flex', alignItems: 'center'}}>
+                  <MarkGithubIcon size={20} style={{marginRight: '8px'}} />
+                  GitHub OAuth
+                  <span className="Label Label--success ml-2" style={{fontSize: '12px'}}>Recommended</span>
+                </h2>
+              </div>
+              <div style={{padding: '32px 40px 16px 40px'}}>
+                <p className="color-fg-muted f5 mb-3">Securely authenticate with your GitHub account using OAuth. No tokens to manage.</p>
+                <Button
+                  onClick={() => {
+                    window.plausible?.('Auth Method Selected', { props: { method: 'oauth' } })
+                    window.location.href = '/api/oauth/start'
+                  }}
+                  variant="primary"
+                  block
+                  size="large"
+                  leadingVisual={MarkGithubIcon}
+                >
+                  Sign in with GitHub
+                </Button>
+                <p className="f6 color-fg-muted mt-3 mb-0" style={{fontStyle: 'italic'}}>
+                  <strong>When to use:</strong> Best for most users. Secure, easy setup, no token management required.
+                </p>
+              </div>
+            </div>
+
+            <div className="d-flex flex-items-center my-5">
+              <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
+              <span className="px-4 f5 text-semibold color-fg-muted">OR</span>
+              <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
+            </div>
+
+            {/* Option 2: Personal Access Token - Simple */}
             <div style={{
               boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
               border: '1px solid var(--borderColor-default)',
@@ -84,7 +128,7 @@ export function AuthSetup({
               />
               <div style={{padding: '0 40px 16px 40px'}}>
                 <p className="f6 color-fg-muted mb-0" style={{fontStyle: 'italic'}}>
-                  <strong>When to use:</strong> Quick setup for personal projects. Updates every 10 seconds via polling.
+                  <strong>When to use:</strong> Self-managed tokens for automation or testing. Updates every 10 seconds via polling.
                 </p>
               </div>
             </div>
@@ -95,7 +139,7 @@ export function AuthSetup({
               <div className="flex-1" style={{height: '1px', background: 'var(--borderColor-default)'}}></div>
             </div>
 
-            {/* Option 2: Self-Hosted GitHub App - Advanced */}
+            {/* Option 3: Self-Hosted GitHub App - Advanced */}
             <div style={{
               boxShadow: '0 1px 3px var(--color-shadow-small), 0 8px 24px var(--color-shadow-medium)',
               border: '1px solid var(--borderColor-default)',
@@ -116,7 +160,10 @@ export function AuthSetup({
               <div style={{padding: '32px 40px 16px 40px'}}>
                 <p className="color-fg-muted f5 mb-3">Create and configure your own GitHub App with full control over permissions and webhooks.</p>
                 <Button
-                  onClick={() => setShowGitHubAppForm(true)}
+                  onClick={() => {
+                    window.plausible?.('Auth Method Selected', { props: { method: 'github-app' } })
+                    setShowGitHubAppForm(true)
+                  }}
                   variant="default"
                   block
                   size="large"

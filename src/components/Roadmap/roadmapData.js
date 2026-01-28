@@ -3,7 +3,7 @@ export const roadmapItems = [
     id: 1,
     title: 'Auth — GitHub OAuth',
     description: 'Implement Sign in with GitHub and secure session handling (httpOnly cookie).',
-    status: 'in-progress',
+    status: 'done',
     benefits: [
       'Low-friction sign in',
       'Stable identity across devices',
@@ -29,7 +29,7 @@ export const roadmapItems = [
     benefits: [
       'Near-real-time events',
       'Reduced polling and API usage',
-      'Reliable retry/dedup behavior'
+      'Reliable retry/dedup behaviour'
     ]
   },
   {

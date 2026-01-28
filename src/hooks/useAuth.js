@@ -32,7 +32,12 @@ export function useAuth() {
   // Check authentication on mount
   useEffect(() => {
     const checkAuth = async () => {
-      if (isGitHubAppConfigured()) {
+      // Check for OAuth session cookie first
+      const hasOAuthSession = document.cookie.split(';').some(c => c.trim().startsWith('gh_session='))
+      
+      if (hasOAuthSession) {
+        setAuthMethod('oauth')
+      } else if (isGitHubAppConfigured()) {
         setAuthMethod('github-app')
         try {
           const info = await getAppInstallationInfo()
@@ -53,9 +58,14 @@ export function useAuth() {
 
   /**
    * Gets the currently active authentication token
-   * @returns {string|null} The active token (PAT or GitHub App token) or null if none exists
+   * @returns {string|null} The active token (PAT, OAuth, or GitHub App token) or null if none exists
    */
   const getActiveToken = () => {
+    if (authMethod === 'oauth') {
+      // Extract token from gh_session cookie
+      const match = document.cookie.match(/gh_session=([^;]+)/)
+      return match ? match[1] : null
+    }
     if (authMethod === 'github-app') {
       return getGitHubAppToken()
     }
@@ -121,7 +131,12 @@ export function useAuth() {
    * Clears credentials and resets to initial auth state
    */
   const handleLogout = () => {
-    if (authMethod === 'github-app') {
+    if (authMethod === 'oauth') {
+      // Clear OAuth session by calling logout endpoint
+      fetch('/api/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
+      // Also clear cookie client-side (will be overwritten by server response)
+      document.cookie = 'gh_session=; Path=/; Max-Age=0; Secure; SameSite=Lax'
+    } else if (authMethod === 'github-app') {
       clearGitHubAppAuth()
       setAppInfo(null)
     } else if (authMethod === 'demo') {
