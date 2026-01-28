@@ -36,18 +36,18 @@ module "frontend" {
   # Add cache behaviors for API routes
   additional_cache_behaviors = [
     for key, path in local.lambda_path_patterns : {
-      path_pattern              = path
-      target_origin_id          = "lambda-${key}"
-      cache_policy_id           = aws_cloudfront_cache_policy.lambda_api.id
-      origin_request_policy_id  = aws_cloudfront_origin_request_policy.lambda_api.id
+      path_pattern               = path
+      target_origin_id           = "lambda-${key}"
+      cache_policy_id            = aws_cloudfront_cache_policy.lambda_api.id
+      origin_request_policy_id   = aws_cloudfront_origin_request_policy.lambda_api.id
       response_headers_policy_id = aws_cloudfront_response_headers_policy.lambda_api.id
     }
   ]
 
   # Enable CloudFront access logging
-  enable_logging      = true
-  logging_prefix      = "cf-logs/"
-  log_retention_days  = 30
+  enable_logging     = true
+  logging_prefix     = "cf-logs/"
+  log_retention_days = 30
 
   tags = {
     Name = "${var.project_name}-${var.environment}"
