@@ -112,6 +112,7 @@ exports.handler = async (event) => {
     const accessToken = tokenJson.access_token
 
     // Set httpOnly cookie with the access token and clear state cookie
+    // Also set a non-httpOnly auth_status cookie that JavaScript can read
     return {
       statusCode: 302,
       headers: {
@@ -119,6 +120,7 @@ exports.handler = async (event) => {
       },
       cookies: [
         `gh_session=${accessToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax; Secure`,
+        'auth_status=authenticated; Path=/; Max-Age=86400; SameSite=Lax; Secure',
         'oauth_state=; HttpOnly; Path=/; Max-Age=0; Secure'
       ],
       body: ''

@@ -32,8 +32,8 @@ export function useAuth() {
   // Check authentication on mount
   useEffect(() => {
     const checkAuth = async () => {
-      // Check for OAuth session cookie first
-      const hasOAuthSession = document.cookie.split(';').some(c => c.trim().startsWith('gh_session='))
+      // Check for OAuth session cookie first (non-httpOnly status cookie)
+      const hasOAuthSession = document.cookie.split(';').some(c => c.trim().startsWith('auth_status='))
       
       if (hasOAuthSession) {
         setAuthMethod('oauth')
@@ -134,8 +134,9 @@ export function useAuth() {
     if (authMethod === 'oauth') {
       // Clear OAuth session by calling logout endpoint
       fetch('/api/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
-      // Also clear cookie client-side (will be overwritten by server response)
+      // Also clear cookies client-side (will be overwritten by server response)
       document.cookie = 'gh_session=; Path=/; Max-Age=0; Secure; SameSite=Lax'
+      document.cookie = 'auth_status=; Path=/; Max-Age=0; Secure; SameSite=Lax'
     } else if (authMethod === 'github-app') {
       clearGitHubAppAuth()
       setAppInfo(null)

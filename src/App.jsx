@@ -19,7 +19,7 @@ import { DEFAULT_REFRESH_INTERVAL } from './constants/timing'
 function App() {
   // Check if user has any auth credentials - if so, skip landing page
   const hasAuth = () => {
-    const hasOAuthSession = document.cookie.split(';').some(c => c.trim().startsWith('gh_session='))
+    const hasOAuthSession = document.cookie.split(';').some(c => c.trim().startsWith('auth_status='))
     return !!(
       hasOAuthSession ||
       localStorage.getItem('github_token') ||
@@ -66,7 +66,7 @@ function App() {
       showAuthSetup: auth.showAuthSetup,
       hasInitialAuth,
       authInitialized,
-      hasCookie: document.cookie.includes('gh_session=')
+      hasCookie: document.cookie.includes('auth_status=')
     })
   }, [showLanding, auth.authMethod, auth.showAuthSetup, hasInitialAuth, authInitialized])
 
