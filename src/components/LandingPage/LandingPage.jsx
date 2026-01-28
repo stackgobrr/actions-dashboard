@@ -239,14 +239,6 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
                 Get started
               </Button>
               <Button
-                variant="outline"
-                size="large"
-                leadingVisual={MarkGithubIcon}
-                onClick={() => { window.location.href = '/api/oauth/start' }}
-              >
-                Sign in with GitHub
-              </Button>
-              <Button
                 variant="default"
                 size="large"
                 leadingVisual={EyeIcon}
