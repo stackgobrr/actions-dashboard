@@ -99,28 +99,10 @@ This creates:
 - CloudFront distribution
 - Origin Access Control (OAC)
 - Bucket policy for CloudFront access
-- Lambda functions (webhook receiver, SSE handler)
-- Lambda Function URLs
+- Lambda functions for OAuth callbacks
 - IAM roles and CloudWatch log groups
 
-### 5. Configure GitHub App Webhook
-
-After deployment, you'll need to add the webhook URL to your GitHub App:
-
-```bash
-# Get the webhook URL from Terraform outputs
-terraform output webhook_receiver_url
-```
-
-Then:
-1. Go to your GitHub App settings: `https://github.com/settings/apps/your-app-name`
-2. Scroll to "Webhook" section
-3. Paste the `webhook_receiver_url` into the "Webhook URL" field
-4. Save changes
-
-The GitHub App will now send workflow events to your Lambda function, which will broadcast them to connected dashboard clients via SSE.
-
-### 6. Build and Deploy Website
+### 5. Build and Deploy Website
 
 ```bash
 cd ..
@@ -137,7 +119,7 @@ make invalidate
 make deploy
 ```
 
-### 7. Get Your Dashboard URL
+### 6. Get Your Dashboard URL
 
 ```bash
 terraform -chdir=infra output website_url
@@ -186,7 +168,7 @@ For a dashboard accessed mainly from EU/US, `PriceClass_100` is sufficient.
 
 ### Cache Configuration
 
-The deployment uses optimized caching:
+The deployment uses optimised caching:
 - **Static assets** (JS, CSS, images): 1 year cache (`max-age=31536000`)
 - **index.html**: No cache (`max-age=0`) to ensure users always get latest version
 - **404/403 errors**: Redirect to `index.html` for SPA routing
@@ -217,7 +199,7 @@ aws cloudwatch get-metric-statistics \
 
 Monitor storage and requests in S3 console or CloudWatch.
 
-## Cost Optimization
+## Cost Optimisation
 
 ### S3 Pricing
 

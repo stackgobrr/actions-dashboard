@@ -4,35 +4,32 @@ Live GitHub Actions status dashboard for all h3ow3d repositories.
 
 ## Features
 
-- 🔐 **Dual Authentication**: GitHub App (recommended) or Personal Access Token
-- � **Auto-refresh**: Configurable refresh intervals (5s to 5m)
-- 🎨 **Visual Status**: Color-coded status indicators
-- 📊 **Categorized View**: Organized by repository type (common, modules, infra, services)
-- 🔗 **Quick Links**: Direct links to workflow runs
-- ⚡ **Fast**: Built with React + Vite
-- 🎨 **Multiple Themes**: Dark, Light, Gruvbox, Cyberpunk
-- ⌨️ **Keyboard Shortcuts**: T (theme), R (refresh), F (fullscreen)
-- 🖥️ **Fullscreen Mode**: Optimized dashboard view
-- 🐳 **Docker Ready**: Run locally or deploy to AWS
-- ☁️ **AWS S3 + CloudFront**: Serverless static hosting with global CDN
+- **Dual Authentication**: GitHub App (recommended) or Personal Access Token
+- **Auto-refresh**: Configurable refresh intervals
+- **Visual Status**: Colour-coded status indicators
+- **Categorised View**: Organised by repository type (common, modules, infra, services)
+- **Quick Links**: Direct links to workflow runs
+- **Multiple Themes**: Dark, Light, Gruvbox, Cyberpunk
+- **Keyboard Shortcuts**: T (theme), R (refresh), F (fullscreen)
+- **Fullscreen Mode**: Optimised dashboard view
+- **Docker Support**: Run locally in containers
+- **AWS Deployment**: Static hosting with S3 + CloudFront CDN
 
 ## Authentication
 
-### Option 1: GitHub App (Recommended) 🔐
+### Option 1: GitHub App (Recommended)
 
 More secure with fine-grained permissions and automatic token refresh.
 
-1. Create a GitHub App: https://github.com/settings/apps
+1. Create a GitHub App at https://github.com/settings/apps
 2. Install it on your repositories
 3. Run the dashboard and enter your App ID, Installation ID, and Private Key
 
-See [GITHUB_APP_SETUP.md](GITHUB_APP_SETUP.md) for detailed instructions.
+### Option 2: Personal Access Token
 
-### Option 2: Personal Access Token 🔑
+Simpler setup, suitable for personal use.
 
-Simpler setup, good for personal use.
-
-1. Create a PAT: https://github.com/settings/tokens/new?scopes=repo&description=h3ow3d-dashboard
+1. Create a PAT at https://github.com/settings/tokens/new?scopes=repo&description=h3ow3d-dashboard
 2. Run the dashboard and enter your token
 3. Token is stored securely in your browser
 
@@ -47,7 +44,7 @@ Open http://localhost:3001 and choose your authentication method.
 
 ## Deployment Options
 
-### Option 1: AWS S3 + CloudFront (Production) ☁️
+### Option 1: AWS S3 + CloudFront (Production)
 
 Deploy as a static website with S3 storage and CloudFront CDN:
 
@@ -63,17 +60,17 @@ make deploy
 make infra-output
 ```
 
-**Benefits**:
-- True serverless - just static files
+This gives you:
+- Static file hosting
 - Global CDN with edge caching
-- Extremely low cost (~$0.10-2/month)
-- No cold starts - instant loading
+- Low cost (~£0.10-2/month)
+- Instant loading
 - HTTPS included
-- GitHub Actions auto-deployment
+- Automated deployment via GitHub Actions
 
-📖 **[Full Deployment Guide →](docs/DEPLOYMENT.md)**
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full guide.
 
-### Option 2: Local Docker 🐳
+### Option 2: Local Docker
 
 Run locally in a container:
 
@@ -88,7 +85,7 @@ docker-compose up -d
 
 Dashboard available at http://localhost:8080
 
-### Option 3: Development 💻
+### Option 3: Development
 
 Run local development server:
 
@@ -325,9 +322,9 @@ docker rm h3ow3d-dashboard
 - **Infra**: Infrastructure deployment
 - **Services**: Application services
 
-## Customization
+## Customisation
 
-To add or remove repositories, edit `REPOSITORIES` in `src/App.jsx`:
+To add or remove repositories, edit `REPOSITORIES` in `src/constants.js`:
 
 ```javascript
 const REPOSITORIES = {

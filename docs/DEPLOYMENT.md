@@ -1,26 +1,26 @@
 # Deployment Guide
 
-This guide covers deployment options for the h3ow3d Actions Dashboard.
+Deployment options for the h3ow3d Actions Dashboard.
 
-## Table of Contents
+## Contents
 
 - [AWS S3 + CloudFront (Production)](#aws-s3--cloudfront-production)
 - [Docker (Local/Self-Hosted)](#docker-localself-hosted)
-- [Vercel (Alternative Hosting)](#vercel-alternative-hosting)
+- [Vercel (Alternative)](#vercel-alternative)
 - [Development Server](#development-server)
 
 ---
 
 ## AWS S3 + CloudFront (Production)
 
-Deploy as a static website with S3 storage and CloudFront CDN.
+Deploys as a static website with S3 storage and CloudFront CDN.
 
 ### Prerequisites
 
-- AWS CLI configured with credentials
-- Terraform v1.0+
+- AWS CLI configured
+- Terraform v1.0 or later
 
-### Deployment Steps
+### Steps
 
 ```bash
 # 1. Configure (optional)
@@ -40,7 +40,7 @@ make deploy
 make infra-output
 ```
 
-### Custom Domain Setup
+### Custom Domain
 
 1. Get your Route53 hosted zone ID:
    ```bash
@@ -53,17 +53,17 @@ make infra-output
    hosted_zone_id = "Z1234567890ABC"
    ```
 
-3. Apply changes:
+3. Apply:
    ```bash
    cd infra && terraform apply
    ```
 
-Terraform will automatically:
-- Create ACM certificate in us-east-1
+Terraform will:
+- Create an ACM certificate in us-east-1
 - Add DNS validation records to Route53
-- Wait for certificate validation
+- Wait for validation
 - Configure CloudFront with the certificate
-- Create Route53 A record pointing to CloudFront
+- Create the Route53 A record
 
 ### Updating Content
 
@@ -117,9 +117,9 @@ make docker-stop     # Stop container
 make docker-rebuild  # Rebuild and restart
 ```
 
-### Production Setup
+### Production
 
-For production with HTTPS, use a reverse proxy (Traefik, nginx-proxy, or Caddy):
+For production with HTTPS, use a reverse proxy like Traefik, nginx-proxy, or Caddy:
 
 ```yaml
 services:
@@ -134,7 +134,7 @@ services:
 
 ---
 
-## Vercel (Alternative Hosting)
+## Vercel (Alternative)
 
 Deploy to Vercel for free hosting with global CDN.
 
@@ -164,10 +164,9 @@ Dashboard available at http://localhost:3001
 
 ---
 
-## Support
+## Help
 
-For issues or questions:
-- Check [GitHub Issues](https://github.com/h3ow3d/h3ow3d-actions-dashboard/issues)
-- Review `docs/SECURITY.md` for security questions
-- Review `docs/GITHUB_APP_SETUP.md` for authentication help
+If you run into issues:
+- Check the [GitHub Issues](https://github.com/h3ow3d/h3ow3d-actions-dashboard/issues)
+- Review the main README for setup questions
 
