@@ -17,20 +17,22 @@ locals {
     oauth_start = {
       timeout     = 10
       memory_size = 128
-      environment = {
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name
-        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "${local.base_url}/api/oauth/callback"
-        AWS_REGION_NAME                               = var.aws_region
-      }
+      environment = merge({
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
+        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "${local.base_url}/api/oauth/callback",
+        AWS_REGION_NAME                               = var.aws_region,
+        ENVIRONMENT                                   = var.environment
+      }, {})
     }
     oauth_callback = {
       timeout     = 10
       memory_size = 128
-      environment = {
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name
-        AWS_REGION_NAME                                   = var.aws_region
-      }
+      environment = merge({
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name,
+        AWS_REGION_NAME                                   = var.aws_region,
+        ENVIRONMENT                                       = var.environment
+      }, {})
     }
   }
 
