@@ -1,11 +1,15 @@
 version: '3.8'
 
 services:
-  dashboard:
-    build: .
-    container_name: h3ow3d-dashboard
+  actions-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: actions-dashboard:latest
+    container_name: actions-dashboard
     ports:
       - "8080:80"
     restart: unless-stopped
     labels:
-      - "com.h3ow3d.description=GitHub Actions Dashboard"
+      - "com.stackgobrr.app=actions-dashboard"
+      - "com.stackgobrr.description=GitHub Actions monitoring dashboard"
