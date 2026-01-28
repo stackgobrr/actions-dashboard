@@ -226,6 +226,24 @@ jobs:
           echo "s3_bucket=$S3_BUCKET" >> $GITHUB_OUTPUT
           echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
 
+      - name: Display Infrastructure Outputs
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY <<EOF
+          ## 🏗️ Infrastructure Deployment Complete
+          
+          ### Deployed Resources (${{ needs.setup.outputs.environment }})
+          
+          | Resource | Value |
+          |----------|-------|
+          | 🌐 Website URL | \`${{ steps.get-outputs.outputs.website_url }}\` |
+          | 🔐 OAuth Start URL | \`${{ steps.get-outputs.outputs.oauth_start_url }}\` |
+          | 🔐 OAuth Callback URL | \`${{ steps.get-outputs.outputs.oauth_callback_url }}\` |
+          | 📦 S3 Bucket | \`${{ steps.get-outputs.outputs.s3_bucket }}\` |
+          | ☁️ CloudFront Distribution | \`${{ steps.get-outputs.outputs.distribution_id }}\` |
+          
+          ---
+          EOF
+
   build:
     name: Build Application
     needs: deploy-infrastructure
