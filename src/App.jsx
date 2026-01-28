@@ -270,6 +270,7 @@ function App() {
                     authMethod={auth.authMethod}
                     selectedRepos={selectedRepos}
                     onSaveRepos={handleSaveRepos}
+                    isDemoMode={isDemoMode}
                   />
                 )}
                 <HotkeyHelper

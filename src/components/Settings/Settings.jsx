@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { XIcon, SearchIcon, PlusIcon, TrashIcon } from '@primer/octicons-react'
 import { Button, IconButton, TextInput } from '@primer/react'
 import { trackEvent } from '../../utils/analytics'
+import { MOCK_REPO_STATUSES } from '../../data/mockRepoStatuses'
 import './Settings.css'
 
-export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, onSaveRepos }) {
+export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, onSaveRepos, isDemoMode }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [availableRepos, setAvailableRepos] = useState([])
   const [loading, setLoading] = useState(false)
@@ -14,10 +15,27 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
   const [manualName, setManualName] = useState('')
 
   useEffect(() => {
-    fetchUserRepos()
-  }, [authMethod])
+    if (isDemoMode) {
+      // In demo mode, show demo repositories as available
+      const demoRepos = Object.keys(MOCK_REPO_STATUSES).map(repoName => ({
+        id: repoName,
+        name: repoName,
+        owner: { login: 'demo' },
+        description: MOCK_REPO_STATUSES[repoName].description || '',
+        topics: MOCK_REPO_STATUSES[repoName].topics || []
+      }))
+      setAvailableRepos(demoRepos)
+    } else {
+      fetchUserRepos()
+    }
+  }, [authMethod, isDemoMode])
 
   const fetchUserRepos = async () => {
+    // Don't fetch real repos in demo mode
+    if (isDemoMode) {
+      return
+    }
+
     setLoading(true)
     setError(null)
     setAvailableRepos([])
@@ -137,23 +155,25 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
               {repos.length === 0 ? (
                 <p className="color-fg-muted text-center py-4">No repositories selected</p>
               ) : (
-                repos.map(repo => (
-                  <div key={repo.name} className="repo-item">
-                    <div className="flex-1">
-                      <div className="f5 text-bold">{repo.owner}/{repo.name}</div>
-                      {repo.description && (
-                        <div className="f6 color-fg-muted">{repo.description}</div>
-                      )}
+                repos
+                  .filter(repo => !isDemoMode || repo.owner === 'demo')
+                  .map(repo => (
+                    <div key={repo.name} className="repo-item">
+                      <div className="flex-1">
+                        <div className="f5 text-bold">{repo.owner}/{repo.name}</div>
+                        {repo.description && (
+                          <div className="f6 color-fg-muted">{repo.description}</div>
+                        )}
+                      </div>
+                      <IconButton
+                        icon={TrashIcon}
+                        onClick={() => removeRepository(repo.name)}
+                        aria-label="Remove repository"
+                        variant="danger"
+                        size="small"
+                      />
                     </div>
-                    <IconButton
-                      icon={TrashIcon}
-                      onClick={() => removeRepository(repo.name)}
-                      aria-label="Remove repository"
-                      variant="danger"
-                      size="small"
-                    />
-                  </div>
-                ))
+                  ))
               )}
             </div>
           </div>
