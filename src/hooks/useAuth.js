@@ -116,32 +116,35 @@ export function useAuth() {
    * Clears the stored PAT and resets authentication state
    */
   const clearToken = () => {
+    // Clear all possible auth tokens
     localStorage.removeItem('github_token')
+    localStorage.removeItem('auth_method')
+    localStorage.removeItem('github_app_id')
+    localStorage.removeItem('github_app_private_key')
+    localStorage.removeItem('github_app_installation_id')
+    localStorage.removeItem('demo_mode')
     setGithubToken('')
     setAuthMethod('none')
+    setAppInfo(null)
     setShowAuthSetup(true)
   }
 
   /**
    * Handles logout for all authentication methods
-   * Clears credentials and resets to initial auth state
+   * Clears all credentials and returns to landing page
    */
   const handleLogout = () => {
-    if (authMethod === 'oauth') {
-      // Clear OAuth token from localStorage
-      localStorage.removeItem('github_token')
-      localStorage.removeItem('auth_method')
-    } else if (authMethod === 'github-app') {
-      clearGitHubAppAuth()
-      setAppInfo(null)
-    } else if (authMethod === 'demo') {
-      localStorage.removeItem('demo_mode')
-    } else {
-      localStorage.removeItem('github_token')
-    }
+    // Clear all possible auth tokens
+    localStorage.removeItem('github_token')
+    localStorage.removeItem('auth_method')
+    localStorage.removeItem('github_app_id')
+    localStorage.removeItem('github_app_private_key')
+    localStorage.removeItem('github_app_installation_id')
+    localStorage.removeItem('demo_mode')
     setGithubToken('')
     setAuthMethod('none')
-    setShowAuthSetup(false) // This triggers the landing page via useEffect in App.jsx
+    setAppInfo(null)
+    setShowAuthSetup(true)
   }
   
   const handleDemoMode = () => {

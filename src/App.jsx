@@ -74,22 +74,14 @@ function App() {
     }
   }, [auth.authMethod, hasInitialAuth])
 
-  // Check if user is already authenticated on mount - wait for auth to initialize
+  // Sync landing page visibility with auth state
   useEffect(() => {
-    // Only hide landing if we have a definite auth method (not 'none')
-    // This prevents flickering when auth is still initializing
-    if (auth.authMethod !== 'none' && !auth.showAuthSetup) {
+    if (auth.showAuthSetup || auth.authMethod === 'none') {
+      setShowLanding(true)
+    } else if (auth.authMethod !== 'none') {
       setShowLanding(false)
     }
   }, [auth.authMethod, auth.showAuthSetup])
-
-  // Watch for logout - show landing page when user logs out
-  // Only trigger after auth has initialized and if we had auth initially
-  useEffect(() => {
-    if (authInitialized && hasInitialAuth && auth.authMethod === 'none' && !auth.showAuthSetup) {
-      setShowLanding(true)
-    }
-  }, [auth.authMethod, auth.showAuthSetup, hasInitialAuth, authInitialized])
   
   // Convert selectedRepos to REPOSITORIES format for hook - memoized to prevent re-renders
   const reposForHook = useMemo(() => 
