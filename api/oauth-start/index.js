@@ -18,20 +18,10 @@ async function getClientId() {
   return cachedClientId
 }
 
-function debug(...args) {
-  if (process.env.ENVIRONMENT === 'dev') {
-    console.log('[DEBUG]', ...args)
-  }
-}
-
 exports.handler = async (event) => {
-  debug('Incoming event:', JSON.stringify(event, null, 2))
-  debug('Lambda environment:', JSON.stringify(process.env, null, 2))
-
   let clientId
   try {
     clientId = await getClientId()
-    debug('Fetched OAuth client ID:', clientId)
   } catch (err) {
     console.error('Failed to fetch OAuth client ID', err)
     return {
@@ -41,7 +31,6 @@ exports.handler = async (event) => {
   }
 
   const redirectUri = process.env.ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI
-  debug('Using redirectUri:', redirectUri)
 
   if (!clientId || !redirectUri) {
     console.error('Missing clientId or redirectUri')
@@ -55,7 +44,6 @@ exports.handler = async (event) => {
 
   const scope = encodeURIComponent('read:user repo')
   const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`
-  debug('OAuth authorize URL:', url)
 
   return {
     statusCode: 302,

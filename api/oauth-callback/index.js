@@ -29,15 +29,8 @@ async function getOAuthSecrets() {
   return { clientId: cachedClientId, clientSecret: cachedClientSecret }
 }
 
-function debug(...args) {
-  if (process.env.ENVIRONMENT === 'dev') {
-    console.log('[DEBUG]', ...args)
-  }
-}
-
 exports.handler = async (event) => {
   try {
-    debug('Incoming event:', JSON.stringify(event, null, 2))
     const code = event.queryStringParameters?.code
     const state = event.queryStringParameters?.state
 
@@ -48,7 +41,6 @@ exports.handler = async (event) => {
       const [key, value] = cookie.split('=')?.map(s => s && s.trim())
       if (key) cookies[key] = value
     })
-    debug('Parsed cookies:', cookies)
 
     if (!code || !state || !cookies.oauth_state || cookies.oauth_state !== state) {
       console.error('Invalid OAuth callback (missing code or state mismatch)', { code, state, cookies })
@@ -63,7 +55,6 @@ exports.handler = async (event) => {
       const secrets = await getOAuthSecrets()
       clientId = secrets.clientId
       clientSecret = secrets.clientSecret
-      debug('Fetched OAuth secrets:', { clientId, clientSecret })
     } catch (err) {
       console.error('Failed to fetch OAuth secrets', err)
       return {
@@ -73,7 +64,6 @@ exports.handler = async (event) => {
     }
 
     const redirectUri = process.env.ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI
-    debug('Using redirectUri for token exchange:', redirectUri)
 
     if (!clientId || !clientSecret) {
       console.error('Missing clientId or clientSecret')
@@ -90,7 +80,6 @@ exports.handler = async (event) => {
       code,
       redirect_uri: redirectUri
     })
-    debug('Token exchange params:', params.toString())
 
     const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
@@ -99,7 +88,6 @@ exports.handler = async (event) => {
     })
 
     const tokenJson = await tokenRes.json()
-    debug('Token exchange response:', tokenJson)
 
     if (tokenJson.error) {
       console.error('OAuth exchange failed:', tokenJson)

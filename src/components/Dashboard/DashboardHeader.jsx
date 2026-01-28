@@ -156,7 +156,7 @@ export function DashboardHeader({
                 className="color-fg-muted"
               />
             </div>
-          ) : authMethod === 'pat' ? (
+          ) : authMethod === 'pat' || authMethod === 'oauth' ? (
             <IconButton
               icon={SignOutIcon}
               onClick={clearToken}

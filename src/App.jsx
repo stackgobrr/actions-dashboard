@@ -63,8 +63,7 @@ function App() {
       authMethod: auth.authMethod,
       showAuthSetup: auth.showAuthSetup,
       hasInitialAuth,
-      authInitialized,
-      hasCookie: document.cookie.includes('auth_status=')
+      authInitialized
     })
   }, [showLanding, auth.authMethod, auth.showAuthSetup, hasInitialAuth, authInitialized])
 
