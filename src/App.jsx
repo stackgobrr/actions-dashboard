@@ -7,7 +7,6 @@ import { Settings } from './components/Settings/Settings'
 import { HotkeyHelper } from './components/UI/HotkeyHelper'
 import { LandingPage } from './components/LandingPage/LandingPage'
 import { Roadmap } from './components/Roadmap/Roadmap'
-import { Security } from './components/Security/Security'
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
 import { Analytics } from './components/Analytics/Analytics'
 import { useGitHubStatus } from './hooks/useGitHubStatus'
@@ -20,9 +19,7 @@ import { DEFAULT_REFRESH_INTERVAL } from './constants/timing'
 function App() {
   // Check if user has any auth credentials - if so, skip landing page
   const hasAuth = () => {
-    const hasOAuthSession = document.cookie.split(';').some(c => c.trim().startsWith('auth_status='))
     return !!(
-      hasOAuthSession ||
       localStorage.getItem('github_token') ||
       localStorage.getItem('github_app_id') ||
       localStorage.getItem('demo_mode')
@@ -31,7 +28,6 @@ function App() {
 
   const [showLanding, setShowLanding] = useState(!hasAuth())
   const [showRoadmap, setShowRoadmap] = useState(false)
-  const [showSecurity, setShowSecurity] = useState(false)
   const [sortBy, setSortBy] = useState('last-run-desc')
   const [theme, setTheme] = useTheme()
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -196,16 +192,7 @@ function App() {
       <Route path="*" element={
         <>
           <Analytics />
-          {showSecurity ? (
-            <Security
-              onBack={() => {
-                setShowSecurity(false)
-                setShowLanding(true)
-              }}
-              theme={theme}
-              setTheme={setTheme}
-            />
-          ) : showRoadmap ? (
+          {showRoadmap ? (
             <Roadmap
               onBack={() => {
                 setShowRoadmap(false)
@@ -221,10 +208,6 @@ function App() {
               onViewRoadmap={() => {
                 setShowLanding(false)
                 setShowRoadmap(true)
-              }}
-              onViewSecurity={() => {
-                setShowLanding(false)
-                setShowSecurity(true)
               }}
               onViewDemo={auth.handleDemoMode}
               theme={theme}
