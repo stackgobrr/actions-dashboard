@@ -32,6 +32,7 @@ locals {
       environment = merge({
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
         ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name,
+        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI              = "${local.base_url}/api/oauth/callback",
         AWS_REGION_NAME                                   = var.aws_region,
         ENVIRONMENT                                       = var.environment
       }, {})
