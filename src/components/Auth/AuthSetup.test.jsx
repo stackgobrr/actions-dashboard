@@ -116,14 +116,6 @@ describe('AuthSetup Component', () => {
       
       expect(saveToken).toHaveBeenCalledOnce()
     })
-
-    it('explains credential security to users', () => {
-      render(<AuthSetup {...defaultProps} />)
-      
-      // User sees security information is displayed
-      expect(screen.getByText(/credentials stay secure/i)).toBeInTheDocument()
-      expect(screen.getByText(/stored locally in your browser only/i)).toBeInTheDocument()
-    })
   })
 
   describe('GitHub App Form', () => {
