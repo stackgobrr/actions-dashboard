@@ -111,19 +111,25 @@ exports.handler = async (event) => {
 
     const accessToken = tokenJson.access_token
 
-    // Set httpOnly cookie with the access token and clear state cookie
-    // Also set a non-httpOnly auth_status cookie that JavaScript can read
+    // Return HTML that sets localStorage and redirects
+    // This allows JavaScript to access the token (same security as PAT/GitHub App)
     return {
-      statusCode: 302,
+      statusCode: 200,
       headers: {
-        'Location': '/'
+        'Content-Type': 'text/html',
+        'Set-Cookie': 'oauth_state=; HttpOnly; Path=/; Max-Age=0; Secure'
       },
-      cookies: [
-        `gh_session=${accessToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax; Secure`,
-        'auth_status=authenticated; Path=/; Max-Age=86400; SameSite=Lax; Secure',
-        'oauth_state=; HttpOnly; Path=/; Max-Age=0; Secure'
-      ],
-      body: ''
+      body: `<!DOCTYPE html>
+<html>
+<head><title>Redirecting...</title></head>
+<body>
+<script>
+localStorage.setItem('github_token', '${accessToken}');
+localStorage.setItem('auth_method', 'oauth');
+window.location.href = '/';
+</script>
+</body>
+</html>`
     }
   } catch (err) {
     console.error('OAuth callback error:', err)
