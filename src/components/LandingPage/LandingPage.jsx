@@ -423,7 +423,7 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
           </div>
           <div className="text-center" sx={{ pt: 4, borderTop: '1px solid', borderColor: 'border.default' }}>
             <Text sx={{ color: 'fg.muted', fontSize: 1 }}>
-              Built with ❤️ by the h3ow3d team • Open source under MIT License
+              Built by stackgobrr team • Open source under MIT License
             </Text>
           </div>
         </div>
