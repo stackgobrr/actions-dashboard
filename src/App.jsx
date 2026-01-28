@@ -233,14 +233,16 @@ function App() {
               backgroundColor: '#0969da',
               color: 'white',
               textAlign: 'center',
-              padding: '8px',
-              fontWeight: 'bold',
-              fontSize: '14px',
-              position: 'sticky',
+              padding: '6px 8px',
+              fontWeight: '600',
+              fontSize: '12px',
+              position: 'fixed',
               top: 0,
-              zIndex: 1000
+              left: 0,
+              right: 0,
+              zIndex: 9999
             }}>
-              DEVELOPMENT SITE
+              DEVELOPMENT
             </div>
           )}
           <Analytics />
