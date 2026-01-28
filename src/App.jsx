@@ -13,6 +13,7 @@ import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
 import { useAuth } from './hooks/useAuth'
 import { REPOSITORIES } from './constants'
+import { MOCK_REPO_STATUSES } from './data/mockRepoStatuses'
 import { logger } from './utils/logger'
 import { DEFAULT_REFRESH_INTERVAL } from './constants/timing'
 
@@ -43,6 +44,20 @@ function App() {
     if (saved) {
       return JSON.parse(saved)
     }
+    
+    // Check if we're starting in demo mode
+    const authMethod = localStorage.getItem('auth_method')
+    const demoMode = localStorage.getItem('demo_mode')
+    if (authMethod === 'demo' || demoMode === 'true') {
+      // Initialize with all demo repositories
+      return Object.keys(MOCK_REPO_STATUSES).map(repoName => ({
+        name: repoName,
+        owner: 'demo',
+        description: MOCK_REPO_STATUSES[repoName].description || '',
+        category: MOCK_REPO_STATUSES[repoName].category || 'demo'
+      }))
+    }
+    
     // Convert REPOSITORIES constant to the new format
     return [
       ...REPOSITORIES.common.map(r => ({ ...r, category: 'common' })),
@@ -87,6 +102,20 @@ function App() {
       setShowLanding(false)
     }
   }, [auth.authMethod, auth.showAuthSetup])
+  
+  // Initialize demo repos when switching to demo mode (if no repos saved)
+  useEffect(() => {
+    if (auth.authMethod === 'demo' && !localStorage.getItem('selectedRepos')) {
+      const demoRepos = Object.keys(MOCK_REPO_STATUSES).map(repoName => ({
+        name: repoName,
+        owner: 'demo',
+        description: MOCK_REPO_STATUSES[repoName].description || '',
+        category: MOCK_REPO_STATUSES[repoName].category || 'demo'
+      }))
+      setSelectedRepos(demoRepos)
+      localStorage.setItem('selectedRepos', JSON.stringify(demoRepos))
+    }
+  }, [auth.authMethod])
   
   // Convert selectedRepos to REPOSITORIES format for hook - memoized to prevent re-renders
   const reposForHook = useMemo(() => 
