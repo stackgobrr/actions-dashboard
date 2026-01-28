@@ -228,9 +228,9 @@ function App() {
       {/* Main app route */}
       <Route path="*" element={
         <>
-          {import.meta.env.DEV && (
+          {(import.meta.env.DEV || window.location.hostname.startsWith('dev.')) && (
             <div style={{
-              backgroundColor: '#0969da',
+              backgroundColor: 'rgba(9, 105, 218, 0.75)',
               color: 'white',
               textAlign: 'center',
               padding: '6px 8px',

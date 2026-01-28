@@ -25,7 +25,6 @@ import './LandingPage.css'
 export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, setTheme }) {
   const [activeFeature, setActiveFeature] = useState(0)
   const [demoStatusIndex, setDemoStatusIndex] = useState(0)
-  const isDev = import.meta.env.DEV
 
   // Cycle through different statuses for the demo card
   const demoStatuses = [
@@ -182,7 +181,7 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
   ]
 
   return (
-    <div className={`landing-page`} style={{ background: 'var(--bgColor-default)', color: 'var(--fgColor-default)', paddingTop: isDev ? '28px' : '0' }}>
+    <div className={`landing-page`} style={{ background: 'var(--bgColor-default)', color: 'var(--fgColor-default)' }}>
       {/* Header */}
       <header className="landing-header">
         <div className="container">
