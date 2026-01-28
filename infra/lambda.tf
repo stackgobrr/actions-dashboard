@@ -15,8 +15,9 @@ locals {
   # Lambda function runtime settings and environment variables
   lambda_functions = {
     oauth_start = {
-      timeout     = 10
-      memory_size = 128
+      timeout          = 10
+      memory_size      = 128
+      source_code_hash = var.oauth_start_source_code_hash
       environment = merge({
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
         ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "${local.base_url}/api/oauth/callback",
@@ -25,8 +26,9 @@ locals {
       }, {})
     }
     oauth_callback = {
-      timeout     = 10
-      memory_size = 128
+      timeout          = 10
+      memory_size      = 128
+      source_code_hash = var.oauth_callback_source_code_hash
       environment = merge({
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
         ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name,
@@ -153,14 +155,15 @@ resource "aws_cloudwatch_log_group" "lambda" {
 resource "aws_lambda_function" "lambda" {
   for_each = local.lambda_functions
 
-  s3_bucket     = aws_s3_bucket.lambda_artifacts.id
-  s3_key        = "${replace(each.key, "_", "-")}.zip"
-  function_name = "${local.resource_prefix}-${replace(each.key, "_", "-")}"
-  role          = aws_iam_role.lambda_execution.arn
-  handler       = "index.handler"
-  runtime       = "nodejs20.x"
-  timeout       = each.value.timeout
-  memory_size   = each.value.memory_size
+  s3_bucket        = aws_s3_bucket.lambda_artifacts.id
+  s3_key           = "${replace(each.key, "_", "-")}.zip"
+  source_code_hash = each.value.source_code_hash != "" ? each.value.source_code_hash : null
+  function_name    = "${local.resource_prefix}-${replace(each.key, "_", "-")}"
+  role             = aws_iam_role.lambda_execution.arn
+  handler          = "index.handler"
+  runtime          = "nodejs20.x"
+  timeout          = each.value.timeout
+  memory_size      = each.value.memory_size
 
   environment {
     variables = each.value.environment
