@@ -29,7 +29,7 @@ export const roadmapItems = [
     benefits: [
       'Near-real-time events',
       'Reduced polling and API usage',
-      'Reliable retry/dedup behavior'
+      'Reliable retry/dedup behaviour'
     ]
   },
   {

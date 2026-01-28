@@ -279,7 +279,7 @@ openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in your-app.pem -out you
               <div style={{padding: '16px', borderTop: '1px solid var(--borderColor-default)'}}>
                 <ol className="ml-3">
                   <li className="mb-2">In your GitHub App settings, click <strong>"Install App"</strong> in the left sidebar</li>
-                  <li className="mb-2">Click the <strong>"Install"</strong> button next to your account/organization</li>
+                  <li className="mb-2">Click the <strong>"Install"</strong> button next to your account/organisation</li>
                   <li className="mb-2">Choose repository access:
                     <ul className="ml-3 mt-1">
                       <li className="mb-1"><strong>All repositories</strong> - Easiest option, gives access to all current and future repos</li>
@@ -536,7 +536,7 @@ openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in your-app.pem -out you
                     padding: '16px'
                   }}>
                     <h3 className="f4 text-semibold mb-2">👥 Team Friendly</h3>
-                    <p className="f5 color-fg-muted mb-0">Not tied to a specific user account - better for organizations</p>
+                    <p className="f5 color-fg-muted mb-0">Not tied to a specific user account - better for organisations</p>
                   </div>
                   
                   <div style={{

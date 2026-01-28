@@ -131,7 +131,7 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
     {
       icon: <WorkflowIcon size={24} />,
       title: "Multi-Repository Support",
-      description: "Track workflows across multiple repositories, organized by categories like modules, services, and infrastructure."
+      description: "Track workflows across multiple repositories, organised by categories like modules, services, and infrastructure."
     },
     {
       icon: <ShieldLockIcon size={24} />,
@@ -146,7 +146,7 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
     {
       icon: <FilterIcon size={24} />,
       title: "Smart Filtering",
-      description: "Filter workflows by status, search by name, or organize by workflow labels and categories."
+      description: "Filter workflows by status, search by name, or organise by workflow labels and categories."
     },
     {
       icon: <CommandPaletteIcon size={24} />,
