@@ -38,6 +38,7 @@ function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showHotkeyHelper, setShowHotkeyHelper] = useState(false)
   const [filterByLabels, setFilterByLabels] = useState([])
+  const [hasInitialAuth, setHasInitialAuth] = useState(hasAuth()) // Track if we had auth on mount
   const [selectedRepos, setSelectedRepos] = useState(() => {
     // Load from localStorage or use default
     const saved = localStorage.getItem('selectedRepos')
@@ -66,11 +67,12 @@ function App() {
   }, [auth.authMethod, auth.showAuthSetup])
 
   // Watch for logout - show landing page when user logs out
+  // Only trigger if we had auth initially (prevents false positive on mount)
   useEffect(() => {
-    if (auth.authMethod === 'none' && !auth.showAuthSetup) {
+    if (hasInitialAuth && auth.authMethod === 'none' && !auth.showAuthSetup) {
       setShowLanding(true)
     }
-  }, [auth.authMethod, auth.showAuthSetup])
+  }, [auth.authMethod, auth.showAuthSetup, hasInitialAuth])
   
   // Convert selectedRepos to REPOSITORIES format for hook - memoized to prevent re-renders
   const reposForHook = useMemo(() => 
