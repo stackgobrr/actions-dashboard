@@ -46,6 +46,18 @@ variable "oauth_client_id_secret_name" {
   default     = "actions-dashboard/oauth-client-id"
 }
 
+variable "oauth_start_source_code_hash" {
+  description = "Source code hash for oauth_start Lambda (base64-encoded SHA256)"
+  type        = string
+  default     = ""
+}
+
+variable "oauth_callback_source_code_hash" {
+  description = "Source code hash for oauth_callback Lambda (base64-encoded SHA256)"
+  type        = string
+  default     = ""
+}
+
 variable "oauth_client_secret_secret_name" {
   description = "Secrets Manager secret name for OAuth client secret"
   type        = string

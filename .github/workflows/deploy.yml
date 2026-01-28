@@ -107,6 +107,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Package and upload Lambda functions
+        id: lambda-hashes
         run: |
           cd api
           
@@ -124,6 +125,12 @@ jobs:
             
             # Create zip archive
             zip -r "${func_name}.zip" . -x "*.git*" -x "node_modules/.cache/*"
+            
+            # Calculate hash
+            HASH=$(openssl dgst -sha256 -binary "${func_name}.zip" | openssl base64)
+            
+            # Output hash for each function
+            echo "${func_name//-/_}_hash=$HASH" >> $GITHUB_OUTPUT
             
             # Upload to S3
             aws s3 cp "${func_name}.zip" "s3://${{ steps.bucket.outputs.name }}/${func_name}.zip"
@@ -147,6 +154,8 @@ jobs:
           TF_VAR_webhook_secret: ${{ secrets.ACTIONS_DASHBOARD_WEBHOOK_SECRET }}
           TF_VAR_oauth_client_id: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_ID }}
           TF_VAR_oauth_client_secret: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET }}
+          TF_VAR_oauth_start_source_code_hash: ${{ steps.lambda-hashes.outputs.oauth_start_hash }}
+          TF_VAR_oauth_callback_source_code_hash: ${{ steps.lambda-hashes.outputs.oauth_callback_hash }}
 
       - name: Get Terraform outputs
         id: get-outputs
