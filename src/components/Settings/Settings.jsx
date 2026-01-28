@@ -109,11 +109,13 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
     onClose()
   }
 
-  const filteredAvailable = availableRepos.filter(repo =>
-    repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    repo.owner.login.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    repo.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredAvailable = availableRepos
+    .filter(repo => !repos.find(r => r.name === repo.name && r.owner === repo.owner.login))
+    .filter(repo =>
+      repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      repo.owner.login.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      repo.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
 
   return (
     <div className="settings-overlay">
@@ -173,27 +175,23 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
                   <p className="color-fg-danger text-center py-4">{error}</p>
                 ) : (
                   <div className="repo-list">
-                    {filteredAvailable.map(repo => {
-                      const isSelected = repos.find(r => r.name === repo.name)
-                      return (
-                        <div key={repo.id} className="repo-item">
-                          <div>
-                            <div className="f5 text-bold">{repo.owner.login}/{repo.name}</div>
-                            {repo.description && (
-                              <div className="f6 color-fg-muted">{repo.description}</div>
-                            )}
-                          </div>
-                          <Button
-                            size="small"
-                            leadingVisual={PlusIcon}
-                            onClick={() => addRepository(repo)}
-                            disabled={isSelected}
-                          >
-                            {isSelected ? 'Added' : 'Add'}
-                          </Button>
+                    {filteredAvailable.map(repo => (
+                      <div key={repo.id} className="repo-item">
+                        <div>
+                          <div className="f5 text-bold">{repo.owner.login}/{repo.name}</div>
+                          {repo.description && (
+                            <div className="f6 color-fg-muted">{repo.description}</div>
+                          )}
                         </div>
-                      )
-                    })}
+                        <Button
+                          size="small"
+                          leadingVisual={PlusIcon}
+                          onClick={() => addRepository(repo)}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 )}
           </div>
