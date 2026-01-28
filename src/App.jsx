@@ -12,6 +12,7 @@ import { Analytics } from './components/Analytics/Analytics'
 import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
 import { useAuth } from './hooks/useAuth'
+import { useRateLimit } from './hooks/useRateLimit'
 import { REPOSITORIES } from './constants'
 import { MOCK_REPO_STATUSES } from './data/mockRepoStatuses'
 import { logger } from './utils/logger'
@@ -36,6 +37,7 @@ function App() {
   const [showGuide, setShowGuide] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showHotkeyHelper, setShowHotkeyHelper] = useState(false)
+  const [showRateLimit, setShowRateLimit] = useState(false)
   const [filterByLabels, setFilterByLabels] = useState([])
   const [hasInitialAuth, setHasInitialAuth] = useState(hasAuth()) // Track if we had auth on mount
   const [selectedRepos, setSelectedRepos] = useState(() => {
@@ -181,6 +183,10 @@ function App() {
       }
 
       switch(e.key.toLowerCase()) {
+        case 'a':
+          // Toggle rate limit display
+          setShowRateLimit(prev => !prev)
+          break
         case 'h':
           // Toggle hotkey helper
           setShowHotkeyHelper(prev => !prev)
@@ -291,6 +297,10 @@ function App() {
                   toggleDemoMode={toggleDemoMode}
                   canToggleDemoMode={canToggleDemoMode}
                   onToggleHotkeyHelper={() => setShowHotkeyHelper(prev => !prev)}
+                  showRateLimit={showRateLimit}
+                  rateLimit={rateLimit}
+                  rateLimitLoading={rateLimitLoading}
+                  rateLimitError={rateLimitError}
                 />
                 {showSettings && (
                   <Settings

@@ -16,6 +16,7 @@ import { Button, IconButton, Select, Checkbox, Label, ActionMenu, ActionList } f
 import { ThemeToggle } from '../UI/ThemeToggle'
 import { RefreshButton } from '../UI/RefreshButton'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
+import { RateLimitDisplay } from './RateLimitDisplay'
 import { getTopicColor } from '../../utils/statusHelpers'
 import { trackEvent } from '../../utils/analytics'
 import './DashboardHeader.css'
@@ -43,7 +44,11 @@ export function DashboardHeader({
   isDemoMode,
   toggleDemoMode,
   canToggleDemoMode,
-  onToggleHotkeyHelper
+  onToggleHotkeyHelper,
+  showRateLimit,
+  rateLimit,
+  rateLimitLoading,
+  rateLimitError
 }) {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark'
@@ -101,13 +106,22 @@ export function DashboardHeader({
               </Label>
             )}
           </h1>
-          <p className="f6 color-fg-muted mb-0">
-            {isDemoMode 
-              ? canToggleDemoMode
-                ? "Showing demo data - click badge to connect to real repositories"
-                : "Showing demo data - logout to connect to real repositories"
-              : "Live GitHub Actions status for all repositories"}
-          </p>
+          <div className="d-flex flex-items-center" style={{ gap: '12px' }}>
+            <p className="f6 color-fg-muted mb-0">
+              {isDemoMode 
+                ? canToggleDemoMode
+                  ? "Showing demo data - click badge to connect to real repositories"
+                  : "Showing demo data - logout to connect to real repositories"
+                : "Live GitHub Actions status for all repositories"}
+            </p>
+            {showRateLimit && (
+              <RateLimitDisplay 
+                rateLimit={rateLimit}
+                loading={rateLimitLoading}
+                error={rateLimitError}
+              />
+            )}
+          </div>
         </div>
         
         <div className="dashboard-header-actions">

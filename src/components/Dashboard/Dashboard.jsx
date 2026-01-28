@@ -30,7 +30,11 @@ export function Dashboard({
   isDemoMode,
   toggleDemoMode,
   canToggleDemoMode,
-  onToggleHotkeyHelper
+  onToggleHotkeyHelper,
+  showRateLimit,
+  rateLimit,
+  rateLimitLoading,
+  rateLimitError
 }) {
   // Collect all unique topics from all repositories
   const allTopics = [...new Set(
@@ -77,6 +81,10 @@ export function Dashboard({
             toggleDemoMode={toggleDemoMode}
             canToggleDemoMode={canToggleDemoMode}
             onToggleHotkeyHelper={onToggleHotkeyHelper}
+            showRateLimit={showRateLimit}
+            rateLimit={rateLimit}
+            rateLimitLoading={rateLimitLoading}
+            rateLimitError={rateLimitError}
           />
         )}
 
