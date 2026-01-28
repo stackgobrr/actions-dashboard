@@ -56,6 +56,26 @@ function App() {
   })
 
   const auth = useAuth()
+  const [authInitialized, setAuthInitialized] = useState(false)
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[App Debug]', {
+      showLanding,
+      authMethod: auth.authMethod,
+      showAuthSetup: auth.showAuthSetup,
+      hasInitialAuth,
+      authInitialized,
+      hasCookie: document.cookie.includes('gh_session=')
+    })
+  }, [showLanding, auth.authMethod, auth.showAuthSetup, hasInitialAuth, authInitialized])
+
+  // Track when auth has finished initializing
+  useEffect(() => {
+    if (auth.authMethod !== 'none' || !hasInitialAuth) {
+      setAuthInitialized(true)
+    }
+  }, [auth.authMethod, hasInitialAuth])
 
   // Check if user is already authenticated on mount - wait for auth to initialize
   useEffect(() => {
@@ -67,12 +87,12 @@ function App() {
   }, [auth.authMethod, auth.showAuthSetup])
 
   // Watch for logout - show landing page when user logs out
-  // Only trigger if we had auth initially (prevents false positive on mount)
+  // Only trigger after auth has initialized and if we had auth initially
   useEffect(() => {
-    if (hasInitialAuth && auth.authMethod === 'none' && !auth.showAuthSetup) {
+    if (authInitialized && hasInitialAuth && auth.authMethod === 'none' && !auth.showAuthSetup) {
       setShowLanding(true)
     }
-  }, [auth.authMethod, auth.showAuthSetup, hasInitialAuth])
+  }, [auth.authMethod, auth.showAuthSetup, hasInitialAuth, authInitialized])
   
   // Convert selectedRepos to REPOSITORIES format for hook - memoized to prevent re-renders
   const reposForHook = useMemo(() => 
