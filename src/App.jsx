@@ -236,11 +236,11 @@ function App() {
               padding: '6px 8px',
               fontWeight: '600',
               fontSize: '12px',
-              position: 'fixed',
+              position: 'sticky',
               top: 0,
               left: 0,
               right: 0,
-              zIndex: 9999
+              zIndex: 200
             }}>
               DEVELOPMENT
             </div>
