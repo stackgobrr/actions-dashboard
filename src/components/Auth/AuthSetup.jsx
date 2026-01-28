@@ -47,22 +47,6 @@ export function AuthSetup({
             <h1 className="h2 mb-2">GitHub Authentication</h1>
             <p className="color-fg-muted f4">Choose an authentication method to access workflow statuses.</p>
           </div>
-
-          <div style={{ marginBottom: '24px' }}>
-            <Flash variant="default">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div>
-                  <ShieldLockIcon size={16} style={{marginRight: '8px', verticalAlign: 'text-bottom'}} />
-                  <strong>Your credentials stay secure:</strong>
-                </div>
-                <ul className="f5 mb-0" style={{ paddingLeft: '28px' }}>
-                  <li>Stored locally in your browser only, never sent to our servers</li>
-                  <li>Direct API calls from your browser to GitHub, no middleman</li>
-                  <li>CSP and same-origin policies prevent unauthorized access</li>
-                </ul>
-              </div>
-            </Flash>
-          </div>
         
         {!showGitHubAppForm && (
           <>
