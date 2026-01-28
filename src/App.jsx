@@ -7,6 +7,7 @@ import { Settings } from './components/Settings/Settings'
 import { HotkeyHelper } from './components/UI/HotkeyHelper'
 import { LandingPage } from './components/LandingPage/LandingPage'
 import { Roadmap } from './components/Roadmap/Roadmap'
+import { Security } from './components/Security/Security'
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
 import { Analytics } from './components/Analytics/Analytics'
 import { useGitHubStatus } from './hooks/useGitHubStatus'
@@ -30,6 +31,7 @@ function App() {
 
   const [showLanding, setShowLanding] = useState(!hasAuth())
   const [showRoadmap, setShowRoadmap] = useState(false)
+  const [showSecurity, setShowSecurity] = useState(false)
   const [sortBy, setSortBy] = useState('last-run-desc')
   const [theme, setTheme] = useTheme()
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -194,7 +196,16 @@ function App() {
       <Route path="*" element={
         <>
           <Analytics />
-          {showRoadmap ? (
+          {showSecurity ? (
+            <Security
+              onBack={() => {
+                setShowSecurity(false)
+                setShowLanding(true)
+              }}
+              theme={theme}
+              setTheme={setTheme}
+            />
+          ) : showRoadmap ? (
             <Roadmap
               onBack={() => {
                 setShowRoadmap(false)
@@ -210,6 +221,10 @@ function App() {
               onViewRoadmap={() => {
                 setShowLanding(false)
                 setShowRoadmap(true)
+              }}
+              onViewSecurity={() => {
+                setShowLanding(false)
+                setShowSecurity(true)
               }}
               onViewDemo={auth.handleDemoMode}
               theme={theme}

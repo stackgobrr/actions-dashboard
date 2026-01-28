@@ -22,7 +22,7 @@ import { RepoCard } from '../Dashboard/RepoCard'
 import '../../styles/shared.css'
 import './LandingPage.css'
 
-export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, setTheme }) {
+export function LandingPage({ onGetStarted, onViewRoadmap, onViewSecurity, onViewDemo, theme, setTheme }) {
   const [activeFeature, setActiveFeature] = useState(0)
   const [demoStatusIndex, setDemoStatusIndex] = useState(0)
 
@@ -196,6 +196,12 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
                 onClick={onViewRoadmap}
               >
                 Roadmap
+              </Button>
+              <Button
+                variant="invisible"
+                onClick={onViewSecurity}
+              >
+                Security
               </Button>
               <IconButton
                 icon={theme === 'dark' ? SunIcon : MoonIcon}

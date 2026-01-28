@@ -1,0 +1,227 @@
+/* Security Page Styles - consistent with Roadmap page */
+
+.security-page {
+  min-height: 100vh;
+  background: var(--bgColor-default);
+}
+
+/* Header - matching roadmap page */
+.security-header {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--borderColor-default);
+  background: var(--bgColor-default);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: var(--bgColor-default, rgba(255, 255, 255, 0.8));
+}
+
+[data-color-mode="dark"] .security-header {
+  background: rgba(13, 17, 23, 0.8);
+}
+
+.security-header button,
+.security-header a[class*="Button"] {
+  height: 32px;
+  line-height: 20px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.security-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.security-intro {
+  text-align: center;
+  padding: 40px 32px 0;
+  margin-bottom: 40px;
+}
+
+.security-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--fgColor-default);
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
+}
+
+.security-intro p {
+  font-size: 15px;
+  color: var(--fgColor-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.security-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.security-card {
+  background: var(--bgColor-default);
+  border: 1px solid var(--borderColor-default);
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.15s ease;
+}
+
+.security-card:hover {
+  border-color: var(--borderColor-neutral-muted);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.security-card .card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.security-card .card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fgColor-default);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.security-card .card-description {
+  font-size: 14px;
+  color: var(--fgColor-muted);
+  margin: 0 0 12px 0;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.security-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.security-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--fgColor-muted);
+}
+
+.security-features li svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.security-features li strong {
+  color: var(--fgColor-default);
+  font-weight: 600;
+}
+
+.security-features li code {
+  background: var(--bgColor-neutral-muted);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+.security-note {
+  background: var(--bgColor-attention-muted);
+  border-color: var(--borderColor-attention-emphasis);
+}
+
+.security-note h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: var(--fgColor-default);
+  letter-spacing: -0.01em;
+}
+
+.security-note p {
+  margin: 0 0 10px 0;
+  line-height: 1.6;
+  color: var(--fgColor-muted);
+  font-size: 14px;
+}
+
+.security-note ul {
+  margin: 10px 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.security-note li {
+  margin: 4px 0;
+  line-height: 1.6;
+  color: var(--fgColor-muted);
+  font-size: 13px;
+}
+
+.security-report {
+  background: var(--bgColor-accent-muted);
+  border-color: var(--borderColor-accent-emphasis);
+}
+
+.security-report h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: var(--fgColor-default);
+  letter-spacing: -0.01em;
+}
+
+.security-report p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--fgColor-muted);
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .security-container {
+    padding: 24px 16px;
+  }
+
+  .security-intro {
+    padding: 32px 16px 0;
+    margin-bottom: 32px;
+  }
+
+  .security-title {
+    font-size: 24px;
+  }
+
+  .security-intro p {
+    font-size: 14px;
+  }
+
+  .security-card {
+    padding: 16px;
+  }
+
+  .security-card .card-title {
+    font-size: 15px;
+  }
+
+  .security-card .card-description {
+    font-size: 13px;
+  }
+
+  .security-features li {
+    font-size: 12px;
+  }
+}
