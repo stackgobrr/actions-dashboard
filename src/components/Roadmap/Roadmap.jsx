@@ -1,4 +1,4 @@
-import { ChevronLeftIcon, MoonIcon, SunIcon, RocketIcon } from '@primer/octicons-react'
+import { ChevronLeftIcon, MoonIcon, SunIcon, ProjectRoadmapIcon } from '@primer/octicons-react'
 import { Button, IconButton, Text, Label } from '@primer/react'
 import { roadmapItems, statusConfig } from './roadmapData'
 import './Roadmap.css'
@@ -11,7 +11,7 @@ export function Roadmap({ onBack, theme, setTheme }) {
         <div className="container">
           <div className="d-flex flex-justify-between flex-items-center">
             <div className="d-flex flex-items-center" style={{ gap: '12px' }}>
-              <RocketIcon size={28} />
+              <ProjectRoadmapIcon size={28} />
               <Text sx={{ fontSize: 3, fontWeight: 'semibold' }}>Actions Dashboard</Text>
             </div>
             <div className="d-flex flex-items-center" style={{ gap: '16px' }}>
