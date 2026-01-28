@@ -136,7 +136,7 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
     {
       icon: <ShieldLockIcon size={24} />,
       title: "Secure Authentication",
-      description: "Support for Personal Access Tokens and GitHub Apps. All credentials stored locally in your browser."
+      description: "Multiple authentication options with secure credential storage. Your data stays private and protected."
     },
     {
       icon: <EyeIcon size={24} />,
