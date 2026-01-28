@@ -336,7 +336,7 @@ export function LandingPage({ onGetStarted, onViewRoadmap, onViewDemo, theme, se
               <div className="step-number">1</div>
               <div className="step-content">
                 <h3>Connect GitHub</h3>
-                <p>Authenticate with a Personal Access Token or GitHub App</p>
+                <p>Authenticate with GitHub OAuth, Personal Access Token, or GitHub App</p>
                 <div className="step-visual">
                   <ShieldLockIcon size={40} />
                 </div>
