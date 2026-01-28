@@ -157,34 +157,57 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   useEffect(() => {
     // Use demo data when in demo mode (selected as auth or environment-based)
     if (isDemoMode) {
-      setRepoStatuses(MOCK_REPO_STATUSES)
+      // Get list of selected repo names from the repositories object
+      const selectedRepoNames = [
+        ...repositories.common.map(r => r.name),
+        ...repositories.modules.map(r => r.name),
+        ...repositories.infra.map(r => r.name),
+        ...repositories.services.map(r => r.name),
+        ...repositories.utils.map(r => r.name),
+        ...repositories.custom.map(r => r.name),
+      ]
+      
+      // Filter MOCK_REPO_STATUSES to only include selected repos
+      const filteredMockStatuses = Object.keys(MOCK_REPO_STATUSES)
+        .filter(repoName => selectedRepoNames.includes(repoName))
+        .reduce((acc, repoName) => {
+          acc[repoName] = MOCK_REPO_STATUSES[repoName]
+          return acc
+        }, {})
+      
+      setRepoStatuses(filteredMockStatuses)
       setLastUpdate(new Date())
       setLoading(false)
       
       // Cycle the animation demo card through different statuses to showcase pulse effect
-      const statusCycle = [
-        { status: 'completed', conclusion: 'success' },
-        { status: 'completed', conclusion: 'failure' },
-        { status: 'in_progress', conclusion: null },
-        { status: 'completed', conclusion: 'cancelled' }
-      ]
-      let cycleIndex = 0
-      
-      const cycleInterval = setInterval(() => {
-        cycleIndex = (cycleIndex + 1) % statusCycle.length
-        const nextStatus = statusCycle[cycleIndex]
+      // Only if it's in the selected repos
+      if (selectedRepoNames.includes('demo-pulse-animation')) {
+        const statusCycle = [
+          { status: 'completed', conclusion: 'success' },
+          { status: 'completed', conclusion: 'failure' },
+          { status: 'in_progress', conclusion: null },
+          { status: 'completed', conclusion: 'cancelled' }
+        ]
+        let cycleIndex = 0
         
-        setRepoStatuses(prev => ({
-          ...prev,
-          'demo-pulse-animation': {
-            ...prev['demo-pulse-animation'],
-            ...nextStatus,
-            updatedAt: new Date().toISOString()
-          }
-        }))
-      }, 5000) // Change status every 5 seconds
+        const cycleInterval = setInterval(() => {
+          cycleIndex = (cycleIndex + 1) % statusCycle.length
+          const nextStatus = statusCycle[cycleIndex]
+          
+          setRepoStatuses(prev => ({
+            ...prev,
+            'demo-pulse-animation': {
+              ...prev['demo-pulse-animation'],
+              ...nextStatus,
+              updatedAt: new Date().toISOString()
+            }
+          }))
+        }, 5000) // Change status every 5 seconds
+        
+        return () => clearInterval(cycleInterval)
+      }
       
-      return () => clearInterval(cycleInterval)
+      return
     }
     
     // Normal production flow
