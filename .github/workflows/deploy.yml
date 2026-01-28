@@ -168,7 +168,7 @@ jobs:
 
   deploy-infrastructure:
     name: Deploy Infrastructure
-    needs: [test, setup, package-lambdas]
+    needs: [test, setup, create-lambda-bucket, package-lambdas]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
