@@ -76,9 +76,14 @@ function App() {
 
   // Sync landing page visibility with auth state
   useEffect(() => {
-    if (auth.showAuthSetup || auth.authMethod === 'none') {
+    if (auth.showAuthSetup) {
+      // When auth setup is requested, hide landing page to show auth setup
+      setShowLanding(false)
+    } else if (auth.authMethod === 'none') {
+      // No auth and no setup requested - show landing page
       setShowLanding(true)
-    } else if (auth.authMethod !== 'none') {
+    } else {
+      // Has auth - hide landing page
       setShowLanding(false)
     }
   }, [auth.authMethod, auth.showAuthSetup])
