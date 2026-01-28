@@ -137,6 +137,12 @@ function App() {
     DEFAULT_REFRESH_INTERVAL
   )
 
+  const { rateLimit, loading: rateLimitLoading, error: rateLimitError } = useRateLimit(
+    auth.getActiveToken,
+    auth.authMethod,
+    showRateLimit
+  )
+
   const handleSaveRepos = (repos) => {
     setSelectedRepos(repos)
     localStorage.setItem('selectedRepos', JSON.stringify(repos))
@@ -222,6 +228,21 @@ function App() {
       {/* Main app route */}
       <Route path="*" element={
         <>
+          {import.meta.env.DEV && (
+            <div style={{
+              backgroundColor: '#0969da',
+              color: 'white',
+              textAlign: 'center',
+              padding: '8px',
+              fontWeight: 'bold',
+              fontSize: '14px',
+              position: 'sticky',
+              top: 0,
+              zIndex: 1000
+            }}>
+              DEVELOPMENT SITE
+            </div>
+          )}
           <Analytics />
           {showRoadmap ? (
             <Roadmap
