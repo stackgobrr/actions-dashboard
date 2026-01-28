@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from 'react'
 
 /**
  * Custom hook to fetch and monitor GitHub API rate limit
+ * Syncs with dashboard refresh cycle via lastUpdate parameter
  */
-export function useRateLimit(getActiveToken, authMethod, enabled = false) {
+export function useRateLimit(getActiveToken, authMethod, enabled = false, lastUpdate = null) {
   const [rateLimit, setRateLimit] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -45,11 +46,8 @@ export function useRateLimit(getActiveToken, authMethod, enabled = false) {
   useEffect(() => {
     if (enabled) {
       fetchRateLimit()
-      // Refresh every 60 seconds
-      const interval = setInterval(fetchRateLimit, 60000)
-      return () => clearInterval(interval)
     }
-  }, [enabled, fetchRateLimit])
+  }, [enabled, lastUpdate, fetchRateLimit])
 
   return {
     rateLimit,

@@ -7,6 +7,7 @@ export function HotkeyHelper({ isOpen, onClose }) {
     { key: 'F', description: 'Toggle fullscreen mode' },
     { key: 'T', description: 'Toggle light/dark theme' },
     { key: 'S', description: 'Open settings/repository configuration' },
+    { key: 'A', description: 'Show/hide GitHub API rate limit' },
     { key: 'ESC', description: 'Close this dialog' },
   ]
 
