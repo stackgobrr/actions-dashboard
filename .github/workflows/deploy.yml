@@ -105,6 +105,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'api/*/package-lock.json'
 
       - name: Package and upload Lambda functions
         id: lambda-hashes
