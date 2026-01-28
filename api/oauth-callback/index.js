@@ -115,12 +115,12 @@ exports.handler = async (event) => {
     return {
       statusCode: 302,
       headers: {
-        'Location': '/',
-        'Set-Cookie': [
-          `gh_session=${accessToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax; Secure`,
-          'oauth_state=; HttpOnly; Path=/; Max-Age=0; Secure'
-        ].join(', ')
+        'Location': '/'
       },
+      cookies: [
+        `gh_session=${accessToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax; Secure`,
+        'oauth_state=; HttpOnly; Path=/; Max-Age=0; Secure'
+      ],
       body: ''
     }
   } catch (err) {
