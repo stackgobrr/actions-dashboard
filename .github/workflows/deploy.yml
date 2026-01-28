@@ -72,6 +72,12 @@ jobs:
           terraform_version: '1.14.1'
           terraform_wrapper: false
 
+      - name: Cache Terraform
+        uses: actions/cache@v4
+        with:
+          path: infra/.terraform
+          key: terraform-${{ needs.setup.outputs.environment }}-${{ hashFiles('infra/.terraform.lock.hcl') }}
+
       - name: Create S3 bucket for Lambda artifacts
         run: |
           cd infra
@@ -96,6 +102,13 @@ jobs:
           cd infra
           BUCKET_NAME=$(terraform output -raw lambda_artifacts_bucket)
           echo "name=$BUCKET_NAME" >> $GITHUB_OUTPUT
+
+      - name: Upload Terraform state
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-state
+          path: infra/.terraform
+          retention-days: 1
 
   package-lambdas:
     name: Package Lambda - ${{ matrix.function }}
@@ -184,6 +197,12 @@ jobs:
         with:
           terraform_version: '1.14.1'
           terraform_wrapper: false
+
+      - name: Restore Terraform state
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-state
+          path: infra/.terraform
 
       - name: Deploy infrastructure
         uses: stackgobrr/common-github-actions/actions/terraform-deploy@main
