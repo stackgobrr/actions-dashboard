@@ -1,0 +1,131 @@
+.focus-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.focus-view-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--fgColor-default);
+}
+
+.focus-view-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: var(--fgColor-muted);
+}
+
+.focus-view-content {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: calc(80vh - 120px);
+}
+
+.focus-view-loading,
+.focus-view-error,
+.focus-view-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--fgColor-muted);
+}
+
+.focus-view-error {
+  color: var(--color-fg-danger);
+}
+
+.focus-view-section-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fgColor-default);
+}
+
+.focus-view-runs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.focus-view-run-item {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bgColor-muted);
+  border: 1px solid var(--borderColor-default);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.focus-view-run-item:hover {
+  border-color: var(--borderColor-emphasis);
+  box-shadow: 0 2px 8px var(--color-shadow-small);
+}
+
+.focus-view-run-status {
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.focus-view-run-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.focus-view-run-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.focus-view-run-workflow {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fgColor-default);
+}
+
+.focus-view-run-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.focus-view-run-branch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--fgColor-muted);
+}
+
+.focus-view-run-commit {
+  color: var(--fgColor-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.focus-view-run-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--fgColor-muted);
+}
+
+.focus-view-run-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}

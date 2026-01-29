@@ -357,6 +357,7 @@ function App() {
                   rateLimit={rateLimit}
                   rateLimitLoading={rateLimitLoading}
                   rateLimitError={rateLimitError}
+                  getActiveToken={auth.getActiveToken}
                 />
                 {showSettings && (
                   <Settings

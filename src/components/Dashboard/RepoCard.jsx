@@ -3,19 +3,24 @@ import {
   LinkExternalIcon,
   GitPullRequestIcon,
   NoEntryIcon,
-  PinIcon
+  PinIcon,
+  CheckCircleFillIcon,
+  XCircleFillIcon,
+  ClockIcon
 } from '@primer/octicons-react'
-import { Link, Label, CounterLabel, IconButton } from '@primer/react'
+import { Link, Label, CounterLabel, IconButton, Spinner } from '@primer/react'
 import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../../utils/statusHelpers.jsx'
 import { useState, useEffect, useRef } from 'react'
 import './RepoCard.css'
 
-export function RepoCard({ repoName, status, onTogglePin, isPinned }) {
+export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, isExpanded, onToggleExpand, getActiveToken }) {
   const labelColor = getLabelColor(status.category)
   const hasPRs = status.openPRCount > 0
   const topics = status.topics || []
   const [isFlashing, setIsFlashing] = useState(false)
   const prevStatusRef = useRef(null)
+  const [runs, setRuns] = useState([])
+  const [loadingRuns, setLoadingRuns] = useState(false)
   
   // Construct PR URL from repository URL
   const repoUrl = status.url ? status.url.split('/actions/')[0] : null
@@ -34,8 +39,54 @@ export function RepoCard({ repoName, status, onTogglePin, isPinned }) {
     prevStatusRef.current = currentStatus
   }, [status.status, status.conclusion])
 
+  useEffect(() => {
+    if (isExpanded && runs.length === 0) {
+      const fetchRuns = async () => {
+        setLoadingRuns(true)
+        try {
+          const token = getActiveToken()
+          const headers = token ? { 'Authorization': `token ${token}` } : {}
+          const response = await fetch(
+            `https://api.github.com/repos/${repoOwner}/${repoName}/actions/runs?per_page=5`,
+            { headers }
+          )
+          if (response.ok) {
+            const data = await response.json()
+            setRuns(data.workflow_runs || [])
+          }
+        } catch (err) {
+          console.error('Failed to fetch runs:', err)
+        } finally {
+          setLoadingRuns(false)
+        }
+      }
+      fetchRuns()
+    }
+  }, [isExpanded, repoName, repoOwner, getActiveToken, runs.length])
+
+  const getRunStatusIcon = (run) => {
+    if (run.status === 'completed') {
+      if (run.conclusion === 'success') return <CheckCircleFillIcon size={14} className="color-fg-success" />
+      if (run.conclusion === 'failure') return <XCircleFillIcon size={14} className="color-fg-danger" />
+    }
+    return <ClockIcon size={14} className="color-fg-attention" />
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now - date
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    
+    if (diffMins < 1) return 'just now'
+    if (diffMins < 60) return `${diffMins}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    return date.toLocaleDateString()
+  }
+
   return (
-    <div className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''}`}>
+    <div className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''} ${isExpanded ? 'expanded' : ''}`}>
       {hasPRs && prUrl && (
         <Link
           href={prUrl}
@@ -80,7 +131,7 @@ export function RepoCard({ repoName, status, onTogglePin, isPinned }) {
         </div>
       </div>
       
-      <div className="repo-card__body">
+      <div className="repo-card__body" onClick={onToggleExpand} style={{ cursor: 'pointer' }}>
         {status.error ? (
           <p className="repo-card__error">{status.error}</p>
         ) : status.status ? (
@@ -117,6 +168,49 @@ export function RepoCard({ repoName, status, onTogglePin, isPinned }) {
           </>
         )}
       </div>
+      
+      {isExpanded && (
+        <div className="repo-card__runs">
+          <div className="repo-card__runs-header">
+            <span className="repo-card__runs-title">Recent Runs</span>
+          </div>
+          {loadingRuns ? (
+            <div className="repo-card__runs-loading">
+              <Spinner size="small" />
+            </div>
+          ) : runs.length > 0 ? (
+            <div className="repo-card__runs-list">
+              {runs.map(run => (
+                <div key={run.id} className="repo-card__run-item">
+                  <div className="repo-card__run-status">
+                    {getRunStatusIcon(run)}
+                  </div>
+                  <div className="repo-card__run-info">
+                    <div className="repo-card__run-name">{run.name}</div>
+                    <div className="repo-card__run-meta">
+                      <span>#{run.run_number}</span>
+                      <span>•</span>
+                      <span>{formatDate(run.created_at)}</span>
+                    </div>
+                  </div>
+                  <Link
+                    href={run.html_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{ display: 'flex' }}
+                  >
+                    <LinkExternalIcon size={14} />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="repo-card__runs-empty">
+              No recent runs
+            </div>
+          )}
+        </div>
+      )}
       
       <div className="repo-card__footer">
         {status.url ? (

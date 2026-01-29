@@ -37,7 +37,8 @@ export function Dashboard({
   showRateLimit,
   rateLimit,
   rateLimitLoading,
-  rateLimitError
+  rateLimitError,
+  getActiveToken
 }) {
   // Collect all unique topics from all repositories
   const allTopics = [...new Set(
@@ -123,7 +124,11 @@ export function Dashboard({
             <div className="mb-2">Loading repository statuses...</div>
           </div>
         ) : (
-          <DashboardGrid repositories={sortedRepos} />
+          <DashboardGrid 
+            repositories={sortedRepos} 
+            getActiveToken={getActiveToken}
+            selectedRepos={selectedRepos}
+          />
         )}
         
         {isFullscreen && (
