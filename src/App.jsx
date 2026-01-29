@@ -149,7 +149,7 @@ function App() {
   
   // Convert selectedRepos to REPOSITORIES format for hook - memoized to prevent re-renders
   const reposForHook = useMemo(() => 
-    ['common', 'modules', 'infra', 'services', 'utils', 'custom']
+    ['common', 'modules', 'infra', 'services', 'utils', 'custom', 'demo']
       .reduce((acc, category) => ({
         ...acc,
         [category]: selectedRepos.filter(r => r.category === category)

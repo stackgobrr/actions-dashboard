@@ -122,6 +122,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       ...repositories.services.map(r => ({ ...r, category: 'services' })),
       ...repositories.utils.map(r => ({ ...r, category: 'utils' })),
       ...repositories.custom.map(r => ({ ...r, category: 'custom' })),
+      ...repositories.demo.map(r => ({ ...r, category: 'demo' })),
     ]
 
     // Fetch all repos in parallel for much faster loading
@@ -165,6 +166,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
         ...repositories.services.map(r => r.name),
         ...repositories.utils.map(r => r.name),
         ...repositories.custom.map(r => r.name),
+        ...repositories.demo.map(r => r.name),
       ]
       
       // Filter MOCK_REPO_STATUSES to only include selected repos
