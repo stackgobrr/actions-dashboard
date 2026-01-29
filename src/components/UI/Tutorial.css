@@ -1,0 +1,116 @@
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+.tutorial-highlight {
+  border: 3px solid var(--color-accent-emphasis);
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  animation: tutorialPulse 2s ease-in-out infinite;
+}
+
+@keyframes tutorialPulse {
+  0%, 100% {
+    border-color: var(--color-accent-emphasis);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    border-color: var(--color-accent-fg);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+  }
+}
+
+.tutorial-tooltip {
+  background: var(--bgColor-default);
+  border: 1px solid var(--borderColor-default);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  min-width: 320px;
+  overflow: hidden;
+}
+
+.tutorial-tooltip__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 0 16px;
+}
+
+.tutorial-tooltip__progress {
+  flex: 1;
+  height: 3px;
+  background: var(--borderColor-default);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-right: 12px;
+}
+
+.tutorial-tooltip__progress-bar {
+  height: 100%;
+  background: var(--color-accent-emphasis);
+  transition: width 0.3s ease;
+}
+
+.tutorial-tooltip__body {
+  padding: 20px 24px;
+}
+
+.tutorial-tooltip__title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fgColor-default);
+}
+
+.tutorial-tooltip__description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--fgColor-muted);
+}
+
+.tutorial-tooltip__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-top: 1px solid var(--borderColor-default);
+  background: var(--bgColor-muted);
+}
+
+.tutorial-tooltip__counter {
+  font-size: 12px;
+  color: var(--fgColor-muted);
+  font-weight: 500;
+}
+
+.tutorial-tooltip__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Ensure tooltip is always visible */
+.tutorial-tooltip {
+  pointer-events: auto;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .tutorial-overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .tutorial-tooltip {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+}
