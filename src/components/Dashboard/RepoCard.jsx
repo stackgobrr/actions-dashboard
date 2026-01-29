@@ -16,6 +16,10 @@ export function RepoCard({ repoName, status }) {
   const [isFlashing, setIsFlashing] = useState(false)
   const prevStatusRef = useRef(null)
   
+  // Construct PR URL from repository URL
+  const repoUrl = status.url ? status.url.split('/actions/')[0] : null
+  const prUrl = repoUrl ? `${repoUrl}/pulls` : null
+  
   useEffect(() => {
     const currentStatus = getStatusClass(status)
     const prevStatus = prevStatusRef.current
@@ -31,7 +35,22 @@ export function RepoCard({ repoName, status }) {
 
   return (
     <div className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''}`}>
-      {hasPRs && (
+      {hasPRs && prUrl && (
+        <Link
+          href={prUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="repo-card__pr-badge"
+          sx={{ textDecoration: 'none', color: 'inherit' }}
+          aria-label={`View ${status.openPRCount} open pull request${status.openPRCount > 1 ? 's' : ''}`}
+        >
+          <CounterLabel>
+            <GitPullRequestIcon size={12} />
+            {status.openPRCount}
+          </CounterLabel>
+        </Link>
+      )}
+      {hasPRs && !prUrl && (
         <div className="repo-card__pr-badge">
           <CounterLabel>
             <GitPullRequestIcon size={12} />
