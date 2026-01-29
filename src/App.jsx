@@ -140,8 +140,7 @@ function App() {
   const { rateLimit, loading: rateLimitLoading, error: rateLimitError } = useRateLimit(
     auth.getActiveToken,
     auth.authMethod,
-    showRateLimit,
-    lastUpdate
+    showRateLimit
   )
 
   const handleSaveRepos = (repos) => {
