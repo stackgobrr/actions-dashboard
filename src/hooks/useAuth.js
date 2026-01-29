@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   isGitHubAppConfigured,
   getGitHubAppToken,
@@ -61,12 +61,12 @@ export function useAuth() {
    * Gets the currently active authentication token
    * @returns {string|null} The active token (PAT, OAuth, or GitHub App token) or null if none exists
    */
-  const getActiveToken = () => {
+  const getActiveToken = useCallback(() => {
     if (authMethod === 'github-app') {
       return getGitHubAppToken()
     }
     return githubToken
-  }
+  }, [authMethod, githubToken])
 
   /**
    * Validates and saves a Personal Access Token
