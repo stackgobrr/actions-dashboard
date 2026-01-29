@@ -42,16 +42,19 @@ function App() {
   const [filterByOwners, setFilterByOwners] = useState([])
   const [hasInitialAuth, setHasInitialAuth] = useState(hasAuth()) // Track if we had auth on mount
   const [selectedRepos, setSelectedRepos] = useState(() => {
-    // Load from localStorage or use default
-    const saved = localStorage.getItem('selectedRepos')
+    // Check if we're starting in demo mode
+    const authMethod = localStorage.getItem('auth_method')
+    const demoMode = localStorage.getItem('demo_mode')
+    const isDemo = authMethod === 'demo' || demoMode === 'true'
+    
+    // Use different storage keys for demo vs real repos
+    const storageKey = isDemo ? 'demoRepos' : 'selectedRepos'
+    const saved = localStorage.getItem(storageKey)
     if (saved) {
       return JSON.parse(saved)
     }
     
-    // Check if we're starting in demo mode
-    const authMethod = localStorage.getItem('auth_method')
-    const demoMode = localStorage.getItem('demo_mode')
-    if (authMethod === 'demo' || demoMode === 'true') {
+    if (isDemo) {
       // Initialize with all demo repositories
       return Object.keys(MOCK_REPO_STATUSES).map(repoName => ({
         name: repoName,
@@ -106,17 +109,41 @@ function App() {
     }
   }, [auth.authMethod, auth.showAuthSetup])
   
-  // Initialize demo repos when switching to demo mode (if no repos saved)
+  // Clear and reinitialize repos when switching auth methods to prevent mixing demo/real repos
   useEffect(() => {
-    if (auth.authMethod === 'demo' && !localStorage.getItem('selectedRepos')) {
-      const demoRepos = Object.keys(MOCK_REPO_STATUSES).map(repoName => ({
-        name: repoName,
-        owner: 'demo',
-        description: MOCK_REPO_STATUSES[repoName].description || '',
-        category: MOCK_REPO_STATUSES[repoName].category || 'demo'
-      }))
-      setSelectedRepos(demoRepos)
-      localStorage.setItem('selectedRepos', JSON.stringify(demoRepos))
+    if (auth.authMethod === 'demo') {
+      // Switching to demo mode - load demo repos from demoRepos storage
+      const savedDemoRepos = localStorage.getItem('demoRepos')
+      if (savedDemoRepos) {
+        setSelectedRepos(JSON.parse(savedDemoRepos))
+      } else {
+        // Initialize with all demo repositories
+        const demoRepos = Object.keys(MOCK_REPO_STATUSES).map(repoName => ({
+          name: repoName,
+          owner: 'demo',
+          description: MOCK_REPO_STATUSES[repoName].description || '',
+          category: MOCK_REPO_STATUSES[repoName].category || 'demo'
+        }))
+        setSelectedRepos(demoRepos)
+        localStorage.setItem('demoRepos', JSON.stringify(demoRepos))
+      }
+    } else if (auth.authMethod !== 'none' && auth.authMethod !== 'demo') {
+      // Switching to authenticated mode (PAT or GitHub App) - load from selectedRepos storage
+      const savedRepos = localStorage.getItem('selectedRepos')
+      if (savedRepos) {
+        setSelectedRepos(JSON.parse(savedRepos))
+      } else {
+        // Load default real repositories
+        const defaultRepos = [
+          ...REPOSITORIES.common.map(r => ({ ...r, category: 'common' })),
+          ...REPOSITORIES.modules.map(r => ({ ...r, category: 'modules' })),
+          ...REPOSITORIES.infra.map(r => ({ ...r, category: 'infra' })),
+          ...REPOSITORIES.services.map(r => ({ ...r, category: 'services' })),
+          ...REPOSITORIES.utils.map(r => ({ ...r, category: 'utils' }))
+        ]
+        setSelectedRepos(defaultRepos)
+        localStorage.setItem('selectedRepos', JSON.stringify(defaultRepos))
+      }
     }
   }, [auth.authMethod])
   
@@ -146,7 +173,9 @@ function App() {
 
   const handleSaveRepos = (repos) => {
     setSelectedRepos(repos)
-    localStorage.setItem('selectedRepos', JSON.stringify(repos))
+    // Save to appropriate storage key based on auth method
+    const storageKey = auth.authMethod === 'demo' ? 'demoRepos' : 'selectedRepos'
+    localStorage.setItem(storageKey, JSON.stringify(repos))
   }
 
   const handleGetStarted = () => {
