@@ -2,14 +2,15 @@ import {
   GitBranchIcon,
   LinkExternalIcon,
   GitPullRequestIcon,
-  NoEntryIcon
+  NoEntryIcon,
+  PinIcon
 } from '@primer/octicons-react'
-import { Link, Label, CounterLabel } from '@primer/react'
+import { Link, Label, CounterLabel, IconButton } from '@primer/react'
 import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../../utils/statusHelpers.jsx'
 import { useState, useEffect, useRef } from 'react'
 import './RepoCard.css'
 
-export function RepoCard({ repoName, status }) {
+export function RepoCard({ repoName, status, onTogglePin, isPinned }) {
   const labelColor = getLabelColor(status.category)
   const hasPRs = status.openPRCount > 0
   const topics = status.topics || []
@@ -34,7 +35,7 @@ export function RepoCard({ repoName, status }) {
   }, [status.status, status.conclusion])
 
   return (
-    <div className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''}`}>
+    <div className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''}`}>
       {hasPRs && prUrl && (
         <Link
           href={prUrl}
@@ -65,7 +66,18 @@ export function RepoCard({ repoName, status }) {
             <p className="repo-card__description">{status.description}</p>
           )}
         </div>
-        <div className="repo-card__status-icon">{getStatusIcon(status)}</div>
+        <div className="repo-card__header-actions">
+          <IconButton
+            icon={PinIcon}
+            size="small"
+            variant="invisible"
+            onClick={() => onTogglePin(repoName)}
+            aria-label={isPinned ? 'Unpin repository' : 'Pin repository'}
+            className={isPinned ? 'pinned' : ''}
+            sx={{ color: isPinned ? 'var(--color-accent-fg)' : 'inherit' }}
+          />
+          <div className="repo-card__status-icon">{getStatusIcon(status)}</div>
+        </div>
       </div>
       
       <div className="repo-card__body">

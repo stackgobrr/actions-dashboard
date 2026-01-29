@@ -9,15 +9,15 @@ export default defineConfig(({ mode }) => ({
       transformIndexHtml(html) {
         const plausibleDomain = process.env.VITE_PLAUSIBLE_DOMAIN
         
-        // Only inject Plausible if domain is configured
-        if (plausibleDomain) {
+        // Only inject Plausible in production mode and if domain is configured
+        if (mode === 'production' && plausibleDomain) {
           return html.replace(
             '%VITE_PLAUSIBLE_SCRIPT%',
             `<script defer data-domain="${plausibleDomain}" src="https://plausible.io/js/script.hash.js"></script>`
           )
         }
         
-        // Remove placeholder if no domain configured
+        // Remove placeholder in development or if no domain configured
         return html.replace('%VITE_PLAUSIBLE_SCRIPT%', '')
       }
     }
