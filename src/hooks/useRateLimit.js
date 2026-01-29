@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 /**
  * Custom hook to fetch and monitor GitHub API rate limit
@@ -8,6 +8,7 @@ export function useRateLimit(getActiveToken, authMethod, enabled = false) {
   const [rateLimit, setRateLimit] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const hasLoadedRef = useRef(false)
 
   const fetchRateLimit = useCallback(async () => {
     if (!enabled || authMethod === 'demo' || authMethod === 'none') {
@@ -15,7 +16,7 @@ export function useRateLimit(getActiveToken, authMethod, enabled = false) {
     }
 
     // Only show loading on initial fetch (when we don't have data yet)
-    if (!rateLimit) {
+    if (!hasLoadedRef.current) {
       setLoading(true)
     }
     setError(null)
@@ -39,14 +40,15 @@ export function useRateLimit(getActiveToken, authMethod, enabled = false) {
 
       const data = await response.json()
       setRateLimit(data.rate)
+      hasLoadedRef.current = true
     } catch (err) {
       setError(err.message)
     } finally {
-      if (!rateLimit) {
+      if (!hasLoadedRef.current) {
         setLoading(false)
       }
     }
-  }, [getActiveToken, authMethod, enabled, rateLimit])
+  }, [getActiveToken, authMethod, enabled])
 
   useEffect(() => {
     if (enabled) {

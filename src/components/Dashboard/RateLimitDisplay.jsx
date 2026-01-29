@@ -59,7 +59,7 @@ export function RateLimitDisplay({ rateLimit, loading, error }) {
     <div className={`d-flex flex-items-center f6 ${isLow ? 'color-fg-danger' : 'color-fg-muted'}`}>
       {isLow && <AlertIcon size={16} style={{ marginRight: '4px' }} />}
       <span>
-        GitHub API: {rateLimit.remaining}/{rateLimit.limit} • resets in {timeRemaining}
+        API Rate Limit: {rateLimit.remaining}/{rateLimit.limit} • resets in {timeRemaining}
       </span>
     </div>
   )
