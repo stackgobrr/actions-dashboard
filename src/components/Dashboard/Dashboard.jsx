@@ -27,6 +27,9 @@ export function Dashboard({
   onOpenSettings,
   filterByLabels,
   setFilterByLabels,
+  filterByOwners,
+  setFilterByOwners,
+  selectedRepos,
   isDemoMode,
   toggleDemoMode,
   canToggleDemoMode,
@@ -42,14 +45,38 @@ export function Dashboard({
       .flatMap(status => status.topics || [])
   )].sort()
   
-  // Filter repositories by labels (topics) first, then sort
-  const filteredRepos = filterByLabels.length > 0
-    ? Object.fromEntries(
-        Object.entries(repoStatuses).filter(([_, status]) => 
-          status.topics && status.topics.some(topic => filterByLabels.includes(topic))
-        )
+  // Extract all unique owners from repo statuses
+  const allOwners = [...new Set(
+    Object.entries(repoStatuses)
+      .map(([repoName, _]) => {
+        // Find the owner from selectedRepos
+        const repo = selectedRepos?.find(r => r.name === repoName)
+        return repo?.owner
+      })
+      .filter(Boolean)
+  )].sort()
+  
+  // Filter repositories by labels (topics) and owners, then sort
+  let filteredRepos = repoStatuses
+  
+  // Apply label filter
+  if (filterByLabels.length > 0) {
+    filteredRepos = Object.fromEntries(
+      Object.entries(filteredRepos).filter(([_, status]) => 
+        status.topics && status.topics.some(topic => filterByLabels.includes(topic))
       )
-    : repoStatuses
+    )
+  }
+  
+  // Apply owner filter
+  if (filterByOwners.length > 0) {
+    filteredRepos = Object.fromEntries(
+      Object.entries(filteredRepos).filter(([repoName, _]) => {
+        const repo = selectedRepos?.find(r => r.name === repoName)
+        return repo && filterByOwners.includes(repo.owner)
+      })
+    )
+  }
   
   const sortedRepos = sortRepositories(filteredRepos, sortBy)
 
@@ -76,7 +103,10 @@ export function Dashboard({
             onOpenSettings={onOpenSettings}
             filterByLabels={filterByLabels}
             setFilterByLabels={setFilterByLabels}
+            filterByOwners={filterByOwners}
+            setFilterByOwners={setFilterByOwners}
             allTopics={allTopics}
+            allOwners={allOwners}
             isDemoMode={isDemoMode}
             toggleDemoMode={toggleDemoMode}
             canToggleDemoMode={canToggleDemoMode}

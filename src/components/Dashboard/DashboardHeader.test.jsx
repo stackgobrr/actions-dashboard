@@ -25,7 +25,18 @@ describe('DashboardHeader Component', () => {
     onOpenSettings: vi.fn(),
     filterByLabels: [],
     setFilterByLabels: vi.fn(),
-    allTopics: []
+    filterByOwners: [],
+    setFilterByOwners: vi.fn(),
+    allTopics: [],
+    allOwners: [],
+    isDemoMode: false,
+    toggleDemoMode: vi.fn(),
+    canToggleDemoMode: false,
+    onToggleHotkeyHelper: vi.fn(),
+    showRateLimit: false,
+    rateLimit: null,
+    rateLimitLoading: false,
+    rateLimitError: null
   }
 
   describe('Basic Rendering', () => {

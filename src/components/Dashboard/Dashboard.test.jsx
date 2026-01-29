@@ -22,7 +22,18 @@ describe('Dashboard Component - Critical Functionality', () => {
     setAutoRefresh: vi.fn(),
     onOpenSettings: vi.fn(),
     filterByLabels: [],
-    setFilterByLabels: vi.fn()
+    setFilterByLabels: vi.fn(),
+    filterByOwners: [],
+    setFilterByOwners: vi.fn(),
+    selectedRepos: [],
+    isDemoMode: false,
+    toggleDemoMode: vi.fn(),
+    canToggleDemoMode: false,
+    onToggleHotkeyHelper: vi.fn(),
+    showRateLimit: false,
+    rateLimit: null,
+    rateLimitLoading: false,
+    rateLimitError: null
   }
 
   describe('Repository Display', () => {

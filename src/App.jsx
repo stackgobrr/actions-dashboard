@@ -39,6 +39,7 @@ function App() {
   const [showHotkeyHelper, setShowHotkeyHelper] = useState(false)
   const [showRateLimit, setShowRateLimit] = useState(false)
   const [filterByLabels, setFilterByLabels] = useState([])
+  const [filterByOwners, setFilterByOwners] = useState([])
   const [hasInitialAuth, setHasInitialAuth] = useState(hasAuth()) // Track if we had auth on mount
   const [selectedRepos, setSelectedRepos] = useState(() => {
     // Load from localStorage or use default
@@ -316,6 +317,9 @@ function App() {
                   onOpenSettings={() => setShowSettings(true)}
                   filterByLabels={filterByLabels}
                   setFilterByLabels={setFilterByLabels}
+                  filterByOwners={filterByOwners}
+                  setFilterByOwners={setFilterByOwners}
+                  selectedRepos={selectedRepos}
                   isDemoMode={isDemoMode}
                   toggleDemoMode={toggleDemoMode}
                   canToggleDemoMode={canToggleDemoMode}

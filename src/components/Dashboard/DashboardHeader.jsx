@@ -40,7 +40,10 @@ export function DashboardHeader({
   onOpenSettings,
   filterByLabels,
   setFilterByLabels,
+  filterByOwners,
+  setFilterByOwners,
   allTopics,
+  allOwners,
   isDemoMode,
   toggleDemoMode,
   canToggleDemoMode,
@@ -72,13 +75,33 @@ export function DashboardHeader({
       })
     }
   }
-  
+
+  const toggleOwnerFilter = (ownerName) => {
+    if (filterByOwners.includes(ownerName)) {
+      setFilterByOwners(filterByOwners.filter(o => o !== ownerName))
+      trackEvent('Filter Changed', { 
+        filterType: 'owner',
+        action: 'removed',
+        value: ownerName
+      })
+    } else {
+      setFilterByOwners([...filterByOwners, ownerName])
+      trackEvent('Filter Changed', { 
+        filterType: 'owner',
+        action: 'added',
+        value: ownerName
+      })
+    }
+  }
+
   const clearLabelFilters = () => {
-    trackEvent('Filter Changed', { 
-      filterType: 'topic',
-      action: 'cleared'
-    })
     setFilterByLabels([])
+    trackEvent('Filter Cleared', { filterType: 'topics' })
+  }
+
+  const clearOwnerFilters = () => {
+    setFilterByOwners([])
+    trackEvent('Filter Cleared', { filterType: 'owners' })
   }
 
   return (
@@ -282,6 +305,48 @@ export function DashboardHeader({
                     <ActionList.Divider />
                     <ActionList>
                       <ActionList.Item onSelect={clearLabelFilters}>
+                        <ActionList.LeadingVisual>
+                          <XIcon />
+                        </ActionList.LeadingVisual>
+                        Clear all filters
+                      </ActionList.Item>
+                    </ActionList>
+                  </>
+                )}
+              </ActionMenu.Overlay>
+            </ActionMenu>
+        )}
+        
+        {allOwners && allOwners.length > 0 && (
+          <ActionMenu>
+            <ActionMenu.Anchor>
+              <Button 
+                size="small" 
+                leadingVisual={RepoIcon} 
+                trailingAction={ChevronDownIcon}
+              >
+                {filterByOwners.length === 0 
+                  ? 'Select owners...' 
+                  : `${filterByOwners.length} selected`}
+              </Button>
+            </ActionMenu.Anchor>
+              <ActionMenu.Overlay width="auto">
+                <ActionList selectionVariant="multiple">
+                  {allOwners.map(owner => (
+                    <ActionList.Item
+                      key={owner}
+                      selected={filterByOwners.includes(owner)}
+                      onSelect={() => toggleOwnerFilter(owner)}
+                    >
+                      {owner}
+                    </ActionList.Item>
+                  ))}
+                </ActionList>
+                {filterByOwners.length > 0 && (
+                  <>
+                    <ActionList.Divider />
+                    <ActionList>
+                      <ActionList.Item onSelect={clearOwnerFilters}>
                         <ActionList.LeadingVisual>
                           <XIcon />
                         </ActionList.LeadingVisual>
