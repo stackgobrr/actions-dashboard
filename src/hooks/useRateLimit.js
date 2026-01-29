@@ -16,7 +16,8 @@ export function useRateLimit(getActiveToken, authMethod, enabled = false) {
     }
 
     // Only show loading on initial fetch (when we don't have data yet)
-    if (!hasLoadedRef.current) {
+    const isInitialLoad = !hasLoadedRef.current
+    if (isInitialLoad) {
       setLoading(true)
     }
     setError(null)
@@ -25,6 +26,9 @@ export function useRateLimit(getActiveToken, authMethod, enabled = false) {
       const token = await getActiveToken()
       if (!token) {
         setError('No token available')
+        if (isInitialLoad) {
+          setLoading(false)
+        }
         return
       }
 
@@ -44,7 +48,7 @@ export function useRateLimit(getActiveToken, authMethod, enabled = false) {
     } catch (err) {
       setError(err.message)
     } finally {
-      if (!hasLoadedRef.current) {
+      if (isInitialLoad) {
         setLoading(false)
       }
     }
