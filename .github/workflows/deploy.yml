@@ -21,14 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.env.outputs.environment }}
+      tfvars_env: ${{ steps.env.outputs.tfvars_env }}
     steps:
       - name: Set environment
         id: env
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             echo "environment=Production" >> "$GITHUB_OUTPUT"
+            echo "tfvars_env=prod" >> "$GITHUB_OUTPUT"
           else
             echo "environment=Development" >> "$GITHUB_OUTPUT"
+            echo "tfvars_env=dev" >> "$GITHUB_OUTPUT"
           fi
   test:
     name: Run Tests
@@ -84,7 +87,7 @@ jobs:
           cd infra
           terraform init \
           -backend-config="key=utils/actions-dashboard/${{ needs.setup.outputs.environment }}/terraform.tfstate"
-          terraform apply -auto-approve -var-file=env/${{ needs.setup.outputs.environment }}.tfvars \
+          terraform apply -auto-approve -var-file=env/${{ needs.setup.outputs.tfvars_env }}.tfvars \
             -target=aws_s3_bucket.lambda_artifacts \
             -target=aws_s3_bucket_versioning.lambda_artifacts \
             -target=aws_s3_bucket_lifecycle_configuration.lambda_artifacts
@@ -200,7 +203,7 @@ jobs:
           working-directory: 'infra'
           terraform-wrapper: 'false'
           auto-approve: 'true'
-          environment: ${{ needs.setup.outputs.environment }}
+          environment: ${{ needs.setup.outputs.tfvars_env }}
         env:
           TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
           TF_VAR_hosted_zone_id: ${{ vars.HOSTED_ZONE_ID }}
