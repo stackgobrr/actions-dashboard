@@ -1,7 +1,6 @@
 import { DashboardHeader } from './DashboardHeader'
 import { DashboardGrid } from './DashboardGrid'
 import { FullscreenToggle } from '../UI/FullscreenToggle'
-import { Tutorial } from '../UI/Tutorial'
 import { sortRepositories } from '../../utils/gridHelpers'
 import './Dashboard.css'
 
@@ -133,9 +132,6 @@ export function Dashboard({
           </div>
         )}
       </div>
-
-      {/* Tutorial overlay for demo mode */}
-      <Tutorial isDemoMode={isDemoMode} />
     </div>
   )
 }

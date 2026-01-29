@@ -4,15 +4,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.05);
   z-index: 10000;
-  backdrop-filter: blur(1px);
 }
 
 .tutorial-highlight {
   border: 3px solid var(--color-accent-emphasis);
   border-radius: 8px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.02);
   pointer-events: none;
   animation: tutorialPulse 2s ease-in-out infinite;
 }
@@ -20,11 +19,11 @@
 @keyframes tutorialPulse {
   0%, 100% {
     border-color: var(--color-accent-emphasis);
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.02);
   }
   50% {
     border-color: var(--color-accent-fg);
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.03);
   }
 }
 
@@ -104,6 +103,94 @@
   pointer-events: auto;
 }
 
+/* First action highlight - subtle pulsing glow */
+.tutorial-first-action-highlight {
+  position: relative;
+}
+
+.tutorial-first-action-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: 0 0 0 2px var(--color-accent-emphasis);
+  opacity: 0.6;
+  animation: subtlePulse 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tutorial-first-action-highlight > * {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px var(--color-accent-emphasis);
+    opacity: 0.6;
+  }
+  50% {
+    box-shadow: 0 0 8px 3px var(--color-accent-emphasis);
+    opacity: 0.8;
+  }
+}
+
+/* Small tooltip for first action */
+.tutorial-first-action-tooltip {
+  position: absolute;
+  bottom: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bgColor-default);
+  border: 1px solid var(--borderColor-default);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--fgColor-default);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  z-index: 10000;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.tutorial-first-action-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--borderColor-default);
+}
+
+.tutorial-first-action-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--bgColor-default);
+  z-index: 1;
+  margin-top: -1px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 /* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
   .tutorial-overlay {
@@ -112,5 +199,9 @@
   
   .tutorial-tooltip {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  
+  .tutorial-first-action-tooltip {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   }
 }
