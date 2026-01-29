@@ -163,7 +163,9 @@ jobs:
   deploy-infrastructure:
     name: Deploy Infrastructure
     needs: [test, setup, package-lambdas]
-    runs-on: ubuntu-latest    environment: ${{ needs.setup.outputs.environment }}    permissions:
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
+    permissions:
       id-token: write
       contents: read
     outputs:
