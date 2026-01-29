@@ -138,7 +138,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'api/${{ matrix.function }}/package.json'
+          cache-dependency-path: 'api/${{ matrix.function }}/package-lock.json'
 
       - name: Package Lambda function
         id: hash
