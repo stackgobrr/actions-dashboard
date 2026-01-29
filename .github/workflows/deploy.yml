@@ -86,7 +86,7 @@ jobs:
         run: |
           cd infra
           terraform init \
-          -backend-config="key=utils/actions-dashboard/${{ needs.setup.outputs.environment }}/terraform.tfstate"
+          -backend-config="key=utils/actions-dashboard/${{ needs.setup.outputs.tfvars_env }}/terraform.tfstate"
           terraform apply -auto-approve -var-file=env/${{ needs.setup.outputs.tfvars_env }}.tfvars \
             -target=aws_s3_bucket.lambda_artifacts \
             -target=aws_s3_bucket_versioning.lambda_artifacts \
