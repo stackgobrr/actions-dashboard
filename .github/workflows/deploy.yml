@@ -26,9 +26,9 @@ jobs:
         id: env
         run: |
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            echo "environment=prod" >> "$GITHUB_OUTPUT"
+            echo "environment=Production" >> "$GITHUB_OUTPUT"
           else
-            echo "environment=dev" >> "$GITHUB_OUTPUT"
+            echo "environment=Development" >> "$GITHUB_OUTPUT"
           fi
   test:
     name: Run Tests
@@ -48,6 +48,7 @@ jobs:
     name: Create Lambda Artifacts Bucket
     needs: [setup]
     runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
     permissions:
       id-token: write
       contents: read
@@ -162,8 +163,7 @@ jobs:
   deploy-infrastructure:
     name: Deploy Infrastructure
     needs: [test, setup, package-lambdas]
-    runs-on: ubuntu-latest
-    permissions:
+    runs-on: ubuntu-latest    environment: ${{ needs.setup.outputs.environment }}    permissions:
       id-token: write
       contents: read
     outputs:
@@ -271,8 +271,9 @@ jobs:
 
   deploy-frontend:
     name: Deploy Frontend
-    needs: [deploy-infrastructure, build]
+    needs: [setup, deploy-infrastructure, build]
     runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
     permissions:
       id-token: write
       contents: read
