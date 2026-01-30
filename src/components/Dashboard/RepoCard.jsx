@@ -86,7 +86,9 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
   }
 
   return (
-    <div className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''} ${isExpanded ? 'expanded' : ''}`}>
+    <div 
+      className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''} ${isExpanded ? 'expanded' : ''}`}
+    >
       {hasPRs && prUrl && (
         <Link
           href={prUrl}
@@ -111,7 +113,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
         </div>
       )}
       <div className="repo-card__header">
-        <div>
+        <div className="repo-card__title-wrapper">
           <h3 className="repo-card__title">{repoName}</h3>
           {status.description && (
             <p className="repo-card__description">{status.description}</p>
