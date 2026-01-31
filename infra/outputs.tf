@@ -33,12 +33,6 @@ output "route53_record_name" {
   value       = module.frontend.domain_name
 }
 
-# Lambda Artifact Bucket
-output "lambda_artifacts_bucket" {
-  description = "S3 bucket for Lambda deployment artifacts"
-  value       = aws_s3_bucket.lambda_artifacts.id
-}
-
 # OAuth Lambda Function URLs
 output "oauth_start_url" {
   description = "URL for OAuth start endpoint"
