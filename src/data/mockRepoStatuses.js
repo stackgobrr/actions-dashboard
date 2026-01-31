@@ -3,6 +3,158 @@
  * Showcases all card features and states
  */
 
+// Mock workflow runs data for expanded view testing
+const mockAuthors = ['Alice Chen', 'Bob Smith', 'Charlie Davis', 'Diana Miller', 'Ethan Brown'];
+
+export const MOCK_WORKFLOW_RUNS = {
+  'demo-pulse-animation': Array.from({ length: 30 }, (_, i) => ({
+    id: 1000 + i,
+    name: ['CI Pipeline', 'Build & Test', 'Deploy', 'Lint', 'Security Scan'][i % 5],
+    status: i === 0 ? 'in_progress' : 'completed',
+    conclusion: i === 0 ? null : i % 6 === 0 ? 'failure' : 'success',
+    run_number: 123 + i,
+    head_branch: i % 4 === 0 ? 'develop' : i % 4 === 1 ? 'feature/new-ui' : i % 4 === 2 ? 'hotfix/critical-bug' : 'main',
+    head_sha: `abc${i.toString().padStart(13, '0')}`,
+    head_commit: { 
+      message: `${['feat', 'fix', 'chore', 'test', 'docs', 'refactor', 'style', 'perf'][i % 8]}: ${[
+        'add new feature', 
+        'resolve bug in production', 
+        'update dependencies',
+        'add comprehensive test coverage',
+        'improve documentation',
+        'refactor legacy code',
+        'apply code formatting',
+        'optimize performance'
+      ][i % 8]}\n\nThis is a longer commit message with multiple lines\nto test how the UI handles more content`,
+      author: { name: mockAuthors[i % 5] }
+    },
+    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 3).toISOString(),
+    html_url: `https://github.com/demo/repo/actions/runs/${1000 + i}`
+  })),
+  'demo-success-with-prs': Array.from({ length: 35 }, (_, i) => ({
+    id: 2000 + i,
+    name: ['CI Pipeline', 'Deploy', 'Test Suite', 'Code Quality', 'Build', 'Integration Tests'][i % 6],
+    status: 'completed',
+    conclusion: i % 8 === 0 ? 'failure' : i % 8 === 1 ? 'cancelled' : 'success',
+    run_number: 234 + i,
+    head_branch: i % 5 === 0 ? 'main' : i % 5 === 1 ? 'develop' : i % 5 === 2 ? 'feature/analytics' : i % 5 === 3 ? 'feature/settings' : 'feature/dashboard-improvements',
+    head_sha: `fed${i.toString().padStart(13, '0')}`,
+    head_commit: { 
+      message: `${['feat', 'fix', 'chore', 'test', 'docs'][i % 5]}: ${[
+        'add new dashboard features with comprehensive analytics',
+        'fix critical bug affecting user experience', 
+        'update all dependencies to latest versions',
+        'add integration tests for all components',
+        'update API documentation with examples'
+      ][i % 5]}`,
+      author: { name: mockAuthors[i % 5] }
+    },
+    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 2).toISOString(),
+    html_url: `https://github.com/demo/repo/actions/runs/${2000 + i}`
+  })),
+  'demo-failure': Array.from({ length: 28 }, (_, i) => ({
+    id: 3000 + i,
+    name: ['Test Suite', 'Lint', 'Type Check', 'Unit Tests', 'E2E Tests'][i % 5],
+    status: 'completed',
+    conclusion: i % 3 === 0 ? 'failure' : 'success',
+    run_number: 156 + i,
+    head_branch: i % 3 === 0 ? 'feature/new-feature' : i % 3 === 1 ? 'feature/bug-fixes' : 'main',
+    head_sha: `987${i.toString().padStart(13, '0')}`,
+    head_commit: { 
+      message: `test: ${[
+        'add comprehensive test coverage for all edge cases',
+        'fix flaky tests in CI pipeline',
+        'improve test reliability and performance',
+        'add missing unit tests',
+        'update test fixtures and mocks'
+      ][i % 5]}`,
+      author: { name: mockAuthors[i % 5] }
+    },
+    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 4).toISOString(),
+    html_url: `https://github.com/demo/repo/actions/runs/${3000 + i}`
+  })),
+  'demo-in-progress': Array.from({ length: 25 }, (_, i) => ({
+    id: 4000 + i,
+    name: ['Deploy to Staging', 'Build', 'Test', 'Package', 'Publish'][i % 5],
+    status: i < 3 ? 'in_progress' : 'completed',
+    conclusion: i < 3 ? null : i % 7 === 0 ? 'failure' : 'success',
+    run_number: 67 + i,
+    head_branch: i % 2 === 0 ? 'develop' : 'release/v2.0',
+    head_sha: `stg${i.toString().padStart(13, '0')}`,
+    head_commit: { 
+      message: `${['deploy', 'build', 'release'][i % 3]}: ${[
+        'prepare version 2.0 release with new features',
+        'build artifacts for production deployment',
+        'create release candidate for testing'
+      ][i % 3]}`,
+      author: { name: mockAuthors[i % 5] }
+    },
+    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 5).toISOString(),
+    html_url: `https://github.com/demo/repo/actions/runs/${4000 + i}`
+  })),
+  'demo-many-topics': Array.from({ length: 40 }, (_, i) => ({
+    id: 5000 + i,
+    name: ['CI Pipeline', 'Build & Test', 'Deploy', 'Security Scan', 'Lint', 'Type Check', 'Code Coverage', 'Performance Tests'][i % 8],
+    status: 'completed',
+    conclusion: i % 7 === 0 ? 'failure' : i % 7 === 1 ? 'cancelled' : 'success',
+    run_number: 300 + i,
+    head_branch: i % 5 === 0 ? 'main' : i % 5 === 1 ? 'develop' : i % 5 === 2 ? `feature/feature-${i}` : i % 5 === 3 ? `bugfix/issue-${i}` : `hotfix/urgent-${i}`,
+    head_sha: `com${i.toString().padStart(13, '0')}`,
+    head_commit: { 
+      message: `${['feat', 'fix', 'chore', 'test', 'docs', 'refactor', 'style', 'perf', 'ci'][i % 9]}: ${[
+        'update components with new design system',
+        'fix bug in authentication flow', 
+        'refactor code for better maintainability',
+        'add tests for edge cases',
+        'update documentation with examples',
+        'optimize build process',
+        'apply linting rules',
+        'improve performance metrics',
+        'update CI/CD pipeline'
+      ][i % 9]}\n\nDetailed explanation of changes:\n- Change 1\n- Change 2\n- Change 3`,
+      author: { name: mockAuthors[i % 5] }
+    },
+    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 5).toISOString(),
+    html_url: `https://github.com/demo/repo/actions/runs/${5000 + i}`
+  })),
+  'demo-high-pr-count': Array.from({ length: 45 }, (_, i) => ({
+    id: 6000 + i,
+    name: ['PR Checks', 'CI', 'Build', 'Tests', 'Lint & Format', 'Code Review'][i % 6],
+    status: 'completed',
+    conclusion: i % 10 === 0 ? 'failure' : 'success',
+    run_number: 450 + i,
+    head_branch: `pr-${i + 1}`,
+    head_sha: `pr${i.toString().padStart(15, '0')}`,
+    head_commit: { 
+      message: `PR #${i + 1}: ${[
+        'various improvements and bug fixes',
+        'add new features and enhancements',
+        'refactor codebase for better performance',
+        'update dependencies and configuration',
+        'improve test coverage and reliability'
+      ][i % 5]}`,
+      author: { name: mockAuthors[i % 5] }
+    },
+    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 3).toISOString(),
+    html_url: `https://github.com/demo/repo/actions/runs/${6000 + i}`
+  })),
+  'demo-warning': Array.from({ length: 20 }, (_, i) => ({
+    id: 7000 + i,
+    name: ['Long Running Job', 'Nightly Build', 'Full Test Suite'][i % 3],
+    status: 'completed',
+    conclusion: i % 4 === 0 ? 'cancelled' : i % 4 === 1 ? 'timed_out' : 'success',
+    run_number: 126 + i,
+    head_branch: 'main',
+    head_sha: `wrn${i.toString().padStart(13, '0')}`,
+    head_commit: { 
+      message: 'chore: cleanup old workflows and optimize',
+      author: { name: mockAuthors[i % 5] }
+    },
+    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 10).toISOString(),
+    html_url: `https://github.com/demo/repo/actions/runs/${7000 + i}`
+  }))
+}
+
 export const MOCK_REPO_STATUSES = {
   // Animated demo card - status will cycle to show pulse animation
   'demo-pulse-animation': {

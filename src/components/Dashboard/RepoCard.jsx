@@ -10,10 +10,11 @@ import {
   WorkflowIcon,
   GitCommitIcon
 } from '@primer/octicons-react'
-import { Link, Label, CounterLabel, IconButton, Spinner, UnderlineNav } from '@primer/react'
+import { Link, Label, CounterLabel, IconButton, Spinner, UnderlineNav, ActionMenu, ActionList } from '@primer/react'
 import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../../utils/statusHelpers.jsx'
 import { trackEvent } from '../../utils/analytics'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { MOCK_WORKFLOW_RUNS } from '../../data/mockRepoStatuses'
 import './RepoCard.css'
 
 export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, isExpanded, onToggleExpand, getActiveToken, isDemoMode }) {
@@ -25,6 +26,8 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
   const [runs, setRuns] = useState([])
   const [loadingRuns, setLoadingRuns] = useState(false)
   const [activeTab, setActiveTab] = useState('workflows')
+  const [selectedBranch, setSelectedBranch] = useState('all')
+  const [selectedWorkflow, setSelectedWorkflow] = useState('all')
   
   // Construct PR URL from repository URL
   const repoUrl = status.url ? status.url.split('/actions/')[0] : null
@@ -48,15 +51,24 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       const fetchRuns = async () => {
         setLoadingRuns(true)
         try {
-          const token = getActiveToken()
-          const headers = token ? { 'Authorization': `token ${token}` } : {}
-          const response = await fetch(
-            `https://api.github.com/repos/${repoOwner}/${repoName}/actions/runs?per_page=30`,
-            { headers }
-          )
-          if (response.ok) {
-            const data = await response.json()
-            setRuns(data.workflow_runs || [])
+          // In demo mode, use mock data
+          if (isDemoMode) {
+            // Simulate loading delay
+            await new Promise(resolve => setTimeout(resolve, 500))
+            // Use just the repo name as the key for mock data
+            const mockRuns = MOCK_WORKFLOW_RUNS[repoName] || []
+            setRuns(mockRuns)
+          } else {
+            const token = getActiveToken()
+            const headers = token ? { 'Authorization': `token ${token}` } : {}
+            const response = await fetch(
+              `https://api.github.com/repos/${repoOwner}/${repoName}/actions/runs?per_page=30`,
+              { headers }
+            )
+            if (response.ok) {
+              const data = await response.json()
+              setRuns(data.workflow_runs || [])
+            }
           }
         } catch (err) {
           console.error('Failed to fetch runs:', err)
@@ -66,7 +78,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       }
       fetchRuns()
     }
-  }, [isExpanded, repoName, repoOwner, getActiveToken, runs.length])
+  }, [isExpanded, repoName, repoOwner, getActiveToken, runs.length, isDemoMode])
 
   const getRunStatusIcon = (run) => {
     if (run.status === 'completed') {
@@ -88,6 +100,30 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
     if (diffHours < 24) return `${diffHours}h ago`
     return date.toLocaleDateString()
   }
+
+  // Extract unique branches from runs
+  const availableBranches = useMemo(() => {
+    const branches = [...new Set(runs.map(run => run.head_branch).filter(Boolean))].sort()
+    return branches
+  }, [runs])
+
+  // Extract unique workflows from runs
+  const availableWorkflows = useMemo(() => {
+    const workflows = [...new Set(runs.map(run => run.name).filter(Boolean))].sort()
+    return workflows
+  }, [runs])
+
+  // Filter runs by selected branch and workflow
+  const filteredRuns = useMemo(() => {
+    let filtered = runs
+    if (selectedBranch !== 'all') {
+      filtered = filtered.filter(run => run.head_branch === selectedBranch)
+    }
+    if (selectedWorkflow !== 'all') {
+      filtered = filtered.filter(run => run.name === selectedWorkflow)
+    }
+    return filtered
+  }, [runs, selectedBranch, selectedWorkflow])
 
   return (
     <div 
@@ -143,7 +179,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
           if (isDemoMode) {
             trackEvent('Demo Interaction', { 
               action: isExpanded ? 'collapsed_repo' : 'expanded_repo',
-              repo: repoName 
+              label: status.repoName || 'Unknown'
             })
           }
         }}
@@ -155,13 +191,85 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
           <>
             <div className="repo-card__row">
               <span className="repo-card__label-text">Workflow</span>
-              <span className="repo-card__value repo-card__value--bold">{status.workflow || 'N/A'}</span>
+              {isExpanded && availableWorkflows.length > 0 ? (
+                <div onClick={(e) => e.stopPropagation()} style={{ marginLeft: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
+                  <ActionMenu>
+                    <ActionMenu.Button 
+                      size="small" 
+                      variant="invisible"
+                      sx={{ fontSize: '12px', fontWeight: 'normal', padding: '2px 6px' }}
+                    >
+                      <WorkflowIcon size={11} style={{ marginRight: '4px' }} />
+                      {selectedWorkflow === 'all' ? 'All workflows' : selectedWorkflow}
+                    </ActionMenu.Button>
+                    <ActionMenu.Overlay width="medium">
+                      <ActionList>
+                        <ActionList.Item
+                          selected={selectedWorkflow === 'all'}
+                          onSelect={() => setSelectedWorkflow('all')}
+                        >
+                          All workflows
+                        </ActionList.Item>
+                        <ActionList.Divider />
+                        {availableWorkflows.map(workflow => (
+                          <ActionList.Item
+                            key={workflow}
+                            selected={selectedWorkflow === workflow}
+                            onSelect={() => setSelectedWorkflow(workflow)}
+                          >
+                            <WorkflowIcon size={12} style={{ marginRight: '4px' }} />
+                            {workflow}
+                          </ActionList.Item>
+                        ))}
+                      </ActionList>
+                    </ActionMenu.Overlay>
+                  </ActionMenu>
+                </div>
+              ) : (
+                <span className="repo-card__value repo-card__value--bold">{status.workflow || 'N/A'}</span>
+              )}
             </div>
             <div className="repo-card__row">
               <span className="repo-card__label-text">Branch</span>
-              <span className="repo-card__value">
-                <GitBranchIcon size={11} /> {status.branch || 'N/A'}
-              </span>
+              {isExpanded && availableBranches.length > 0 ? (
+                <div onClick={(e) => e.stopPropagation()} style={{ marginLeft: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
+                  <ActionMenu>
+                    <ActionMenu.Button 
+                      size="small" 
+                      variant="invisible"
+                      sx={{ fontSize: '12px', fontWeight: 'normal', padding: '2px 6px' }}
+                    >
+                      <GitBranchIcon size={11} style={{ marginRight: '4px' }} />
+                      {selectedBranch === 'all' ? 'All branches' : selectedBranch}
+                    </ActionMenu.Button>
+                    <ActionMenu.Overlay width="medium">
+                      <ActionList>
+                        <ActionList.Item
+                          selected={selectedBranch === 'all'}
+                          onSelect={() => setSelectedBranch('all')}
+                        >
+                          All branches
+                        </ActionList.Item>
+                        <ActionList.Divider />
+                        {availableBranches.map(branch => (
+                          <ActionList.Item
+                            key={branch}
+                            selected={selectedBranch === branch}
+                            onSelect={() => setSelectedBranch(branch)}
+                          >
+                            <GitBranchIcon size={12} style={{ marginRight: '4px' }} />
+                            {branch}
+                          </ActionList.Item>
+                        ))}
+                      </ActionList>
+                    </ActionMenu.Overlay>
+                  </ActionMenu>
+                </div>
+              ) : (
+                <span className="repo-card__value">
+                  <GitBranchIcon size={11} /> {status.branch || 'N/A'}
+                </span>
+              )}
             </div>
             <div className="repo-card__row">
               <span className="repo-card__label-text">Commit</span>
@@ -188,20 +296,21 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       
       {isExpanded && (
         <div className="repo-card__runs">
-          <UnderlineNav aria-label="View options" className="repo-card__tabs" sx={{ marginBottom: 2, borderBottomWidth: '1px' }}>
-            <UnderlineNav.Item
-              aria-current={activeTab === 'workflows' ? 'page' : undefined}
-              onSelect={() => {
-                setActiveTab('workflows')
-                if (isDemoMode) {
-                  trackEvent('Demo Interaction', { 
+          <div className="repo-card__runs-header">
+            <UnderlineNav aria-label="View options" className="repo-card__tabs" sx={{ marginBottom: 2, borderBottomWidth: '1px', display: 'flex', width: '100%' }}>
+              <UnderlineNav.Item
+                aria-current={activeTab === 'workflows' ? 'page' : undefined}
+                onSelect={() => {
+                  setActiveTab('workflows')
+                  if (isDemoMode) {
+                    trackEvent('Demo Interaction', { 
                     action: 'tab_changed',
                     tab: 'workflows',
                     repo: repoName 
                   })
                 }
               }}
-              sx={{ padding: '6px 10px', gap: 2 }}
+              sx={{ padding: '6px 10px', gap: 2, flex: 1, justifyContent: 'center' }}
             >
               <WorkflowIcon size={12} style={{ marginRight: '6px', opacity: 0.6 }} />
               Workflows
@@ -218,135 +327,76 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
                   })
                 }
               }}
-              sx={{ padding: '6px 10px', gap: 2 }}
+              sx={{ padding: '6px 10px', gap: 2, flex: 1, justifyContent: 'center' }}
             >
               <GitCommitIcon size={12} style={{ marginRight: '6px', opacity: 0.6 }} />
               Commits
             </UnderlineNav.Item>
-            <UnderlineNav.Item
-              aria-current={activeTab === 'branches' ? 'page' : undefined}
-              onSelect={() => {
-                setActiveTab('branches')
-                if (isDemoMode) {
-                  trackEvent('Demo Interaction', { 
-                    action: 'tab_changed',
-                    tab: 'branches',
-                    repo: repoName 
-                  })
-                }
-              }}
-              sx={{ padding: '6px 10px', gap: 2 }}
-            >
-              <GitBranchIcon size={12} style={{ marginRight: '6px', opacity: 0.6 }} />
-              Branches
-            </UnderlineNav.Item>
           </UnderlineNav>
+          </div>
 
           {loadingRuns ? (
             <div className="repo-card__runs-loading">
               <Spinner size="small" />
             </div>
-          ) : runs.length > 0 ? (
+          ) : filteredRuns.length > 0 ? (
             <div className="repo-card__runs-content">
-              {activeTab === 'workflows' && (() => {
-                const grouped = runs.reduce((acc, run) => {
-                  const workflow = run.name || 'Unknown'
-                  if (!acc[workflow]) acc[workflow] = []
-                  acc[workflow].push(run)
-                  return acc
-                }, {})
-                return Object.entries(grouped).map(([workflow, workflowRuns]) => (
-                  <div key={workflow} className="repo-card__run-group">
-                    <div className="repo-card__run-group-title">
-                      <WorkflowIcon size={12} />
-                      {workflow}
-                      <span className="repo-card__run-group-count">{workflowRuns.length}</span>
-                    </div>
-                    {workflowRuns.slice(0, 3).map(run => (
-                      <div key={run.id} className="repo-card__run-item">
-                        <div className="repo-card__run-status">{getRunStatusIcon(run)}</div>
-                        <div className="repo-card__run-info">
-                          <div className="repo-card__run-meta">
-                            <span>#{run.run_number}</span>
-                            <span>•</span>
-                            <span>{formatDate(run.created_at)}</span>
-                          </div>
-                        </div>
-                        <Link href={run.html_url} target="_blank" rel="noopener noreferrer" sx={{ display: 'flex' }}>
-                          <LinkExternalIcon size={14} />
-                        </Link>
-                      </div>
-                    ))}
+              {activeTab === 'workflows' && filteredRuns.map(run => (
+                <div key={run.id} className="repo-card__run-item">
+                  <div className="repo-card__run-status">{getRunStatusIcon(run)}</div>
+                  <div className="repo-card__run-info">
+                    <span className="repo-card__run-name">{run.name}</span>
+                    <span className="repo-card__run-meta">
+                      <GitBranchIcon size={10} style={{ marginRight: '2px' }} />
+                      {run.head_branch} • #{run.run_number} • {formatDate(run.created_at)}
+                    </span>
                   </div>
-                ))
-              })()}
+                  <Link href={run.html_url} target="_blank" rel="noopener noreferrer" sx={{ display: 'flex' }}>
+                    <LinkExternalIcon size={14} />
+                  </Link>
+                </div>
+              ))}
               {activeTab === 'commits' && (() => {
-                const grouped = runs.reduce((acc, run) => {
-                  const sha = run.head_sha
-                  const message = run.head_commit?.message?.split('\\n')[0] || 'No message'
-                  if (!acc[sha]) acc[sha] = { message, runs: [] }
-                  acc[sha].runs.push(run)
-                  return acc
-                }, {})
-                return Object.entries(grouped).map(([sha, data]) => (
-                  <div key={sha} className="repo-card__run-group">
-                    <div className="repo-card__run-group-title">
-                      <GitCommitIcon size={12} />
-                      <span className="repo-card__commit-message">{data.message}</span>
-                      <code className="repo-card__commit-sha">{sha.substring(0, 7)}</code>
-                      <span className="repo-card__run-group-count">{data.runs.length}</span>
+                // Create a unique list of commits (deduplicate by SHA)
+                const uniqueCommits = [];
+                const seenShas = new Set();
+                
+                filteredRuns.forEach(run => {
+                  if (run.head_sha && !seenShas.has(run.head_sha)) {
+                    seenShas.add(run.head_sha);
+                    uniqueCommits.push({
+                      sha: run.head_sha,
+                      message: run.head_commit?.message?.split('\n')[0] || 'No message',
+                      author: run.head_commit?.author?.name || 'Unknown',
+                      timestamp: run.created_at,
+                      branch: run.head_branch
+                    });
+                  }
+                });
+                
+                return uniqueCommits.map(commit => (
+                  <div key={commit.sha} className="repo-card__run-item">
+                    <div className="repo-card__run-status">
+                      <GitCommitIcon size={14} className="color-fg-muted" />
                     </div>
-                    {data.runs.map(run => (
-                      <div key={run.id} className="repo-card__run-item">
-                        <div className="repo-card__run-status">{getRunStatusIcon(run)}</div>
-                        <div className="repo-card__run-info">
-                          <div className="repo-card__run-name">{run.name}</div>
-                          <div className="repo-card__run-meta">
-                            <span>#{run.run_number}</span>
-                            <span>•</span>
-                            <span>{formatDate(run.created_at)}</span>
-                          </div>
-                        </div>
-                        <Link href={run.html_url} target="_blank" rel="noopener noreferrer" sx={{ display: 'flex' }}>
-                          <LinkExternalIcon size={14} />
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                ))
-              })()}
-              {activeTab === 'branches' && (() => {
-                const grouped = runs.reduce((acc, run) => {
-                  const branch = run.head_branch || 'unknown'
-                  if (!acc[branch]) acc[branch] = []
-                  acc[branch].push(run)
-                  return acc
-                }, {})
-                return Object.entries(grouped).map(([branch, branchRuns]) => (
-                  <div key={branch} className="repo-card__run-group">
-                    <div className="repo-card__run-group-title">
-                      <GitBranchIcon size={12} />
-                      {branch}
-                      <span className="repo-card__run-group-count">{branchRuns.length}</span>
+                    <div className="repo-card__run-info">
+                      <span className="repo-card__run-name">{commit.message}</span>
+                      <span className="repo-card__run-meta">
+                        <GitBranchIcon size={10} style={{ marginRight: '2px' }} />
+                        {commit.branch} • {commit.author} • {formatDate(commit.timestamp)}
+                      </span>
                     </div>
-                    {branchRuns.slice(0, 3).map(run => (
-                      <div key={run.id} className="repo-card__run-item">
-                        <div className="repo-card__run-status">{getRunStatusIcon(run)}</div>
-                        <div className="repo-card__run-info">
-                          <div className="repo-card__run-name">{run.name}</div>
-                          <div className="repo-card__run-meta">
-                            <span>#{run.run_number}</span>
-                            <span>•</span>
-                            <span>{formatDate(run.created_at)}</span>
-                          </div>
-                        </div>
-                        <Link href={run.html_url} target="_blank" rel="noopener noreferrer" sx={{ display: 'flex' }}>
-                          <LinkExternalIcon size={14} />
-                        </Link>
-                      </div>
-                    ))}
+                    <code className="repo-card__commit-sha">{commit.sha.substring(0, 7)}</code>
+                    <Link 
+                      href={`https://github.com/${repoOwner}/${repoName}/commit/${commit.sha}`}
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      sx={{ display: 'flex', marginLeft: '4px' }}
+                    >
+                      <LinkExternalIcon size={14} />
+                    </Link>
                   </div>
-                ))
+                ));
               })()}
             </div>
           ) : (

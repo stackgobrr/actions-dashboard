@@ -17,6 +17,13 @@
   min-height: 400px;
 }
 
+/* Make body more compact when expanded */
+.repo-card.expanded .repo-card__body {
+  padding: 8px 16px;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
 .repo-card.pinned {
   border-color: var(--color-accent-emphasis);
   box-shadow: 0 2px 8px var(--color-accent-shadow);
@@ -333,14 +340,50 @@
   padding: 8px 12px;
   border-top: 1px solid var(--borderColor-default);
   background: var(--bgColor-default);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.repo-card__runs-header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.repo-card__branch-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .repo-card__tabs {
   font-size: 12px;
+  flex-shrink: 0;
+  width: 100% !important;
+}
+
+.repo-card__tabs nav {
+  width: 100% !important;
+}
+
+.repo-card__tabs ul {
+  width: 100% !important;
+  display: flex !important;
+}
+
+.repo-card__tabs li {
+  flex: 1 !important;
+  display: flex !important;
+  justify-content: center !important;
 }
 
 .repo-card__runs-header {
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .repo-card__runs-title {
@@ -354,6 +397,31 @@
   flex-direction: column;
   gap: 12px;
   margin-top: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  max-height: 400px;
+  padding-right: 4px;
+}
+
+/* Custom scrollbar for runs content */
+.repo-card__runs-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.repo-card__runs-content::-webkit-scrollbar-track {
+  background: var(--bgColor-muted);
+  border-radius: 3px;
+}
+
+.repo-card__runs-content::-webkit-scrollbar-thumb {
+  background: var(--borderColor-default);
+  border-radius: 3px;
+}
+
+.repo-card__runs-content::-webkit-scrollbar-thumb:hover {
+  background: var(--borderColor-emphasis);
 }
 
 .repo-card__run-group {
@@ -434,6 +502,9 @@
 .repo-card__run-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .repo-card__run-name {
@@ -443,6 +514,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex-shrink: 1;
 }
 
 .repo-card__run-meta {
@@ -451,7 +523,8 @@
   gap: 4px;
   font-size: 10px;
   color: var(--fgColor-muted);
-  margin-top: 1px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .repo-card__runs-empty {
