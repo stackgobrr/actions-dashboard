@@ -50,8 +50,8 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
     const currentSequence = status.updateSequence
     const prevSequence = prevSequenceRef.current
     
-    // Trigger flash if status changed OR new event happened (sequence changed)
-    if (prevStatus && (prevStatus !== currentStatus || prevSequence !== currentSequence)) {
+    // Trigger flash if new event happened (sequence changed), regardless of status
+    if (prevSequence !== null && prevSequence !== currentSequence) {
       setIsFlashing(true)
       setTimeout(() => setIsFlashing(false), 1800) // 3 pulses at 0.6s each
     }
@@ -62,7 +62,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
 
   // Fetch runs when expanded
   useEffect(() => {
-    if (isExpanded && runs.length === 0) {
+    if (isExpanded) {
       const fetchRuns = async () => {
         setLoadingRuns(true)
         try {
@@ -72,7 +72,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             await new Promise(resolve => setTimeout(resolve, 500))
             // Use just the repo name as the key for mock data
             const mockRuns = MOCK_WORKFLOW_RUNS[repoName] || []
-            setRuns(mockRuns)
+            setRuns([...mockRuns]) // Create new array reference
           } else {
             const token = getActiveToken()
             const headers = token ? { 'Authorization': `token ${token}` } : {}
@@ -93,14 +93,15 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       }
       fetchRuns()
     }
-  }, [isExpanded, repoName, repoOwner, getActiveToken, runs.length, isDemoMode])
+  }, [isExpanded, repoName, repoOwner, getActiveToken, isDemoMode])
 
   // Poll for updates in demo mode when expanded
   useEffect(() => {
     if (isExpanded && isDemoMode) {
       const updateInterval = setInterval(() => {
         const mockRuns = MOCK_WORKFLOW_RUNS[repoName] || []
-        setRuns(mockRuns)
+        // Create new array reference to trigger React re-render
+        setRuns([...mockRuns])
       }, 5000) // Update every 5 seconds
       
       return () => clearInterval(updateInterval)
@@ -163,8 +164,10 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
 
   // Get the latest run from filtered results to display in card
   const displayStatus = useMemo(() => {
-    if (isExpanded && filteredRuns.length > 0) {
-      const latestRun = filteredRuns[0] // Already sorted by most recent
+    // When expanded with loaded runs, always use our local runs data
+    if (isExpanded && runs.length > 0 && filteredRuns.length > 0) {
+      // Show the most recent run based on current filters
+      const latestRun = filteredRuns[0]
       return {
         workflow: latestRun.name || status.workflow,
         branch: latestRun.head_branch || status.branch,
@@ -172,8 +175,9 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
         conclusion: latestRun.conclusion
       }
     }
+    // When collapsed or no runs loaded yet, use status from parent
     return status
-  }, [isExpanded, filteredRuns, status])
+  }, [isExpanded, runs.length, filteredRuns, status])
 
   return (
     <div 

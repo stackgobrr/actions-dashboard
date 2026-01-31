@@ -332,10 +332,13 @@ export const MOCK_WORKFLOW_RUNS = {
 
 // Helper to get latest run status for initial card display
 const getLatestRunStatus = (repoName) => {
-  const runs = MOCK_WORKFLOW_RUNS[repoName];
+  // Read directly from storage to ensure we get the latest data
+  const runs = runsStorage[repoName];
   if (!runs || runs.length === 0) {
     return { status: 'no_runs', conclusion: null, workflow: 'N/A', branch: 'N/A', commitMessage: 'N/A' };
   }
+  
+  // Show the most recent run (chronologically)
   const latest = runs[0];
   return {
     status: latest.status,
