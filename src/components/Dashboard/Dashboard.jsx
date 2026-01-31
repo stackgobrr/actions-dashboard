@@ -128,6 +128,7 @@ export function Dashboard({
             repositories={sortedRepos} 
             getActiveToken={getActiveToken}
             selectedRepos={selectedRepos}
+            isDemoMode={isDemoMode}
           />
         )}
         

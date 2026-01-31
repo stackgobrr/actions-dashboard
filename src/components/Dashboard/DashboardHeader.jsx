@@ -61,14 +61,14 @@ export function DashboardHeader({
   const toggleLabelFilter = (topicName) => {
     if (filterByLabels.includes(topicName)) {
       setFilterByLabels(filterByLabels.filter(l => l !== topicName))
-      trackEvent('Filter Changed', { 
+      trackEvent(isDemoMode ? 'Demo Interaction' : 'Filter Changed', { 
         filterType: 'topic',
         action: 'removed',
         value: topicName
       })
     } else {
       setFilterByLabels([...filterByLabels, topicName])
-      trackEvent('Filter Changed', { 
+      trackEvent(isDemoMode ? 'Demo Interaction' : 'Filter Changed', { 
         filterType: 'topic',
         action: 'added',
         value: topicName
@@ -79,14 +79,14 @@ export function DashboardHeader({
   const toggleOwnerFilter = (ownerName) => {
     if (filterByOwners.includes(ownerName)) {
       setFilterByOwners(filterByOwners.filter(o => o !== ownerName))
-      trackEvent('Filter Changed', { 
+      trackEvent(isDemoMode ? 'Demo Interaction' : 'Filter Changed', { 
         filterType: 'owner',
         action: 'removed',
         value: ownerName
       })
     } else {
       setFilterByOwners([...filterByOwners, ownerName])
-      trackEvent('Filter Changed', { 
+      trackEvent(isDemoMode ? 'Demo Interaction' : 'Filter Changed', { 
         filterType: 'owner',
         action: 'added',
         value: ownerName

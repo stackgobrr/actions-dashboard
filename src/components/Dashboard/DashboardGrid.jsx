@@ -9,7 +9,7 @@ import 'react-resizable/css/styles.css'
 const CARD_WIDTH = 280
 const MARGIN = 16
 
-export function DashboardGrid({ repositories, getActiveToken, selectedRepos }) {
+export function DashboardGrid({ repositories, getActiveToken, selectedRepos, isDemoMode }) {
   const { width, containerRef, mounted } = useContainerWidth()
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [expandedRepo, setExpandedRepo] = useState(null)
@@ -151,6 +151,7 @@ export function DashboardGrid({ repositories, getActiveToken, selectedRepos }) {
                   isExpanded={expandedRepo === repoName}
                   onToggleExpand={() => handleCardClick(repoName)}
                   getActiveToken={getActiveToken}
+                  isDemoMode={isDemoMode}
                 />
               </div>
             )

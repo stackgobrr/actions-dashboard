@@ -8,6 +8,7 @@ import {
   getAppInstallationInfo
 } from '../services/githubAppAuth'
 import { logger } from '../utils/logger'
+import { trackEvent } from '../utils/analytics'
 
 /**
  * Hook to manage authentication state for both GitHub App and PAT methods
@@ -38,6 +39,7 @@ export function useAuth() {
       if (authMethod === 'oauth' && localStorage.getItem('github_token')) {
         setGithubToken(localStorage.getItem('github_token'))
         setAuthMethod('oauth')
+        trackEvent('Dashboard Opened', { authMethod: 'oauth' })
       } else if (isGitHubAppConfigured()) {
         setAuthMethod('github-app')
         try {
@@ -101,6 +103,7 @@ export function useAuth() {
       }
 
       // Token is valid
+      trackEvent('Dashboard Opened', { authMethod: 'pat' })
       localStorage.setItem('github_token', githubToken)
       setAuthMethod('pat')
       setShowAuthSetup(false)
@@ -134,6 +137,9 @@ export function useAuth() {
    * Clears all credentials and returns to landing page
    */
   const handleLogout = () => {
+    // Track logout event with auth method
+    trackEvent('User Signed Out', { authMethod })
+    
     // Clear all possible auth tokens
     localStorage.removeItem('github_token')
     localStorage.removeItem('auth_method')
@@ -148,6 +154,7 @@ export function useAuth() {
   }
   
   const handleDemoMode = () => {
+    trackEvent('Demo Mode Started')
     localStorage.setItem('demo_mode', 'true')
     setAuthMethod('demo')
     setShowAuthSetup(false) // Hide auth setup to show dashboard
@@ -179,6 +186,7 @@ export function useAuth() {
       }
 
       saveGitHubAppCredentials(appId, privateKey, installationId)
+      trackEvent('Dashboard Opened', { authMethod: 'github-app' })
       setAuthMethod('github-app')
       setShowGitHubAppForm(false)
       setShowAuthSetup(false)

@@ -10,10 +10,11 @@ import {
 } from '@primer/octicons-react'
 import { Link, Label, CounterLabel, IconButton, Spinner } from '@primer/react'
 import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../../utils/statusHelpers.jsx'
+import { trackEvent } from '../../utils/analytics'
 import { useState, useEffect, useRef } from 'react'
 import './RepoCard.css'
 
-export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, isExpanded, onToggleExpand, getActiveToken }) {
+export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, isExpanded, onToggleExpand, getActiveToken, isDemoMode }) {
   const labelColor = getLabelColor(status.category)
   const hasPRs = status.openPRCount > 0
   const topics = status.topics || []
@@ -133,7 +134,15 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
         </div>
       </div>
       
-      <div className="repo-card__body" onClick={onToggleExpand} style={{ cursor: 'pointer' }}>
+      <div className="repo-card__body" onClick={() => {
+        onToggleExpand()
+        if (isDemoMode) {
+          trackEvent('Demo Interaction', { 
+            action: isExpanded ? 'collapsed_repo' : 'expanded_repo',
+            repo: repoName 
+          })
+        }
+      }} style={{ cursor: 'pointer' }}>
         {status.error ? (
           <p className="repo-card__error">{status.error}</p>
         ) : status.status ? (
