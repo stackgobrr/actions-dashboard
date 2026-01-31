@@ -147,7 +147,7 @@ resource "aws_lambda_function" "lambda" {
 
   s3_bucket        = data.aws_s3_bucket.lambda_artifacts.id
   s3_key           = local.lambda_s3_keys[replace(each.key, "_", "-")]
-  source_code_hash = each.value.source_code_hash != "" ? each.value.source_code_hash : null
+  source_code_hash = local.manifest.commit_sha
   function_name    = "${local.resource_prefix}-${replace(each.key, "_", "-")}"
   role             = aws_iam_role.lambda_execution.arn
   handler          = "index.handler"

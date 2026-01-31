@@ -106,27 +106,6 @@ jobs:
           TF_VAR_oauth_client_secret: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET }}
           TF_VAR_lambda_artifacts_bucket: ${{ vars.LAMBDA_S3_BUCKET_NAME }}
 
-      - name: Update Lambdas
-        if: github.event_name == 'repository_dispatch'
-        run: |
-          cd infra
-          BUCKET_NAME=${{ vars.LAMBDA_S3_BUCKET_NAME }}
-          ENVIRONMENT="${{ needs.setup.outputs.tfvars_env }}"
-
-          MANIFEST=$(aws s3 cp "s3://${BUCKET_NAME}/manifest.json" -)
-
-          for fn in $(echo "$MANIFEST" | jq -r '.lambdas | keys[]'); do
-            S3_KEY=$(echo "$MANIFEST" | jq -r --arg fn "$fn" '.lambdas[$fn].package | sub("s3://[^/]+/"; "")')
-            FUNCTION_NAME="actions-dashboard-${ENVIRONMENT}-${fn}"
-
-            echo "Updating ${FUNCTION_NAME} with ${S3_KEY}"
-
-            aws lambda update-function-code \
-              --function-name "$FUNCTION_NAME" \
-              --s3-bucket "$BUCKET_NAME" \
-              --s3-key "$S3_KEY"
-          done
-
       - name: Get Terraform outputs
         id: get-outputs
         run: |
