@@ -12,6 +12,18 @@
     <meta name="description" content="Monitor GitHub Actions workflows across all your repositories with live updates. Beautiful dashboard for DevOps teams, open source maintainers, and engineering managers. Track CI/CD pipelines, deployment status, and workflow health in real-time.">
     <meta name="keywords" content="GitHub Actions, CI/CD monitoring, workflow dashboard, GitHub Actions dashboard, DevOps tools, continuous integration, deployment tracking, open source, React dashboard, real-time monitoring">
     <meta name="author" content="stackgobrr">
+    <script>
+      // Block non-production environments from search engines
+      // Set VITE_ALLOW_INDEXING=true in production GitHub environment
+      if (!'%VITE_ALLOW_INDEXING%' || '%VITE_ALLOW_INDEXING%' === 'false') {
+        document.write('<meta name="robots" content="noindex, nofollow">');
+      }
+      // Add Google Search Console verification if configured
+      var verification = '%VITE_GOOGLE_SITE_VERIFICATION%';
+      if (verification && verification !== '%VITE_GOOGLE_SITE_VERIFICATION%') {
+        document.write('<meta name="google-site-verification" content="' + verification + '">');
+      }
+    </script>
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
