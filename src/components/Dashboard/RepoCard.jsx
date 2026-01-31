@@ -14,7 +14,8 @@ import {
   BookIcon,
   CodeIcon,
   GraphIcon,
-  GearIcon
+  GearIcon,
+  StopIcon
 } from '@primer/octicons-react'
 import { Link, Label, CounterLabel, IconButton, Spinner, UnderlineNav, ActionMenu, ActionList } from '@primer/react'
 import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../../utils/statusHelpers.jsx'
@@ -108,7 +109,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       if (run.conclusion === 'success') return <CheckCircleFillIcon size={14} className="color-fg-success" />
       if (run.conclusion === 'failure') return <XCircleFillIcon size={14} className="color-fg-danger" />
       if (run.conclusion === 'cancelled' || run.conclusion === 'timed_out') {
-        return <NoEntryIcon size={14} className="color-fg-attention" />
+        return <StopIcon size={14} className="color-fg-muted" />
       }
     }
     return <ClockIcon size={14} className="color-fg-accent" />
