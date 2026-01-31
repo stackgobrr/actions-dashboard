@@ -8,7 +8,13 @@ import {
   XCircleFillIcon,
   ClockIcon,
   WorkflowIcon,
-  GitCommitIcon
+  GitCommitIcon,
+  IssueOpenedIcon,
+  ShieldIcon,
+  BookIcon,
+  CodeIcon,
+  GraphIcon,
+  GearIcon
 } from '@primer/octicons-react'
 import { Link, Label, CounterLabel, IconButton, Spinner, UnderlineNav, ActionMenu, ActionList } from '@primer/react'
 import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../../utils/statusHelpers.jsx'
@@ -194,6 +200,76 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
           )}
         </div>
         <div className="repo-card__header-actions">
+          {isExpanded && repoUrl && (
+            <div style={{ display: 'flex', gap: '4px', marginRight: '8px' }}>
+              <IconButton
+                as="a"
+                href={repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={CodeIcon}
+                size="small"
+                variant="invisible"
+                aria-label="View code"
+                sx={{ color: 'fg.muted' }}
+              />
+              <IconButton
+                as="a"
+                href={`${repoUrl}/issues`}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={IssueOpenedIcon}
+                size="small"
+                variant="invisible"
+                aria-label="View issues"
+                sx={{ color: 'fg.muted' }}
+              />
+              <IconButton
+                as="a"
+                href={`${repoUrl}/wiki`}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={BookIcon}
+                size="small"
+                variant="invisible"
+                aria-label="View wiki"
+                sx={{ color: 'fg.muted' }}
+              />
+              <IconButton
+                as="a"
+                href={`${repoUrl}/security`}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={ShieldIcon}
+                size="small"
+                variant="invisible"
+                aria-label="View security"
+                sx={{ color: 'fg.muted' }}
+              />
+              <IconButton
+                as="a"
+                href={`${repoUrl}/pulse`}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={GraphIcon}
+                size="small"
+                variant="invisible"
+                aria-label="View insights"
+                sx={{ color: 'fg.muted' }}
+              />
+              <IconButton
+                as="a"
+                href={`${repoUrl}/settings`}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={GearIcon}
+                size="small"
+                variant="invisible"
+                aria-label="View settings"
+                sx={{ color: 'fg.muted' }}
+              />
+            </div>
+          )}
           <IconButton
             icon={PinIcon}
             size="small"
