@@ -12,8 +12,8 @@ cloudfront_price_class = "PriceClass_100"
 
 # Custom domain configuration
 domain_name    = "actions.dashboard.stackgobrr.com"
-hosted_zone_id = "Z03625632P0KL404I606"
+hosted_zone_id = ""
 
 # OAuth Configuration
-oauth_client_id     = "Ov23liDdDS2SMaLZhRwb"
-oauth_client_secret = "REPLACE_WITH_YOUR_CLIENT_SECRET"
+oauth_client_id     = ""
+oauth_client_secret = ""
