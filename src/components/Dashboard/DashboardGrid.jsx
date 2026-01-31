@@ -91,7 +91,8 @@ export function DashboardGrid({ repositories, getActiveToken, selectedRepos, isD
         x: adjustedX,
         y: baseY,
         w: expandedW,
-        h: 2
+        h: 2,
+        static: true
       })
       
       // Mark occupied cells by expanded card
@@ -111,7 +112,7 @@ export function DashboardGrid({ repositories, getActiveToken, selectedRepos, isD
       for (let scanY = 0; scanY < 50 && !placed; scanY++) {
         for (let scanX = 0; scanX < cols && !placed; scanX++) {
           if (!occupied.has(`${scanX},${scanY}`)) {
-            result.push({ i: repoName, x: scanX, y: scanY, w: 1, h: 1 })
+            result.push({ i: repoName, x: scanX, y: scanY, w: 1, h: 1, static: true })
             occupied.add(`${scanX},${scanY}`)
             placed = true
           }
@@ -137,6 +138,9 @@ export function DashboardGrid({ repositories, getActiveToken, selectedRepos, isD
           dragConfig={{ enable: false }}
           resizeConfig={{ enable: false }}
           compactor={null}
+          isDraggable={false}
+          isResizable={false}
+          static={true}
         >
           {sortedRepositories.map(([repoName, status]) => {
             const repo = selectedRepos?.find(r => r.name === repoName)
