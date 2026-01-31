@@ -82,6 +82,12 @@ jobs:
           terraform_version: '1.14.1'
           terraform_wrapper: false
 
+      - name: Debug variables
+        run: |
+          echo "HOSTED_ZONE_ID: ${{ vars.HOSTED_ZONE_ID }}"
+          echo "LAMBDA_S3_BUCKET_NAME: ${{ vars.LAMBDA_S3_BUCKET_NAME }}"
+          echo "DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}"
+
       - name: Deploy infrastructure
         uses: stackgobrr/common-github-actions/actions/terraform-deploy@main
         with:
