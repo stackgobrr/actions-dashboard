@@ -1,0 +1,7 @@
+# robots.txt for Actions Dashboard (Development/Staging)
+# This blocks all search engines from indexing non-production environments
+
+User-agent: *
+Disallow: /
+
+# No sitemap for non-production environments

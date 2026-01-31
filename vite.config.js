@@ -12,13 +12,13 @@ export default defineConfig(({ mode }) => ({
         // Only inject Plausible in production mode and if domain is configured
         if (mode === 'production' && plausibleDomain) {
           return html.replace(
-            '%VITE_PLAUSIBLE_SCRIPT%',
+            '<!-- PLAUSIBLE_INJECT -->',
             `<script defer data-domain="${plausibleDomain}" src="https://plausible.io/js/script.hash.js"></script>`
           )
         }
         
         // Remove placeholder in development or if no domain configured
-        return html.replace('%VITE_PLAUSIBLE_SCRIPT%', '')
+        return html.replace('<!-- PLAUSIBLE_INJECT -->', '')
       }
     }
   ],

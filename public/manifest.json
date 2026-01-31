@@ -1,0 +1,35 @@
+{
+  "name": "Actions Dashboard",
+  "short_name": "Actions Dashboard",
+  "description": "Monitor GitHub Actions workflows across all your repositories with live updates",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/github-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["development", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your GitHub Actions dashboard",
+      "url": "/dashboard",
+      "icons": []
+    },
+    {
+      "name": "Roadmap",
+      "short_name": "Roadmap",
+      "description": "View product roadmap",
+      "url": "/roadmap",
+      "icons": []
+    }
+  ]
+}

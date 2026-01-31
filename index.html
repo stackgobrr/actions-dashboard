@@ -3,7 +3,75 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/github-icon.svg" />
+    <link rel="manifest" href="/manifest.json">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary Meta Tags -->
+    <title>Actions Dashboard - Real-time GitHub Actions Monitoring & CI/CD Tracking</title>
+    <meta name="title" content="Actions Dashboard - Real-time GitHub Actions Monitoring & CI/CD Tracking">
+    <meta name="description" content="Monitor GitHub Actions workflows across all your repositories with live updates. Beautiful dashboard for DevOps teams, open source maintainers, and engineering managers. Track CI/CD pipelines, deployment status, and workflow health in real-time.">
+    <meta name="keywords" content="GitHub Actions, CI/CD monitoring, workflow dashboard, GitHub Actions dashboard, DevOps tools, continuous integration, deployment tracking, open source, React dashboard, real-time monitoring">
+    <meta name="author" content="stackgobrr">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://actions.dashboard.stackgobrr.com/">
+    <meta property="og:title" content="Actions Dashboard - Real-time GitHub Actions Monitoring">
+    <meta property="og:description" content="Monitor GitHub Actions workflows across all your repositories with live updates. Beautiful dashboard for tracking CI/CD pipelines, deployment status, and workflow health.">
+    <meta property="og:image" content="https://actions.dashboard.stackgobrr.com/og-image.png">
+    <meta property="og:site_name" content="Actions Dashboard">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://actions.dashboard.stackgobrr.com/">
+    <meta name="twitter:title" content="Actions Dashboard - Real-time GitHub Actions Monitoring">
+    <meta name="twitter:description" content="Monitor GitHub Actions workflows across all your repositories with live updates. Beautiful dashboard for tracking CI/CD pipelines and deployment status.">
+    <meta name="twitter:image" content="https://actions.dashboard.stackgobrr.com/og-image.png">
+    <meta name="twitter:creator" content="@stackgobrr">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Actions Dashboard",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Real-time monitoring dashboard for GitHub Actions workflows. Track CI/CD pipelines, deployment status, and workflow health across multiple repositories.",
+      "url": "https://actions.dashboard.stackgobrr.com",
+      "screenshot": "https://actions.dashboard.stackgobrr.com/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "stackgobrr",
+        "url": "https://github.com/h3ow3d"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "ratingCount": "1"
+      },
+      "featureList": [
+        "Real-time workflow monitoring",
+        "Multi-repository support",
+        "GitHub App and PAT authentication",
+        "Auto-refresh with configurable intervals",
+        "Smart filtering by status and labels",
+        "Keyboard shortcuts",
+        "Dark and light themes",
+        "Local storage for privacy"
+      ]
+    }
+    </script>
     
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="
@@ -20,12 +88,9 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <meta name="description" content="Monitor GitHub Actions workflow statuses across multiple repositories">
     
     <!-- Plausible Analytics - Only injected if VITE_PLAUSIBLE_DOMAIN is set -->
-    %VITE_PLAUSIBLE_SCRIPT%
-    
-    <title>Actions Dashboard</title>
+    <!-- PLAUSIBLE_INJECT -->
   </head>
   <body>
     <div id="root"></div>

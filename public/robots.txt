@@ -1,0 +1,9 @@
+# robots.txt for Actions Dashboard (Production)
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://actions.dashboard.stackgobrr.com/sitemap.xml
+
+# Crawl-delay for polite bots
+Crawl-delay: 1
