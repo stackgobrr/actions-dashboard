@@ -23,7 +23,7 @@ module "frontend" {
   project_name   = var.project_name
   environment    = var.environment
   domain_name    = local.domain_name
-  hosted_zone_id = var.hosted_zone_id != "" ? var.hosted_zone_id : null
+  hosted_zone_id = var.hosted_zone_id
 
   # Add Lambda Function URLs as additional origins
   additional_origins = [

@@ -39,9 +39,8 @@ variable "domain_name" {
 }
 
 variable "hosted_zone_id" {
-  description = "Route53 hosted zone ID (required if domain_name is set)"
+  description = "Route53 hosted zone ID"
   type        = string
-  default     = ""
 }
 
 variable "cloudfront_price_class" {
