@@ -65,7 +65,6 @@ export function FocusView({ repoName, repoOwner, onClose, getActiveToken }) {
         setRuns(data.workflow_runs || [])
         
         trackEvent('Focus View Opened', { 
-          repo: `${repoOwner}/${repoName}`,
           runCount: data.workflow_runs?.length || 0
         })
       } catch (err) {

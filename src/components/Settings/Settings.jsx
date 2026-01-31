@@ -84,8 +84,7 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
         category: 'custom'
       }])
       trackEvent('Repository Added', { 
-        source: 'search',
-        repo: `${repo.owner.login}/${repo.name}`
+        source: 'search'
       })
     }
   }
@@ -94,9 +93,7 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
     const repo = repos.find(r => r.name === repoName)
     setRepos(repos.filter(r => r.name !== repoName))
     if (repo) {
-      trackEvent('Repository Removed', { 
-        repo: `${repo.owner}/${repo.name}`
-      })
+      trackEvent('Repository Removed')
     }
   }
 
@@ -110,8 +107,7 @@ export function Settings({ onClose, getActiveToken, authMethod, selectedRepos, o
           category: 'custom'
         }])
         trackEvent('Repository Added', { 
-          source: 'manual',
-          repo: `${manualOwner}/${manualName}`
+          source: 'manual'
         })
         setManualOwner('')
         setManualName('')
