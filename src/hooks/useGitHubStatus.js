@@ -173,7 +173,8 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       const filteredMockStatuses = Object.keys(MOCK_REPO_STATUSES)
         .filter(repoName => selectedRepoNames.includes(repoName))
         .reduce((acc, repoName) => {
-          acc[repoName] = MOCK_REPO_STATUSES[repoName]
+          // Create new object reference to force React to detect changes
+          acc[repoName] = { ...MOCK_REPO_STATUSES[repoName] }
           return acc
         }, {})
       
@@ -181,35 +182,21 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       setLastUpdate(new Date())
       setLoading(false)
       
-      // Cycle the animation demo card through different statuses to showcase pulse effect
-      // Only if it's in the selected repos
-      if (selectedRepoNames.includes('demo-pulse-animation')) {
-        const statusCycle = [
-          { status: 'completed', conclusion: 'success' },
-          { status: 'completed', conclusion: 'failure' },
-          { status: 'in_progress', conclusion: null },
-          { status: 'completed', conclusion: 'cancelled' }
-        ]
-        let cycleIndex = 0
+      // Poll for updates every 5 seconds to pick up new workflow runs
+      const updateInterval = setInterval(() => {
+        const updatedStatuses = Object.keys(MOCK_REPO_STATUSES)
+          .filter(repoName => selectedRepoNames.includes(repoName))
+          .reduce((acc, repoName) => {
+            // Create new object reference to force React to detect changes
+            acc[repoName] = { ...MOCK_REPO_STATUSES[repoName] }
+            return acc
+          }, {})
         
-        const cycleInterval = setInterval(() => {
-          cycleIndex = (cycleIndex + 1) % statusCycle.length
-          const nextStatus = statusCycle[cycleIndex]
-          
-          setRepoStatuses(prev => ({
-            ...prev,
-            'demo-pulse-animation': {
-              ...prev['demo-pulse-animation'],
-              ...nextStatus,
-              updatedAt: new Date().toISOString()
-            }
-          }))
-        }, 5000) // Change status every 5 seconds
-        
-        return () => clearInterval(cycleInterval)
-      }
+        setRepoStatuses(updatedStatuses)
+        setLastUpdate(new Date())
+      }, 5000) // Check for updates every 5 seconds
       
-      return
+      return () => clearInterval(updateInterval)
     }
     
     // Normal production flow

@@ -17,7 +17,7 @@ export const getStatusIcon = (status) => {
     if (status.conclusion === 'failure') return <XCircleIcon size={18} className="color-fg-danger" />
     return <AlertIcon size={18} className="color-fg-attention" />
   }
-  if (status.status === 'in_progress') return <ClockIcon size={18} className="color-fg-accent" />
+  if (status.status === 'in_progress' || status.status === 'queued' || status.status === 'pending') return <ClockIcon size={18} className="color-fg-accent" />
   return <AlertIcon size={18} className="color-fg-muted" />
 }
 
@@ -33,7 +33,7 @@ export const getStatusClass = (status) => {
     if (status.conclusion === 'failure') return 'failure'
     return 'warning'
   }
-  if (status.status === 'in_progress') return 'in-progress'
+  if (status.status === 'in_progress' || status.status === 'queued' || status.status === 'pending') return 'in-progress'
   if (status.status === 'no_runs') return 'no_runs'
   return 'unknown'
 }

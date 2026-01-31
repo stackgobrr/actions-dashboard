@@ -1,358 +1,444 @@
 /**
  * Mock repository data for demo mode
- * Showcases all card features and states
+ * Simulates a real-world dashboard with realistic repository names and dynamic updates
  */
 
-// Mock workflow runs data for expanded view testing
-const mockAuthors = ['Alice Chen', 'Bob Smith', 'Charlie Davis', 'Diana Miller', 'Ethan Brown'];
+// Helper to generate random data
+const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomChoice = (arr) => arr[random(0, arr.length - 1)];
+const randomBool = (probability = 0.5) => Math.random() < probability;
+
+// Realistic data pools
+const mockAuthors = [
+  'Sarah Martinez', 'Alex Chen', 'Jordan Taylor', 'Morgan Kim', 
+  'Casey Brown', 'Riley Johnson', 'Drew Wilson', 'Sam Davis',
+  'Taylor Anderson', 'Blake Foster', 'Avery Mitchell', 'Quinn Roberts'
+];
+
+// Map workflows to repos for more realistic behavior
+const repoWorkflowsMap = {
+  'api-gateway': ['API Tests', 'Deploy to Staging', 'Deploy to Production', 'Security Scan', 'Load Tests'],
+  'frontend-app': ['Build & Test', 'E2E Tests', 'Deploy Preview', 'Lighthouse CI', 'Deploy to Production'],
+  'ml-pipeline': ['Train Model', 'Validate Dataset', 'Deploy Model', 'Performance Tests', 'Data Quality Checks'],
+  'mobile-app': ['iOS Build', 'Android Build', 'E2E Tests', 'Deploy to TestFlight', 'Deploy to Play Store'],
+  'data-processor': ['Integration Tests', 'Deploy to Staging', 'Data Validation', 'Performance Benchmark'],
+  'auth-service': ['Security Tests', 'Integration Tests', 'Deploy to Staging', 'Deploy to Production'],
+  'notification-service': ['Unit Tests', 'Integration Tests', 'Deploy to Staging', 'Load Tests'],
+  'payment-gateway': ['Security Scan', 'Compliance Tests', 'Deploy to Staging', 'Deploy to Production', 'PCI Audit'],
+  'analytics-dashboard': ['Build UI', 'E2E Tests', 'Deploy Preview', 'Deploy to Production'],
+  'infrastructure': ['Terraform Plan', 'Terraform Apply', 'Security Scan', 'Cost Analysis']
+};
+
+// More realistic branch patterns per repo type
+const getRealisticBranches = (repoName) => {
+  const common = ['main', 'develop', 'staging'];
+  const features = [
+    'feature/user-authentication', 'feature/api-optimization', 'feature/new-dashboard',
+    'feature/payment-integration', 'feature/analytics', 'feature/notifications',
+    'feature/caching', 'feature/performance'
+  ];
+  const fixes = ['fix/memory-leak', 'fix/validation-bug', 'fix/race-condition', 'hotfix/security-patch'];
+  const releases = ['release/v2.1.0', 'release/v2.0.5', 'release/v1.9.8'];
+  
+  return [...common, ...features.slice(0, 3), ...fixes.slice(0, 2), ...releases.slice(0, 1)];
+};
+
+// More varied commit messages
+const commitTemplates = {
+  feat: [
+    'add user authentication with OAuth2',
+    'implement caching layer for API responses',
+    'add real-time notifications via WebSockets',
+    'implement feature flags system',
+    'add comprehensive error tracking',
+    'implement rate limiting middleware'
+  ],
+  fix: [
+    'resolve race condition in payment processing',
+    'fix memory leak in event listeners',
+    'correct timezone handling in analytics',
+    'resolve CORS issues for cross-origin requests',
+    'fix validation logic for edge cases',
+    'patch security vulnerability in dependencies'
+  ],
+  chore: [
+    'upgrade dependencies to latest stable versions',
+    'update Docker base images',
+    'refactor configuration management',
+    'improve logging and monitoring',
+    'optimize build process',
+    'cleanup deprecated code'
+  ],
+  test: [
+    'add integration tests for payment flow',
+    'improve test coverage to 85%',
+    'add E2E tests for critical user paths',
+    'update test fixtures and mocks',
+    'add performance regression tests'
+  ],
+  docs: [
+    'update API documentation with new endpoints',
+    'add architecture decision records',
+    'improve onboarding documentation',
+    'document deployment process'
+  ],
+  refactor: [
+    'restructure authentication module',
+    'optimize database query patterns',
+    'improve error handling architecture',
+    'simplify state management logic'
+  ],
+  perf: [
+    'optimize bundle size by 30%',
+    'reduce initial load time',
+    'implement lazy loading for routes',
+    'optimize image compression'
+  ],
+  ci: [
+    'update CI pipeline configuration',
+    'add automated deployment workflows',
+    'improve build caching',
+    'add security scanning to pipeline'
+  ]
+};
+
+// Generate realistic initial mock runs
+const generateInitialMockRuns = (repoName, repoId, count) => {
+  const workflows = repoWorkflowsMap[repoName] || ['CI/CD Pipeline', 'Deploy', 'Tests'];
+  const branches = getRealisticBranches(repoName);
+  
+  return Array.from({ length: count }, (_, i) => {
+    const isRecent = i === 0;
+    const minutesAgo = i * random(8, 25) + random(2, 15); // More varied spacing
+    
+    // First run might be in progress, others mostly completed
+    let status, conclusion;
+    if (isRecent && random(0, 100) < 20) {
+      status = random(0, 100) < 75 ? 'in_progress' : 'queued';
+      conclusion = null;
+    } else {
+      status = 'completed';
+      const roll = random(0, 100);
+      if (roll < 80) conclusion = 'success'; // 80% success rate
+      else if (roll < 93) conclusion = 'failure'; // 13% failure
+      else conclusion = randomChoice(['cancelled', 'timed_out']); // 7% other
+    }
+    
+    const commitType = randomChoice(Object.keys(commitTemplates));
+    const commitMsg = randomChoice(commitTemplates[commitType]);
+    
+    return {
+      id: repoId * 10000 + i + Date.now(),
+      name: workflows[i % workflows.length],
+      status,
+      conclusion,
+      run_number: 100 + count - i + random(0, 20),
+      head_branch: branches[i % branches.length],
+      head_sha: `${Math.random().toString(36).substring(2, 9)}${i.toString().padStart(6, '0')}`,
+      head_commit: {
+        message: `${commitType}: ${commitMsg}`,
+        author: { name: mockAuthors[i % mockAuthors.length] }
+      },
+      created_at: new Date(Date.now() - 1000 * 60 * minutesAgo).toISOString(),
+      html_url: `https://github.com/acme/${repoName}/actions/runs/${repoId * 10000 + i}`
+    };
+  });
+};
+
+// Simulate live workflow runs being added at random intervals
+const repoIds = {
+  'api-gateway': 1,
+  'frontend-app': 2,
+  'ml-pipeline': 3,
+  'mobile-app': 4,
+  'data-processor': 5,
+  'auth-service': 6,
+  'notification-service': 7,
+  'payment-gateway': 8,
+  'analytics-dashboard': 9,
+  'infrastructure': 10
+};
+
+const repoNames = Object.keys(repoIds);
+const initialRunCounts = {
+  'api-gateway': 8, 'frontend-app': 6, 'ml-pipeline': 5,
+  'mobile-app': 7, 'data-processor': 6, 'auth-service': 9,
+  'notification-service': 5, 'payment-gateway': 7,
+  'analytics-dashboard': 6, 'infrastructure': 5
+};
+
+// Initialize runs storage
+const runsStorage = {};
+const lastUpdateTime = {}; // Track when each repo was last updated
+const updateSequence = {}; // Track order of updates for sorting
+let sequenceCounter = 0; // Global counter for update order
+let lastEventTime = Date.now();
+const eventInterval = 10000; // New event every 10 seconds
+
+// Track activity level per repo (some repos are more active)
+const repoActivityLevels = {
+  'api-gateway': 0.3,        // High activity
+  'frontend-app': 0.25,      // High activity
+  'mobile-app': 0.15,        // Medium activity
+  'auth-service': 0.1,       // Medium activity
+  'data-processor': 0.08,    // Medium-low activity
+  'payment-gateway': 0.05,   // Low activity (critical, less frequent deploys)
+  'ml-pipeline': 0.03,       // Low activity
+  'notification-service': 0.02, // Very low activity
+  'analytics-dashboard': 0.015, // Very low activity
+  'infrastructure': 0.005    // Very low activity (infrastructure changes are rare)
+};
+
+// Initialize all repos with base data
+repoNames.forEach((repoName, index) => {
+  const repoId = repoIds[repoName];
+  runsStorage[repoName] = generateInitialMockRuns(repoName, repoId, initialRunCounts[repoName]);
+  // Set initial update time to random time in last 5 minutes
+  lastUpdateTime[repoName] = new Date(Date.now() - random(1000, 300000)).toISOString();
+  // Initialize sequences starting from 1, in order
+  updateSequence[repoName] = index + 1;
+});
+
+// Set sequence counter to start after initial sequences
+sequenceCounter = repoNames.length;
+
+// Function to add a new run to a weighted random repo
+const addRandomEvent = (now) => {
+  // Weighted selection based on activity levels
+  const totalWeight = Object.values(repoActivityLevels).reduce((sum, w) => sum + w, 0);
+  let randomValue = Math.random() * totalWeight;
+  let selectedRepo = repoNames[0];
+  
+  for (const repoName of repoNames) {
+    randomValue -= repoActivityLevels[repoName];
+    if (randomValue <= 0) {
+      selectedRepo = repoName;
+      break;
+    }
+  }
+  
+  const repoName = selectedRepo;
+  const repoId = repoIds[repoName];
+  const currentRuns = runsStorage[repoName];
+  const workflows = repoWorkflowsMap[repoName];
+  const branches = getRealisticBranches(repoName);
+  
+  // Determine status based on probability
+  const statusRoll = random(0, 100);
+  let status, conclusion;
+  
+  // Realistic lifecycle: new runs always start as queued/pending
+  const commitType = randomChoice(Object.keys(commitTemplates));
+  const commitMsg = randomChoice(commitTemplates[commitType]);
+  
+  // Create new run - always starts as queued
+  const newRun = {
+    id: Date.now() + repoId + random(1, 100),
+    name: randomChoice(workflows),
+    status: 'queued',
+    conclusion: null,
+    run_number: currentRuns.length > 0 ? (currentRuns[0].run_number + 1) : random(100, 200),
+    head_branch: randomChoice(branches),
+    head_sha: `${Math.random().toString(36).substring(2, 9)}${Date.now().toString(36)}`,
+    head_commit: {
+      message: `${commitType}: ${commitMsg}`,
+      author: { name: randomChoice(mockAuthors) }
+    },
+    created_at: new Date(now).toISOString(),
+    html_url: `https://github.com/acme/${repoName}/actions/runs/${Date.now() + repoId}`
+  };
+  
+  // Add to beginning and limit total runs to max 50
+  runsStorage[repoName] = [newRun, ...currentRuns].slice(0, 50);
+  lastUpdateTime[repoName] = new Date(now).toISOString(); // Update timestamp
+  updateSequence[repoName] = ++sequenceCounter; // Increment sequence for sorting
+  
+  console.log(`[Mock Data] 🆕 New queued run added to ${repoName}: ${newRun.name} #${newRun.run_number}`);
+  
+  // Progress workflow runs through their lifecycle
+  // queued -> in_progress -> completed (success/failure)
+  repoNames.forEach(repo => {
+    const runs = runsStorage[repo];
+    let updated = false;
+    
+    runs.forEach((run, idx) => {
+      // Don't update the newest run we just added
+      if (idx === 0 && run.id === newRun.id) return;
+      
+      // Transition queued -> in_progress (70% chance per tick)
+      if (run.status === 'queued' && random(0, 100) < 70) {
+        run.status = 'in_progress';
+        lastUpdateTime[repo] = new Date(now).toISOString(); // Update timestamp
+        updateSequence[repo] = ++sequenceCounter; // Increment sequence for sorting
+        console.log(`[Mock Data] ⏳ Started ${repo}: ${run.name} #${run.run_number}`);
+        updated = true;
+      }
+      // Transition in_progress -> completed (50% chance per tick)
+      else if (run.status === 'in_progress' && random(0, 100) < 50) {
+        run.status = 'completed';
+        // 85% success, 12% failure, 3% cancelled/timed_out
+        const conclusionRoll = random(0, 100);
+        if (conclusionRoll < 85) run.conclusion = 'success';
+        else if (conclusionRoll < 97) run.conclusion = 'failure';
+        else run.conclusion = randomChoice(['cancelled', 'timed_out']);
+        
+        lastUpdateTime[repo] = new Date(now).toISOString(); // Update timestamp
+        updateSequence[repo] = ++sequenceCounter; // Increment sequence for sorting
+        const emoji = run.conclusion === 'success' ? '✅' : run.conclusion === 'failure' ? '❌' : '⚠️';
+        console.log(`[Mock Data] ${emoji} Completed ${repo}: ${run.name} #${run.run_number} -> ${run.conclusion}`);
+        updated = true;
+      }
+    });
+  });
+  
+  // Force a storage update to trigger reactivity
+  return true; // Signal that an event was added
+};
+
+// Getter function that checks if a new event should be added
+const getOrUpdateMockRuns = (repoName) => {
+  return runsStorage[repoName] || [];
+};
+
+// Start the event generation interval
+let eventIntervalId = null;
+
+const startEventGeneration = () => {
+  if (eventIntervalId) return; // Already running
+  
+  console.log('[Mock Data] Starting event generation (every 10s)');
+  
+  // Add events every 10 seconds
+  eventIntervalId = setInterval(() => {
+    addRandomEvent(Date.now());
+  }, eventInterval);
+};
+
+// Auto-start when module loads
+startEventGeneration();
 
 export const MOCK_WORKFLOW_RUNS = {
-  'demo-pulse-animation': Array.from({ length: 30 }, (_, i) => ({
-    id: 1000 + i,
-    name: ['CI Pipeline', 'Build & Test', 'Deploy', 'Lint', 'Security Scan'][i % 5],
-    status: i === 0 ? 'in_progress' : 'completed',
-    conclusion: i === 0 ? null : i % 6 === 0 ? 'failure' : 'success',
-    run_number: 123 + i,
-    head_branch: i % 4 === 0 ? 'develop' : i % 4 === 1 ? 'feature/new-ui' : i % 4 === 2 ? 'hotfix/critical-bug' : 'main',
-    head_sha: `abc${i.toString().padStart(13, '0')}`,
-    head_commit: { 
-      message: `${['feat', 'fix', 'chore', 'test', 'docs', 'refactor', 'style', 'perf'][i % 8]}: ${[
-        'add new feature', 
-        'resolve bug in production', 
-        'update dependencies',
-        'add comprehensive test coverage',
-        'improve documentation',
-        'refactor legacy code',
-        'apply code formatting',
-        'optimize performance'
-      ][i % 8]}\n\nThis is a longer commit message with multiple lines\nto test how the UI handles more content`,
-      author: { name: mockAuthors[i % 5] }
-    },
-    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 3).toISOString(),
-    html_url: `https://github.com/demo/repo/actions/runs/${1000 + i}`
-  })),
-  'demo-success-with-prs': Array.from({ length: 35 }, (_, i) => ({
-    id: 2000 + i,
-    name: ['CI Pipeline', 'Deploy', 'Test Suite', 'Code Quality', 'Build', 'Integration Tests'][i % 6],
-    status: 'completed',
-    conclusion: i % 8 === 0 ? 'failure' : i % 8 === 1 ? 'cancelled' : 'success',
-    run_number: 234 + i,
-    head_branch: i % 5 === 0 ? 'main' : i % 5 === 1 ? 'develop' : i % 5 === 2 ? 'feature/analytics' : i % 5 === 3 ? 'feature/settings' : 'feature/dashboard-improvements',
-    head_sha: `fed${i.toString().padStart(13, '0')}`,
-    head_commit: { 
-      message: `${['feat', 'fix', 'chore', 'test', 'docs'][i % 5]}: ${[
-        'add new dashboard features with comprehensive analytics',
-        'fix critical bug affecting user experience', 
-        'update all dependencies to latest versions',
-        'add integration tests for all components',
-        'update API documentation with examples'
-      ][i % 5]}`,
-      author: { name: mockAuthors[i % 5] }
-    },
-    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 2).toISOString(),
-    html_url: `https://github.com/demo/repo/actions/runs/${2000 + i}`
-  })),
-  'demo-failure': Array.from({ length: 28 }, (_, i) => ({
-    id: 3000 + i,
-    name: ['Test Suite', 'Lint', 'Type Check', 'Unit Tests', 'E2E Tests'][i % 5],
-    status: 'completed',
-    conclusion: i % 3 === 0 ? 'failure' : 'success',
-    run_number: 156 + i,
-    head_branch: i % 3 === 0 ? 'feature/new-feature' : i % 3 === 1 ? 'feature/bug-fixes' : 'main',
-    head_sha: `987${i.toString().padStart(13, '0')}`,
-    head_commit: { 
-      message: `test: ${[
-        'add comprehensive test coverage for all edge cases',
-        'fix flaky tests in CI pipeline',
-        'improve test reliability and performance',
-        'add missing unit tests',
-        'update test fixtures and mocks'
-      ][i % 5]}`,
-      author: { name: mockAuthors[i % 5] }
-    },
-    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 4).toISOString(),
-    html_url: `https://github.com/demo/repo/actions/runs/${3000 + i}`
-  })),
-  'demo-in-progress': Array.from({ length: 25 }, (_, i) => ({
-    id: 4000 + i,
-    name: ['Deploy to Staging', 'Build', 'Test', 'Package', 'Publish'][i % 5],
-    status: i < 3 ? 'in_progress' : 'completed',
-    conclusion: i < 3 ? null : i % 7 === 0 ? 'failure' : 'success',
-    run_number: 67 + i,
-    head_branch: i % 2 === 0 ? 'develop' : 'release/v2.0',
-    head_sha: `stg${i.toString().padStart(13, '0')}`,
-    head_commit: { 
-      message: `${['deploy', 'build', 'release'][i % 3]}: ${[
-        'prepare version 2.0 release with new features',
-        'build artifacts for production deployment',
-        'create release candidate for testing'
-      ][i % 3]}`,
-      author: { name: mockAuthors[i % 5] }
-    },
-    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 5).toISOString(),
-    html_url: `https://github.com/demo/repo/actions/runs/${4000 + i}`
-  })),
-  'demo-many-topics': Array.from({ length: 40 }, (_, i) => ({
-    id: 5000 + i,
-    name: ['CI Pipeline', 'Build & Test', 'Deploy', 'Security Scan', 'Lint', 'Type Check', 'Code Coverage', 'Performance Tests'][i % 8],
-    status: 'completed',
-    conclusion: i % 7 === 0 ? 'failure' : i % 7 === 1 ? 'cancelled' : 'success',
-    run_number: 300 + i,
-    head_branch: i % 5 === 0 ? 'main' : i % 5 === 1 ? 'develop' : i % 5 === 2 ? `feature/feature-${i}` : i % 5 === 3 ? `bugfix/issue-${i}` : `hotfix/urgent-${i}`,
-    head_sha: `com${i.toString().padStart(13, '0')}`,
-    head_commit: { 
-      message: `${['feat', 'fix', 'chore', 'test', 'docs', 'refactor', 'style', 'perf', 'ci'][i % 9]}: ${[
-        'update components with new design system',
-        'fix bug in authentication flow', 
-        'refactor code for better maintainability',
-        'add tests for edge cases',
-        'update documentation with examples',
-        'optimize build process',
-        'apply linting rules',
-        'improve performance metrics',
-        'update CI/CD pipeline'
-      ][i % 9]}\n\nDetailed explanation of changes:\n- Change 1\n- Change 2\n- Change 3`,
-      author: { name: mockAuthors[i % 5] }
-    },
-    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 5).toISOString(),
-    html_url: `https://github.com/demo/repo/actions/runs/${5000 + i}`
-  })),
-  'demo-high-pr-count': Array.from({ length: 45 }, (_, i) => ({
-    id: 6000 + i,
-    name: ['PR Checks', 'CI', 'Build', 'Tests', 'Lint & Format', 'Code Review'][i % 6],
-    status: 'completed',
-    conclusion: i % 10 === 0 ? 'failure' : 'success',
-    run_number: 450 + i,
-    head_branch: `pr-${i + 1}`,
-    head_sha: `pr${i.toString().padStart(15, '0')}`,
-    head_commit: { 
-      message: `PR #${i + 1}: ${[
-        'various improvements and bug fixes',
-        'add new features and enhancements',
-        'refactor codebase for better performance',
-        'update dependencies and configuration',
-        'improve test coverage and reliability'
-      ][i % 5]}`,
-      author: { name: mockAuthors[i % 5] }
-    },
-    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 3).toISOString(),
-    html_url: `https://github.com/demo/repo/actions/runs/${6000 + i}`
-  })),
-  'demo-warning': Array.from({ length: 20 }, (_, i) => ({
-    id: 7000 + i,
-    name: ['Long Running Job', 'Nightly Build', 'Full Test Suite'][i % 3],
-    status: 'completed',
-    conclusion: i % 4 === 0 ? 'cancelled' : i % 4 === 1 ? 'timed_out' : 'success',
-    run_number: 126 + i,
-    head_branch: 'main',
-    head_sha: `wrn${i.toString().padStart(13, '0')}`,
-    head_commit: { 
-      message: 'chore: cleanup old workflows and optimize',
-      author: { name: mockAuthors[i % 5] }
-    },
-    created_at: new Date(Date.now() - 1000 * 60 * (i + 1) * 10).toISOString(),
-    html_url: `https://github.com/demo/repo/actions/runs/${7000 + i}`
-  }))
-}
+  get 'api-gateway'() { return getOrUpdateMockRuns('api-gateway') },
+  get 'frontend-app'() { return getOrUpdateMockRuns('frontend-app') },
+  get 'ml-pipeline'() { return getOrUpdateMockRuns('ml-pipeline') },
+  get 'mobile-app'() { return getOrUpdateMockRuns('mobile-app') },
+  get 'data-processor'() { return getOrUpdateMockRuns('data-processor') },
+  get 'auth-service'() { return getOrUpdateMockRuns('auth-service') },
+  get 'notification-service'() { return getOrUpdateMockRuns('notification-service') },
+  get 'payment-gateway'() { return getOrUpdateMockRuns('payment-gateway') },
+  get 'analytics-dashboard'() { return getOrUpdateMockRuns('analytics-dashboard') },
+  get 'infrastructure'() { return getOrUpdateMockRuns('infrastructure') }
+};
 
-export const MOCK_REPO_STATUSES = {
-  // Animated demo card - status will cycle to show pulse animation
-  'demo-pulse-animation': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'demo',
-    description: '🎬 Watch this card pulse when status changes (cycles every 5 seconds)',
-    workflow: 'Animation Demo',
-    branch: 'main',
-    commitMessage: 'demo: showcase pulse animation on status change',
-    url: 'https://github.com/demo/repo/actions/runs/999',
-    updatedAt: new Date().toISOString(),
-    openPRCount: 0,
-    topics: ['animation', 'demo', 'ui-showcase'],
-    _cycleStatus: true // Special flag to trigger status cycling
-  },
-  
-  // Success state with topics and PRs
-  'demo-success-with-prs': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'demo',
-    description: 'Successfully completed workflow with open PRs',
-    workflow: 'CI Pipeline',
-    branch: 'main',
-    commitMessage: 'feat: add new dashboard features',
-    url: 'https://github.com/demo/repo/actions/runs/123',
-    updatedAt: new Date().toISOString(),
-    openPRCount: 3,
-    topics: ['infrastructure-as-code', 'terraform-module', 'aws']
-  },
-  
-  // Failure state with topics
-  'demo-failure': {
-    status: 'completed',
-    conclusion: 'failure',
-    category: 'demo',
-    description: 'Failed workflow example',
-    workflow: 'Test Suite',
-    branch: 'feature/new-feature',
-    commitMessage: 'test: add comprehensive test coverage',
-    url: 'https://github.com/demo/repo/actions/runs/124',
-    updatedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // 5 minutes ago
-    openPRCount: 1,
-    topics: ['testing', 'ci-cd', 'quality-assurance']
-  },
-  
-  // In-progress state
-  'demo-in-progress': {
-    status: 'in_progress',
-    conclusion: null,
-    category: 'demo',
-    description: 'Currently running workflow',
-    workflow: 'Deploy to Staging',
-    branch: 'develop',
-    commitMessage: 'deploy: prepare version 2.0 release',
-    url: 'https://github.com/demo/repo/actions/runs/125',
-    updatedAt: new Date().toISOString(),
-    openPRCount: 5,
-    topics: ['deployment', 'staging', 'continuous-delivery']
-  },
-  
-  // No recent runs (shows no-entry icon)
-  'demo-no-runs': {
-    status: 'no_runs',
-    conclusion: null,
-    category: 'demo',
-    description: 'New repository with no workflow runs yet',
-    openPRCount: 0,
-    topics: ['new-project', 'getting-started', 'template']
-  },
-  
-  // Error state
-  'demo-error': {
-    status: null,
-    conclusion: null,
-    category: 'demo',
-    description: 'Repository with API error',
-    error: 'Failed to fetch workflow status',
-    openPRCount: 0,
-    topics: ['debugging', 'troubleshooting']
-  },
-  
-  // Warning state
-  'demo-warning': {
-    status: 'completed',
-    conclusion: 'cancelled',
-    category: 'demo',
-    description: 'Workflow was cancelled',
-    workflow: 'Long Running Job',
-    branch: 'main',
-    commitMessage: 'chore: cleanup old workflows',
-    url: 'https://github.com/demo/repo/actions/runs/126',
-    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
-    openPRCount: 0,
-    topics: ['maintenance', 'optimization']
-  },
-  
-  // Many topics (tests wrapping behavior)
-  'demo-many-topics': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'demo',
-    description: 'Repository with many topics to test label wrapping',
-    workflow: 'Build & Deploy',
-    branch: 'main',
-    commitMessage: 'build: optimize build process for production',
-    url: 'https://github.com/demo/repo/actions/runs/127',
-    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-    openPRCount: 2,
-    topics: ['javascript', 'react', 'typescript', 'vite', 'testing', 'ci-cd', 'docker', 'kubernetes']
-  },
-  
-  // Long topic names (tests truncation)
-  'demo-long-topics': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'demo',
-    description: 'Repository with very long topic names to test truncation',
-    workflow: 'Release Pipeline',
-    branch: 'main',
-    commitMessage: 'release: version 1.0.0',
-    url: 'https://github.com/demo/repo/actions/runs/128',
-    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-    openPRCount: 0,
-    topics: ['very-long-topic-name-that-should-truncate-properly', 'another-extremely-long-topic-name-for-testing']
-  },
-  
-  // High PR count
-  'demo-high-pr-count': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'demo',
-    description: 'Active repository with many open pull requests',
-    workflow: 'PR Checks',
-    branch: 'main',
-    commitMessage: 'merge: integrate multiple feature branches',
-    url: 'https://github.com/demo/repo/actions/runs/129',
-    updatedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 minutes ago
-    openPRCount: 42,
-    topics: ['active-development', 'open-source', 'community']
-  },
-  
-  // Minimal - no topics, no description
-  'demo-minimal': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'demo',
-    workflow: 'Quick Test',
-    branch: 'main',
-    commitMessage: 'fix: minor bug fix',
-    url: 'https://github.com/demo/repo/actions/runs/130',
-    updatedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
-    openPRCount: 0,
-    topics: []
-  },
-  
-  // Single topic
-  'demo-single-topic': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'demo',
-    description: 'Repository with single topic label',
-    workflow: 'Linting',
-    branch: 'main',
-    commitMessage: 'style: apply code formatting',
-    url: 'https://github.com/demo/repo/actions/runs/131',
-    updatedAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 minutes ago
-    openPRCount: 0,
-    topics: ['utilities']
-  },
-  
-  // Different categories for sorting
-  'demo-frontend': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'frontend',
-    description: 'Frontend application repository',
-    workflow: 'Build UI',
-    branch: 'main',
-    commitMessage: 'ui: update component library',
-    url: 'https://github.com/demo/repo/actions/runs/132',
-    updatedAt: new Date().toISOString(),
-    openPRCount: 1,
-    topics: ['react', 'ui', 'frontend']
-  },
-  
-  'demo-backend': {
-    status: 'completed',
-    conclusion: 'success',
-    category: 'backend',
-    description: 'Backend API service',
-    workflow: 'API Tests',
-    branch: 'main',
-    commitMessage: 'api: add new endpoints',
-    url: 'https://github.com/demo/repo/actions/runs/133',
-    updatedAt: new Date().toISOString(),
-    openPRCount: 0,
-    topics: ['api', 'backend', 'nodejs']
+// Helper to get latest run status for initial card display
+const getLatestRunStatus = (repoName) => {
+  const runs = MOCK_WORKFLOW_RUNS[repoName];
+  if (!runs || runs.length === 0) {
+    return { status: 'no_runs', conclusion: null, workflow: 'N/A', branch: 'N/A', commitMessage: 'N/A' };
   }
-}
+  const latest = runs[0];
+  return {
+    status: latest.status,
+    conclusion: latest.conclusion,
+    workflow: latest.name,
+    branch: latest.head_branch,
+    commitMessage: latest.head_commit.message.split('\n')[0]
+  };
+};
+
+// Create base repo data (static info that doesn't change)
+const baseRepoData = {
+  'api-gateway': {
+    category: 'backend',
+    description: 'Core API gateway handling all service routing',
+    url: 'https://github.com/acme/api-gateway',
+    openPRCount: 3,
+    topics: ['api', 'gateway', 'microservices', 'node']
+  },
+  
+  'frontend-app': {
+    category: 'frontend',
+    description: 'Main user-facing web application',
+    url: 'https://github.com/acme/frontend-app',
+    openPRCount: 5,
+    topics: ['react', 'typescript', 'vite', 'ui']
+  },
+  
+  'ml-pipeline': {
+    category: 'data',
+    description: 'Machine learning training and inference pipeline',
+    url: 'https://github.com/acme/ml-pipeline',
+    openPRCount: 2,
+    topics: ['python', 'machine-learning', 'tensorflow', 'airflow']
+  },
+  
+  'mobile-app': {
+    category: 'mobile',
+    description: 'iOS and Android mobile application',
+    url: 'https://github.com/acme/mobile-app',
+    openPRCount: 8,
+    topics: ['react-native', 'mobile', 'ios', 'android']
+  },
+  
+  'data-processor': {
+    category: 'data',
+    description: 'High-throughput data processing service',
+    url: 'https://github.com/acme/data-processor',
+    openPRCount: 1,
+    topics: ['kafka', 'spark', 'scala', 'streaming']
+  },
+  
+  'auth-service': {
+    category: 'backend',
+    description: 'Authentication and authorization service',
+    url: 'https://github.com/acme/auth-service',
+    openPRCount: 12,
+    topics: ['oauth', 'jwt', 'security', 'golang']
+  },
+  
+  'notification-service': {
+    category: 'backend',
+    description: 'Multi-channel notification delivery system',
+    url: 'https://github.com/acme/notification-service',
+    openPRCount: 0,
+    topics: ['notifications', 'email', 'sms', 'push']
+  },
+  
+  'payment-gateway': {
+    category: 'backend',
+    description: 'Secure payment processing and billing',
+    url: 'https://github.com/acme/payment-gateway',
+    openPRCount: 4,
+    topics: ['payments', 'stripe', 'security', 'compliance']
+  },
+  
+  'analytics-dashboard': {
+    category: 'frontend',
+    description: 'Internal analytics and reporting dashboard',
+    url: 'https://github.com/acme/analytics-dashboard',
+    openPRCount: 2,
+    topics: ['analytics', 'visualization', 'd3', 'dashboard']
+  },
+  
+  'infrastructure': {
+    category: 'infrastructure',
+    description: 'Infrastructure as code and deployment configs',
+    url: 'https://github.com/acme/infrastructure',
+    openPRCount: 1,
+    topics: ['terraform', 'kubernetes', 'aws', 'devops']
+  }
+};
+
+// Dynamic status object that reads latest run data
+export const MOCK_REPO_STATUSES = {
+  get 'api-gateway'() { return { ...baseRepoData['api-gateway'], ...getLatestRunStatus('api-gateway'), updatedAt: lastUpdateTime['api-gateway'], updateSequence: updateSequence['api-gateway'] } },
+  get 'frontend-app'() { return { ...baseRepoData['frontend-app'], ...getLatestRunStatus('frontend-app'), updatedAt: lastUpdateTime['frontend-app'], updateSequence: updateSequence['frontend-app'] } },
+  get 'ml-pipeline'() { return { ...baseRepoData['ml-pipeline'], ...getLatestRunStatus('ml-pipeline'), updatedAt: lastUpdateTime['ml-pipeline'], updateSequence: updateSequence['ml-pipeline'] } },
+  get 'mobile-app'() { return { ...baseRepoData['mobile-app'], ...getLatestRunStatus('mobile-app'), updatedAt: lastUpdateTime['mobile-app'], updateSequence: updateSequence['mobile-app'] } },
+  get 'data-processor'() { return { ...baseRepoData['data-processor'], ...getLatestRunStatus('data-processor'), updatedAt: lastUpdateTime['data-processor'], updateSequence: updateSequence['data-processor'] } },
+  get 'auth-service'() { return { ...baseRepoData['auth-service'], ...getLatestRunStatus('auth-service'), updatedAt: lastUpdateTime['auth-service'], updateSequence: updateSequence['auth-service'] } },
+  get 'notification-service'() { return { ...baseRepoData['notification-service'], ...getLatestRunStatus('notification-service'), updatedAt: lastUpdateTime['notification-service'], updateSequence: updateSequence['notification-service'] } },
+  get 'payment-gateway'() { return { ...baseRepoData['payment-gateway'], ...getLatestRunStatus('payment-gateway'), updatedAt: lastUpdateTime['payment-gateway'], updateSequence: updateSequence['payment-gateway'] } },
+  get 'analytics-dashboard'() { return { ...baseRepoData['analytics-dashboard'], ...getLatestRunStatus('analytics-dashboard'), updatedAt: lastUpdateTime['analytics-dashboard'], updateSequence: updateSequence['analytics-dashboard'] } },
+  get 'infrastructure'() { return { ...baseRepoData['infrastructure'], ...getLatestRunStatus('infrastructure'), updatedAt: lastUpdateTime['infrastructure'], updateSequence: updateSequence['infrastructure'] } }
+};

@@ -23,6 +23,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
   const topics = status.topics || []
   const [isFlashing, setIsFlashing] = useState(false)
   const prevStatusRef = useRef(null)
+  const prevSequenceRef = useRef(null)
   const [runs, setRuns] = useState([])
   const [loadingRuns, setLoadingRuns] = useState(false)
   const [activeTab, setActiveTab] = useState('workflows')
@@ -36,16 +37,20 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
   useEffect(() => {
     const currentStatus = getStatusClass(status)
     const prevStatus = prevStatusRef.current
+    const currentSequence = status.updateSequence
+    const prevSequence = prevSequenceRef.current
     
-    // Trigger flash if status changed (but not on initial mount)
-    if (prevStatus && prevStatus !== currentStatus) {
+    // Trigger flash if status changed OR new event happened (sequence changed)
+    if (prevStatus && (prevStatus !== currentStatus || prevSequence !== currentSequence)) {
       setIsFlashing(true)
       setTimeout(() => setIsFlashing(false), 1800) // 3 pulses at 0.6s each
     }
     
     prevStatusRef.current = currentStatus
-  }, [status.status, status.conclusion])
+    prevSequenceRef.current = currentSequence
+  }, [status.status, status.conclusion, status.updateSequence])
 
+  // Fetch runs when expanded
   useEffect(() => {
     if (isExpanded && runs.length === 0) {
       const fetchRuns = async () => {
@@ -80,12 +85,27 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
     }
   }, [isExpanded, repoName, repoOwner, getActiveToken, runs.length, isDemoMode])
 
+  // Poll for updates in demo mode when expanded
+  useEffect(() => {
+    if (isExpanded && isDemoMode) {
+      const updateInterval = setInterval(() => {
+        const mockRuns = MOCK_WORKFLOW_RUNS[repoName] || []
+        setRuns(mockRuns)
+      }, 5000) // Update every 5 seconds
+      
+      return () => clearInterval(updateInterval)
+    }
+  }, [isExpanded, isDemoMode, repoName])
+
   const getRunStatusIcon = (run) => {
     if (run.status === 'completed') {
       if (run.conclusion === 'success') return <CheckCircleFillIcon size={14} className="color-fg-success" />
       if (run.conclusion === 'failure') return <XCircleFillIcon size={14} className="color-fg-danger" />
+      if (run.conclusion === 'cancelled' || run.conclusion === 'timed_out') {
+        return <NoEntryIcon size={14} className="color-fg-attention" />
+      }
     }
-    return <ClockIcon size={14} className="color-fg-attention" />
+    return <ClockIcon size={14} className="color-fg-accent" />
   }
 
   const formatDate = (dateString) => {
@@ -125,9 +145,23 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
     return filtered
   }, [runs, selectedBranch, selectedWorkflow])
 
+  // Get the latest run from filtered results to display in card
+  const displayStatus = useMemo(() => {
+    if (isExpanded && filteredRuns.length > 0) {
+      const latestRun = filteredRuns[0] // Already sorted by most recent
+      return {
+        workflow: latestRun.name || status.workflow,
+        branch: latestRun.head_branch || status.branch,
+        status: latestRun.status,
+        conclusion: latestRun.conclusion
+      }
+    }
+    return status
+  }, [isExpanded, filteredRuns, status])
+
   return (
     <div 
-      className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''} ${isExpanded ? 'expanded' : ''}`}
+      className={`repo-card ${getStatusClass(displayStatus)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''} ${isExpanded ? 'expanded' : ''}`}
     >
       {hasPRs && prUrl && (
         <Link
@@ -169,7 +203,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             className={isPinned ? 'pinned' : ''}
             sx={{ color: isPinned ? 'var(--color-accent-fg)' : 'inherit' }}
           />
-          <div className="repo-card__status-icon">{getStatusIcon(status)}</div>
+          <div className="repo-card__status-icon">{getStatusIcon(displayStatus)}</div>
         </div>
       </div>
       
@@ -226,7 +260,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
                   </ActionMenu>
                 </div>
               ) : (
-                <span className="repo-card__value repo-card__value--bold">{status.workflow || 'N/A'}</span>
+                <span className="repo-card__value repo-card__value--bold">{displayStatus.workflow || 'N/A'}</span>
               )}
             </div>
             <div className="repo-card__row">
@@ -267,13 +301,13 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
                 </div>
               ) : (
                 <span className="repo-card__value">
-                  <GitBranchIcon size={11} /> {status.branch || 'N/A'}
+                  <GitBranchIcon size={11} /> {displayStatus.branch || 'N/A'}
                 </span>
               )}
             </div>
             <div className="repo-card__row">
               <span className="repo-card__label-text">Commit</span>
-              <span className="repo-card__value repo-card__value--mono">{status.commitMessage}</span>
+              <span className="repo-card__value repo-card__value--mono">{displayStatus.commitMessage || status.commitMessage}</span>
             </div>
           </>
         ) : (
