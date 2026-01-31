@@ -17,7 +17,6 @@ locals {
     oauth_start = {
       timeout          = 10
       memory_size      = 128
-      source_code_hash = var.oauth_start_source_code_hash
       environment = merge({
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
         ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "${local.base_url}/api/oauth/callback",
@@ -28,7 +27,6 @@ locals {
     oauth_callback = {
       timeout          = 10
       memory_size      = 128
-      source_code_hash = var.oauth_callback_source_code_hash
       environment = merge({
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
         ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name,
@@ -48,6 +46,14 @@ locals {
     oauth_callback = {
       invoke_mode = "BUFFERED"
     }
+  }
+
+  # Extract just the S3 key from the full s3:// URI in the manifest
+  manifest = jsondecode(data.aws_s3_object.manifest.body)
+
+  lambda_s3_keys = {
+    for name, config in local.manifest.lambdas :
+    name => regex("s3://[^/]+/(.+)", config.package)[0]
   }
 }
 
@@ -75,6 +81,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "lambda_artifacts" {
       noncurrent_days = 30
     }
   }
+}
+
+data "aws_s3_object" "manifest" {
+  bucket = aws_s3_bucket.lambda_artifacts.arn
+  key = var.lambda_manifest_key
 }
 
 resource "aws_secretsmanager_secret" "secrets" {
@@ -157,7 +168,7 @@ resource "aws_lambda_function" "lambda" {
   for_each = local.lambda_functions
 
   s3_bucket        = aws_s3_bucket.lambda_artifacts.id
-  s3_key           = "${replace(each.key, "_", "-")}.zip"
+  s3_key           = local.lambda_s3_keys[replace(each.key, "_", "-")]
   source_code_hash = each.value.source_code_hash != "" ? each.value.source_code_hash : null
   function_name    = "${local.resource_prefix}-${replace(each.key, "_", "-")}"
   role             = aws_iam_role.lambda_execution.arn

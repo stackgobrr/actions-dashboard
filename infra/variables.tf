@@ -15,6 +15,12 @@ variable "environment" {
   }
 }
 
+variable "lambda_manifest_key" {
+  description = "The s3 object key of the Lambda manifest file"
+  type = string
+  default = "manifests/lambda-manifest.json"
+}
+
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
