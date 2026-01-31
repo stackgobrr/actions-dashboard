@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MOCK_REPO_STATUSES } from '../data/mockRepoStatuses'
 import { getGitHubAppCredentials } from '../services/githubAppAuth'
 
@@ -42,6 +42,8 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
   const [isDemoMode, setIsDemoMode] = useState(isDemoModeEnabled(authMethod))
+  // Track update sequence for sorting by most recently updated
+  const updateSequenceRef = useRef(0)
 
   // Create a stable key from repositories to detect real changes
   const reposKey = JSON.stringify(
@@ -97,10 +99,11 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
           commitMessage: run.head_commit?.message?.split('\n')[0] || 'No message',
           url: run.html_url,
           updatedAt: run.updated_at,
+          updateSequence: ++updateSequenceRef.current, // Track update order for sorting
         }
       }
       
-      return { ...result, status: 'no_runs', conclusion: null }
+      return { ...result, status: 'no_runs', conclusion: null, updateSequence: ++updateSequenceRef.current }
     } catch (error) {
       return { error: error.message }
     }
