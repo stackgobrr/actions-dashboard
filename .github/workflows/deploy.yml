@@ -17,9 +17,6 @@ concurrency:
 env:
   AWS_REGION: eu-west-2
   NODE_VERSION: '20'
-  HOSTED_ZONE_ID: ${{ vars.HOSTED_ZONE_ID }}
-  DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
-  LAMBDA_S3_BUCKET_NAME: ${{ vars.LAMBDA_S3_BUCKET_NAME }}
 
 jobs:
   setup:
@@ -94,20 +91,20 @@ jobs:
           auto-approve: 'true'
           environment: ${{ needs.setup.outputs.tfvars_env }}
         env:
-          TF_VAR_domain_name: ${{ env.DOMAIN_NAME }}
-          TF_VAR_hosted_zone_id: ${{ env.HOSTED_ZONE_ID }}
+          TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
+          TF_VAR_hosted_zone_id: ${{ vars.HOSTED_ZONE_ID }}
           TF_VAR_actions_dashboard_app_id: ${{ secrets.ACTIONS_DASHBOARD_APP_ID }}
           TF_VAR_app_private_key: ${{ secrets.ACTIONS_DASHBOARD_APP_PRIVATE_KEY }}
           TF_VAR_webhook_secret: ${{ secrets.ACTIONS_DASHBOARD_WEBHOOK_SECRET }}
           TF_VAR_oauth_client_id: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_ID }}
           TF_VAR_oauth_client_secret: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET }}
-          TF_VAR_lambda_artifacts_bucket: ${{ env.LAMBDA_S3_BUCKET_NAME }}
+          TF_VAR_lambda_artifacts_bucket: ${{ vars.LAMBDA_S3_BUCKET_NAME }}
 
       - name: Update Lambdas
         if: github.event_name == 'repository_dispatch'
         run: |
           cd infra
-          BUCKET_NAME=${{ env.LAMBDA_S3_BUCKET_NAME }}
+          BUCKET_NAME=${{ vars.LAMBDA_S3_BUCKET_NAME }}
           ENVIRONMENT="${{ needs.setup.outputs.tfvars_env }}"
 
           MANIFEST=$(aws s3 cp "s3://${BUCKET_NAME}/manifest.json" -)
@@ -181,7 +178,7 @@ jobs:
         env:
           VITE_SSE_ENDPOINT: /api/sse
           VITE_APP_SLUG: ${{ vars.APP_SLUG }}
-          VITE_PLAUSIBLE_DOMAIN: ${{ env.DOMAIN_NAME }}
+          VITE_PLAUSIBLE_DOMAIN: ${{ vars.DOMAIN_NAME }}
 
   deploy-frontend:
     name: Deploy Frontend
