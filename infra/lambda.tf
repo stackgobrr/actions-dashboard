@@ -57,11 +57,6 @@ locals {
   }
 }
 
-data "aws_s3_object" "manifest" {
-  bucket = aws_s3_bucket.lambda_artifacts.arn
-  key = var.lambda_manifest_key
-}
-
 resource "aws_secretsmanager_secret" "secrets" {
   for_each = local.secrets
 
@@ -137,11 +132,20 @@ resource "aws_cloudwatch_log_group" "lambda" {
   }
 }
 
+data "aws_s3_bucket" "lambda_artifacts" {
+  bucket = var.lambda_artifacts_bucket
+}
+
+data "aws_s3_object" "manifest" {
+  bucket = aws_s3_bucket.lambda_artifacts.arn
+  key = var.lambda_manifest_key
+}
+
 # Lambda Functions
 resource "aws_lambda_function" "lambda" {
   for_each = local.lambda_functions
-
-  s3_bucket        = aws_s3_bucket.lambda_artifacts.id
+3
+  s3_bucket        = data.aws_s3_bucket.lambda_artifacts.id
   s3_key           = local.lambda_s3_keys[replace(each.key, "_", "-")]
   source_code_hash = each.value.source_code_hash != "" ? each.value.source_code_hash : null
   function_name    = "${local.resource_prefix}-${replace(each.key, "_", "-")}"
