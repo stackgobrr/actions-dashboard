@@ -4,8 +4,8 @@ import {
   GitPullRequestIcon,
   NoEntryIcon,
   PinIcon,
-  CheckCircleFillIcon,
-  XCircleFillIcon,
+  CheckCircleIcon,
+  CircleSlashIcon,
   ClockIcon,
   WorkflowIcon,
   GitCommitIcon,
@@ -15,7 +15,10 @@ import {
   CodeIcon,
   GraphIcon,
   GearIcon,
-  StopIcon
+  StopIcon,
+  AlertIcon,
+  BlockedIcon,
+  SkipIcon
 } from '@primer/octicons-react'
 import { Link, Label, CounterLabel, IconButton, Spinner, UnderlineNav, ActionMenu, ActionList } from '@primer/react'
 import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../../utils/statusHelpers.jsx'
@@ -106,13 +109,19 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
 
   const getRunStatusIcon = (run) => {
     if (run.status === 'completed') {
-      if (run.conclusion === 'success') return <CheckCircleFillIcon size={14} className="color-fg-success" />
-      if (run.conclusion === 'failure') return <XCircleFillIcon size={14} className="color-fg-danger" />
+      if (run.conclusion === 'success') return <CheckCircleIcon size={14} className="color-fg-success" />
+      if (run.conclusion === 'failure') return <CircleSlashIcon size={14} className="color-fg-danger" />
       if (run.conclusion === 'cancelled' || run.conclusion === 'timed_out') {
-        return <StopIcon size={14} className="color-fg-muted" />
+        return <SkipIcon size={14} className="color-fg-attention" />
       }
     }
-    return <ClockIcon size={14} className="color-fg-accent" />
+    if (run.status === 'queued' || run.status === 'pending') {
+      return <BlockedIcon size={14} className="color-fg-muted" />
+    }
+    if (run.status === 'in_progress') {
+      return <ClockIcon size={14} className="color-fg-accent" />
+    }
+    return <AlertIcon size={14} className="color-fg-muted" />
   }
 
   const formatDate = (dateString) => {
@@ -285,7 +294,8 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       </div>
       
       <div className="repo-card__body" 
-        onClick={() => {
+        onClick={(e) => {
+          e.preventDefault()
           onToggleExpand()
           if (isDemoMode) {
             trackEvent('Demo Interaction', { 

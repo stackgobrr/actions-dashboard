@@ -1,8 +1,10 @@
 import { 
   CheckCircleIcon, 
-  XCircleIcon, 
+  CircleSlashIcon, 
   ClockIcon, 
-  AlertIcon
+  AlertIcon,
+  BlockedIcon,
+  SkipIcon
 } from '@primer/octicons-react'
 
 /**
@@ -14,10 +16,12 @@ export const getStatusIcon = (status) => {
   if (status.error) return <AlertIcon size={18} className="color-fg-danger" />
   if (status.status === 'completed') {
     if (status.conclusion === 'success') return <CheckCircleIcon size={18} className="color-fg-success" />
-    if (status.conclusion === 'failure') return <XCircleIcon size={18} className="color-fg-danger" />
+    if (status.conclusion === 'failure') return <CircleSlashIcon size={18} className="color-fg-danger" />
+    if (status.conclusion === 'cancelled' || status.conclusion === 'timed_out') return <SkipIcon size={18} className="color-fg-attention" />
     return <AlertIcon size={18} className="color-fg-attention" />
   }
-  if (status.status === 'in_progress' || status.status === 'queued' || status.status === 'pending') return <ClockIcon size={18} className="color-fg-accent" />
+  if (status.status === 'queued' || status.status === 'pending') return <BlockedIcon size={18} className="color-fg-muted" />
+  if (status.status === 'in_progress') return <ClockIcon size={18} className="color-fg-accent" />
   return <AlertIcon size={18} className="color-fg-muted" />
 }
 
@@ -33,7 +37,8 @@ export const getStatusClass = (status) => {
     if (status.conclusion === 'failure') return 'failure'
     return 'warning'
   }
-  if (status.status === 'in_progress' || status.status === 'queued' || status.status === 'pending') return 'in-progress'
+  if (status.status === 'queued' || status.status === 'pending') return 'queued'
+  if (status.status === 'in_progress') return 'in-progress'
   if (status.status === 'no_runs') return 'no_runs'
   return 'unknown'
 }
