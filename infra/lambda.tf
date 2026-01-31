@@ -15,8 +15,8 @@ locals {
   # Lambda function runtime settings and environment variables
   lambda_functions = {
     oauth_start = {
-      timeout          = 10
-      memory_size      = 128
+      timeout     = 10
+      memory_size = 128
       environment = merge({
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
         ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "${local.base_url}/api/oauth/callback",
@@ -25,8 +25,8 @@ locals {
       }, {})
     }
     oauth_callback = {
-      timeout          = 10
-      memory_size      = 128
+      timeout     = 10
+      memory_size = 128
       environment = merge({
         ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
         ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name,
@@ -137,14 +137,14 @@ data "aws_s3_bucket" "lambda_artifacts" {
 }
 
 data "aws_s3_object" "manifest" {
-  bucket = aws_s3_bucket.lambda_artifacts.arn
-  key = var.lambda_manifest_key
+  bucket = data.aws_s3_bucket.lambda_artifacts.id
+  key    = var.lambda_manifest_key
 }
 
 # Lambda Functions
 resource "aws_lambda_function" "lambda" {
   for_each = local.lambda_functions
-3
+
   s3_bucket        = data.aws_s3_bucket.lambda_artifacts.id
   s3_key           = local.lambda_s3_keys[replace(each.key, "_", "-")]
   source_code_hash = each.value.source_code_hash != "" ? each.value.source_code_hash : null

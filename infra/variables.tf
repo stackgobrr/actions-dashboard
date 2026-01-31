@@ -17,13 +17,13 @@ variable "environment" {
 
 variable "lambda_artifacts_bucket" {
   description = "The s3 bucket where the Lambda code is stored"
-  type = string
+  type        = string
 }
 
 variable "lambda_manifest_key" {
   description = "The s3 object key of the Lambda manifest file"
-  type = string
-  default = "manifests/lambda-manifest.json"
+  type        = string
+  default     = "manifests/lambda-manifest.json"
 }
 
 variable "project_name" {
