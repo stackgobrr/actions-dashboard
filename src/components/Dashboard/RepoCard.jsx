@@ -5,7 +5,7 @@ import {
   NoEntryIcon,
   PinIcon,
   CheckCircleIcon,
-  CircleSlashIcon,
+  XCircleIcon,
   ClockIcon,
   WorkflowIcon,
   GitCommitIcon,
@@ -111,7 +111,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
   const getRunStatusIcon = (run) => {
     if (run.status === 'completed') {
       if (run.conclusion === 'success') return <CheckCircleIcon size={14} className="color-fg-success" />
-      if (run.conclusion === 'failure') return <CircleSlashIcon size={14} className="color-fg-danger" />
+      if (run.conclusion === 'failure') return <XCircleIcon size={14} className="color-fg-danger" />
       if (run.conclusion === 'cancelled' || run.conclusion === 'timed_out') {
         return <SkipIcon size={14} className="color-fg-attention" />
       }

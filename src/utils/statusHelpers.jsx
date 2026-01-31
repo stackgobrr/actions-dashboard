@@ -1,6 +1,6 @@
 import { 
   CheckCircleIcon, 
-  CircleSlashIcon, 
+  XCircleIcon, 
   ClockIcon, 
   AlertIcon,
   BlockedIcon,
@@ -16,7 +16,7 @@ export const getStatusIcon = (status) => {
   if (status.error) return <AlertIcon size={18} className="color-fg-danger" />
   if (status.status === 'completed') {
     if (status.conclusion === 'success') return <CheckCircleIcon size={18} className="color-fg-success" />
-    if (status.conclusion === 'failure') return <CircleSlashIcon size={18} className="color-fg-danger" />
+    if (status.conclusion === 'failure') return <XCircleIcon size={18} className="color-fg-danger" />
     if (status.conclusion === 'cancelled' || status.conclusion === 'timed_out') return <SkipIcon size={18} className="color-fg-attention" />
     return <AlertIcon size={18} className="color-fg-attention" />
   }
