@@ -6,6 +6,8 @@ on:
       - main
     tags:
       - 'v*'
+  repository_dispatch:
+    types: [lambda-updated]
   workflow_dispatch:
 
 concurrency:
@@ -107,65 +109,9 @@ jobs:
           BUCKET_NAME=$(terraform output -raw lambda_artifacts_bucket)
           echo "name=$BUCKET_NAME" >> $GITHUB_OUTPUT
 
-  package-lambdas:
-    name: Package Lambda - ${{ matrix.function }}
-    needs: [create-lambda-bucket]
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    strategy:
-      matrix:
-        function: [oauth-start, oauth-callback]
-    outputs:
-      oauth_start_hash: ${{ steps.hash.outputs.oauth_start_hash }}
-      oauth_callback_hash: ${{ steps.hash.outputs.oauth_callback_hash }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: stackgobrr/common-github-actions/actions/aws-configure@main
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          auth-method: 'static'
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'api/${{ matrix.function }}/package-lock.json'
-
-      - name: Package Lambda function
-        id: hash
-        run: |
-          cd api/${{ matrix.function }}
-          
-          # Install dependencies if package.json exists
-          if [ -f package.json ]; then
-            npm install --production
-            rm -rf package-lock.json
-          fi
-          
-          # Create zip archive
-          zip -r "${{ matrix.function }}.zip" . -x "*.git*" -x "node_modules/.cache/*"
-          
-          # Calculate hash
-          HASH=$(openssl dgst -sha256 -binary "${{ matrix.function }}.zip" | openssl base64)
-          
-          # Output hash
-          echo "${{ matrix.function }}_hash=$HASH" >> $GITHUB_OUTPUT
-          
-          # Upload to S3
-          aws s3 cp "${{ matrix.function }}.zip" "s3://${{ needs.create-lambda-bucket.outputs.bucket_name }}/${{ matrix.function }}.zip"
-
   deploy-infrastructure:
     name: Deploy Infrastructure
-    needs: [test, setup, package-lambdas]
+    needs: [setup, test]
     runs-on: ubuntu-latest
     environment: ${{ needs.setup.outputs.environment }}
     permissions:
@@ -212,8 +158,27 @@ jobs:
           TF_VAR_webhook_secret: ${{ secrets.ACTIONS_DASHBOARD_WEBHOOK_SECRET }}
           TF_VAR_oauth_client_id: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_ID }}
           TF_VAR_oauth_client_secret: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET }}
-          TF_VAR_oauth_start_source_code_hash: ${{ needs.package-lambdas.outputs.oauth_start_hash }}
-          TF_VAR_oauth_callback_source_code_hash: ${{ needs.package-lambdas.outputs.oauth_callback_hash }}
+
+      - name: Update Lambdas
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          cd infra
+          BUCKET_NAME=$(terraform output -raw lambda_artifacts_bucket)
+          ENVIRONMENT="${{ needs.setup.outputs.tfvars_env }}"
+
+          MANIFEST=$(aws s3 cp "s3://${BUCKET_NAME}/manifest.json" -)
+
+          for fn in $(echo "$MANIFEST" | jq -r '.lambdas | keys[]'); do
+            S3_KEY=$(echo "$MANIFEST" | jq -r --arg fn "$fn" '.lambdas[$fn].package | sub("s3://[^/]+/"; "")')
+            FUNCTION_NAME="actions-dashboard-${ENVIRONMENT}-${fn}"
+
+            echo "Updating ${FUNCTION_NAME} with ${S3_KEY}"
+
+            aws lambda update-function-code \
+              --function-name "$FUNCTION_NAME" \
+              --s3-bucket "$BUCKET_NAME" \
+              --s3-key "$S3_KEY"
+          done
 
       - name: Get Terraform outputs
         id: get-outputs
