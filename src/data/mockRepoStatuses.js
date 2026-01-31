@@ -253,8 +253,6 @@ const addRandomEvent = (now) => {
   lastUpdateTime[repoName] = new Date(now).toISOString(); // Update timestamp
   updateSequence[repoName] = ++sequenceCounter; // Increment sequence for sorting
   
-  console.log(`[Mock Data] 🆕 New queued run added to ${repoName}: ${newRun.name} #${newRun.run_number}`);
-  
   // Progress workflow runs through their lifecycle
   // queued -> in_progress -> completed (success/failure)
   repoNames.forEach(repo => {
@@ -270,7 +268,6 @@ const addRandomEvent = (now) => {
         run.status = 'in_progress';
         lastUpdateTime[repo] = new Date(now).toISOString(); // Update timestamp
         updateSequence[repo] = ++sequenceCounter; // Increment sequence for sorting
-        console.log(`[Mock Data] ⏳ Started ${repo}: ${run.name} #${run.run_number}`);
         updated = true;
       }
       // Transition in_progress -> completed (50% chance per tick)
@@ -284,8 +281,6 @@ const addRandomEvent = (now) => {
         
         lastUpdateTime[repo] = new Date(now).toISOString(); // Update timestamp
         updateSequence[repo] = ++sequenceCounter; // Increment sequence for sorting
-        const emoji = run.conclusion === 'success' ? '✅' : run.conclusion === 'failure' ? '❌' : '⚠️';
-        console.log(`[Mock Data] ${emoji} Completed ${repo}: ${run.name} #${run.run_number} -> ${run.conclusion}`);
         updated = true;
       }
     });
@@ -305,8 +300,6 @@ let eventIntervalId = null;
 
 const startEventGeneration = () => {
   if (eventIntervalId) return; // Already running
-  
-  console.log('[Mock Data] Starting event generation (every 10s)');
   
   // Add events every 10 seconds
   eventIntervalId = setInterval(() => {

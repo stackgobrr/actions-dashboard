@@ -288,7 +288,10 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             icon={PinIcon}
             size="small"
             variant="invisible"
-            onClick={() => onTogglePin(repoName)}
+            onClick={(e) => {
+              e.preventDefault()
+              onTogglePin(repoName)
+            }}
             aria-label={isPinned ? 'Unpin repository' : 'Pin repository'}
             className={isPinned ? 'pinned' : ''}
             sx={{ color: isPinned ? 'var(--color-accent-fg)' : 'inherit' }}
@@ -425,7 +428,8 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             <UnderlineNav aria-label="View options" className="repo-card__tabs" sx={{ marginBottom: 2, borderBottomWidth: '1px', display: 'flex', width: '100%' }}>
               <UnderlineNav.Item
                 aria-current={activeTab === 'workflows' ? 'page' : undefined}
-                onSelect={() => {
+                onSelect={(e) => {
+                  e?.preventDefault?.()
                   setActiveTab('workflows')
                   if (isDemoMode) {
                     trackEvent('Demo Interaction', { 
@@ -442,7 +446,8 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             </UnderlineNav.Item>
             <UnderlineNav.Item
               aria-current={activeTab === 'commits' ? 'page' : undefined}
-              onSelect={() => {
+              onSelect={(e) => {
+                e?.preventDefault?.()
                 setActiveTab('commits')
                 if (isDemoMode) {
                   trackEvent('Demo Interaction', { 
