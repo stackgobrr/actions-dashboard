@@ -47,18 +47,25 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
   useEffect(() => {
     const currentStatus = getStatusClass(status)
     const prevStatus = prevStatusRef.current
-    const currentSequence = status.updateSequence
-    const prevSequence = prevSequenceRef.current
     
-    // Trigger flash if new event happened (sequence changed), regardless of status
-    if (prevSequence !== null && prevSequence !== currentSequence) {
+    // Create a unique identifier for the current workflow state
+    // For real data: use combination of run ID + status + conclusion + updatedAt
+    // For mock data: use updateSequence
+    const currentIdentifier = status.updateSequence 
+      ? status.updateSequence 
+      : `${status.runId || ''}-${status.status}-${status.conclusion}-${status.updatedAt || ''}`
+    const prevIdentifier = prevSequenceRef.current
+    
+    // Trigger flash only if the identifier actually changed (new event detected)
+    // This prevents flashing on every refresh when nothing changed
+    if (prevIdentifier !== null && prevIdentifier !== currentIdentifier) {
       setIsFlashing(true)
       setTimeout(() => setIsFlashing(false), 1800) // 3 pulses at 0.6s each
     }
     
     prevStatusRef.current = currentStatus
-    prevSequenceRef.current = currentSequence
-  }, [status.status, status.conclusion, status.updateSequence])
+    prevSequenceRef.current = currentIdentifier
+  }, [status.status, status.conclusion, status.updateSequence, status.runId, status.updatedAt])
 
   // Fetch runs when expanded
   useEffect(() => {

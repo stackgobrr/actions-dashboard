@@ -65,7 +65,7 @@ async function fetchBatch(repos, token) {
                     }
                   }
                 }
-                checkSuites(first: 5, orderBy: {field: CREATED_AT, direction: DESC}) {
+                checkSuites(first: 5) {
                   nodes {
                     status
                     conclusion
@@ -158,6 +158,7 @@ async function fetchBatch(repos, token) {
         status.commitMessage = commitMessage
         status.url = workflowRun.url || `https://github.com/${repo.owner}/${repo.name}/actions`
         status.updatedAt = checkSuite.updatedAt || workflowRun.updatedAt || checkSuite.createdAt
+        status.runId = workflowRun.databaseId || null
       } else {
         status.status = 'no_runs'
         status.conclusion = null
