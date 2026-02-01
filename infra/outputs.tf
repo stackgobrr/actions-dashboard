@@ -33,17 +33,6 @@ output "route53_record_name" {
   value       = module.frontend.domain_name
 }
 
-# OAuth Lambda Function URLs
-output "oauth_start_url" {
-  description = "URL for OAuth start endpoint"
-  value       = aws_lambda_function_url.lambda["oauth_start"].function_url
-}
-
-output "oauth_callback_url" {
-  description = "URL for OAuth callback endpoint"
-  value       = aws_lambda_function_url.lambda["oauth_callback"].function_url
-}
-
 # OAuth Secrets Manager Secret ARNs and Names
 output "oauth_client_id_secret_arn" {
   description = "ARN of the Secrets Manager secret for OAuth client ID"

@@ -1,9 +1,6 @@
 locals {
-  # Extract Lambda Function URL domains (strip https:// and trailing /) for CloudFront origins
-  lambda_url_domains = {
-    for key in keys(aws_lambda_function.lambda) :
-    key => replace(replace(aws_lambda_function_url.lambda[key].function_url, "https://", ""), "/", "")
-  }
+  # API Gateway domain for CloudFront origin
+  api_gateway_domain = "${aws_api_gateway_rest_api.main.id}.execute-api.${var.aws_region}.amazonaws.com"
 
   # Map OAuth Lambda functions to their CloudFront path patterns
   lambda_path_patterns = {
@@ -25,11 +22,12 @@ module "frontend" {
   domain_name    = local.domain_name
   hosted_zone_id = var.hosted_zone_id
 
-  # Add Lambda Function URLs as additional origins
+  # Add API Gateway as additional origin
   additional_origins = [
-    for key, domain in local.lambda_url_domains : {
-      origin_id   = "lambda-${key}"
-      domain_name = domain
+    {
+      origin_id   = "api-gateway"
+      domain_name = local.api_gateway_domain
+      origin_path = "/v1"
     }
   ]
 
@@ -37,7 +35,7 @@ module "frontend" {
   additional_cache_behaviors = [
     for key, path in local.lambda_path_patterns : {
       path_pattern               = path
-      target_origin_id           = "lambda-${key}"
+      target_origin_id           = "api-gateway"
       cache_policy_id            = aws_cloudfront_cache_policy.lambda_api.id
       origin_request_policy_id   = aws_cloudfront_origin_request_policy.lambda_api.id
       response_headers_policy_id = aws_cloudfront_response_headers_policy.lambda_api.id

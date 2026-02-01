@@ -37,17 +37,6 @@ locals {
     }
   }
 
-  # Lambda Function URL configurations
-  # No CORS needed - these only return redirects, not data consumed by JavaScript
-  function_url_configs = {
-    oauth_start = {
-      invoke_mode = "BUFFERED"
-    }
-    oauth_callback = {
-      invoke_mode = "BUFFERED"
-    }
-  }
-
   # Extract just the S3 key from the full s3:// URI in the manifest
   manifest = jsondecode(data.aws_s3_object.manifest.body)
 
@@ -162,37 +151,4 @@ resource "aws_lambda_function" "lambda" {
   depends_on = [
     aws_cloudwatch_log_group.lambda
   ]
-}
-
-resource "aws_lambda_function_url" "lambda" {
-  for_each = local.function_url_configs
-
-  function_name      = aws_lambda_function.lambda[each.key].function_name
-  authorization_type = "NONE"
-
-  invoke_mode = each.value.invoke_mode
-
-  # CORS is optional - only add if configured
-  dynamic "cors" {
-    for_each = lookup(each.value, "cors", null) != null ? [each.value.cors] : []
-    content {
-      allow_credentials = cors.value.allow_credentials
-      allow_origins     = cors.value.allow_origins
-      allow_methods     = cors.value.allow_methods
-      allow_headers     = cors.value.allow_headers
-      expose_headers    = cors.value.expose_headers
-      max_age           = cors.value.max_age
-    }
-  }
-}
-
-# Allow Function URL to invoke Lambda functions
-resource "aws_lambda_permission" "function_url" {
-  for_each = local.function_url_configs
-
-  statement_id           = "AllowExecutionFromFunctionURL"
-  action                 = "lambda:InvokeFunctionUrl"
-  function_name          = aws_lambda_function.lambda[each.key].function_name
-  principal              = "*"
-  function_url_auth_type = "NONE"
 }
