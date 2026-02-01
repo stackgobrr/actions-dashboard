@@ -131,11 +131,13 @@ async function fetchBatch(repos, token) {
       const checkSuites = repoData.defaultBranchRef?.target?.checkSuites?.nodes || []
       
       // Find the most recently updated checkSuite with a workflow run
+      // Prioritize workflow run timestamps over checkSuite timestamps for accuracy
       const checkSuite = checkSuites
         .filter(cs => cs.workflowRun)
         .sort((a, b) => {
-          const dateA = new Date(a.updatedAt || a.createdAt)
-          const dateB = new Date(b.updatedAt || b.createdAt)
+          // Use workflow run's updatedAt/createdAt for more accurate recency
+          const dateA = new Date(a.workflowRun?.updatedAt || a.workflowRun?.createdAt || a.updatedAt || a.createdAt)
+          const dateB = new Date(b.workflowRun?.updatedAt || b.workflowRun?.createdAt || b.updatedAt || b.createdAt)
           return dateB - dateA // Most recent first
         })[0]
       
@@ -157,11 +159,14 @@ async function fetchBatch(repos, token) {
         status.branch = checkSuite.headBranch?.name || 'unknown'
         status.commitMessage = commitMessage
         status.url = workflowRun.url || `https://github.com/${repo.owner}/${repo.name}/actions`
-        status.updatedAt = checkSuite.updatedAt || workflowRun.updatedAt || checkSuite.createdAt
+        // Prioritize workflow run timestamps for accuracy - they're more reliable than checkSuite timestamps
+        status.updatedAt = workflowRun.updatedAt || workflowRun.createdAt || checkSuite.updatedAt || checkSuite.createdAt
         status.runId = workflowRun.databaseId || null
       } else {
         status.status = 'no_runs'
         status.conclusion = null
+        // Set updatedAt to null so repos without runs sort to the end
+        status.updatedAt = null
       }
 
       return {
