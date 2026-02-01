@@ -24,7 +24,36 @@ jobs:
     outputs:
       environment: ${{ steps.env.outputs.environment }}
       tfvars_env: ${{ steps.env.outputs.tfvars_env }}
+      infra_changed: ${{ steps.changes.outputs.infra }}
+      frontend_changed: ${{ steps.changes.outputs.frontend }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for changes
+        id: changes
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] || [[ "${{ github.event_name }}" == "repository_dispatch" ]] || [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # Manual triggers or tags - run everything
+            echo "infra=true" >> "$GITHUB_OUTPUT"
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            # Check for changes in specific paths
+            if git diff --name-only HEAD~1 HEAD | grep -q '^infra/'; then
+              echo "infra=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "infra=false" >> "$GITHUB_OUTPUT"
+            fi
+            
+            if git diff --name-only HEAD~1 HEAD | grep -qE '^(src/|public/|index.html|package.json|vite.config.js)'; then
+              echo "frontend=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "frontend=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+      
       - name: Set environment
         id: env
         run: |
@@ -52,6 +81,7 @@ jobs:
   deploy-infrastructure:
     name: Deploy Infrastructure
     needs: [setup, test]
+    if: needs.setup.outputs.infra_changed == 'true'
     runs-on: ubuntu-latest
     environment: ${{ needs.setup.outputs.environment }}
     permissions:
@@ -142,7 +172,11 @@ jobs:
 
   build:
     name: Build Application
-    needs: deploy-infrastructure
+    needs: [setup, deploy-infrastructure]
+    if: |
+      always() &&
+      (needs.setup.outputs.frontend_changed == 'true' || 
+       needs.deploy-infrastructure.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -168,6 +202,11 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend
     needs: [setup, deploy-infrastructure, build]
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      (needs.setup.outputs.frontend_changed == 'true' || 
+       needs.deploy-infrastructure.result == 'success')
     runs-on: ubuntu-latest
     environment: ${{ needs.setup.outputs.environment }}
     permissions:
