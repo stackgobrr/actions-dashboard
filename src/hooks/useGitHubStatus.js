@@ -80,17 +80,35 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     // Use GraphQL batch fetching - fetches all repos in 1-2 API calls
     const results = await fetchMultipleRepoStatuses(allRepos, token)
     
-    const statuses = {}
-    results.forEach(({ name, status }) => {
-      const repo = allRepos.find(r => r.name === name)
-      statuses[name] = {
-        ...status,
-        category: repo?.category || 'custom',
-        labels: repo?.labels || [],
-      }
+    // Only update repos whose data actually changed
+    setRepoStatuses(prevStatuses => {
+      const statuses = { ...prevStatuses }
+      let hasChanges = false
+      
+      results.forEach(({ name, status }) => {
+        const repo = allRepos.find(r => r.name === name)
+        const newStatus = {
+          ...status,
+          category: repo?.category || 'custom',
+          labels: repo?.labels || [],
+        }
+        
+        // Check if this repo's data actually changed
+        const prevStatus = prevStatuses[name]
+        const hasChanged = !prevStatus || 
+          prevStatus.updatedAt !== newStatus.updatedAt ||
+          prevStatus.status !== newStatus.status ||
+          prevStatus.conclusion !== newStatus.conclusion
+        
+        if (hasChanged) {
+          statuses[name] = newStatus
+          hasChanges = true
+        }
+      })
+      
+      return hasChanges ? statuses : prevStatuses
     })
-
-    setRepoStatuses(statuses)
+    
     setLastUpdate(new Date())
     setLoading(false)
   }
