@@ -28,18 +28,20 @@ import { MOCK_WORKFLOW_RUNS } from '../../data/mockRepoStatuses'
 import { repoDataService } from '../../services/RepoDataService'
 import './RepoCard.css'
 
-export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, isExpanded, onToggleExpand, getActiveToken, isDemoMode }) {
+export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, isExpanded, onToggleExpand, getActiveToken, isDemoMode, onDataUpdate }) {
   const labelColor = getLabelColor(status.category)
   const hasPRs = status.openPRCount > 0
   const topics = status.topics || []
   const [isFlashing, setIsFlashing] = useState(false)
   const prevStatusRef = useRef(null)
   const prevSequenceRef = useRef(null)
-  const [runs, setRuns] = useState([])
   const [loadingRuns, setLoadingRuns] = useState(false)
   const [activeTab, setActiveTab] = useState('workflows')
   const [selectedBranch, setSelectedBranch] = useState('all')
   const [selectedWorkflow, setSelectedWorkflow] = useState('all')
+  
+  // Get runs from service (single source of truth)
+  const runs = repoDataService.getRuns(repoName)
   
   // Construct PR URL from repository URL
   const repoUrl = status.url ? status.url.split('/actions/')[0] : null
@@ -80,7 +82,8 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             // Simulate loading delay
             await new Promise(resolve => setTimeout(resolve, 500))
             const mockRuns = MOCK_WORKFLOW_RUNS[repoName] || []
-            setRuns([...mockRuns]) // Create new array reference
+            // Store in service - no need for local state
+            repoDataService.setRuns(repoName, mockRuns)
           } else {
             // In real mode, fetch from GitHub API
             const token = getActiveToken()
@@ -92,10 +95,13 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             if (response.ok) {
               const data = await response.json()
               const runs = data.workflow_runs || []
-              setRuns(runs)
               // Store in service for unified data management
               repoDataService.setRuns(repoName, runs)
             }
+          }
+          // Notify parent that data was updated so it re-reads from service
+          if (onDataUpdate) {
+            onDataUpdate()
           }
         } catch (err) {
           console.error('Failed to fetch runs:', err)
@@ -105,20 +111,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       }
       fetchRuns()
     }
-  }, [isExpanded, repoName, repoOwner, getActiveToken, isDemoMode])
-
-  // Poll for updates in demo mode when expanded
-  useEffect(() => {
-    if (isExpanded && isDemoMode) {
-      const updateInterval = setInterval(() => {
-        const mockRuns = MOCK_WORKFLOW_RUNS[repoName] || []
-        // Create new array reference to trigger React re-render
-        setRuns([...mockRuns])
-      }, 5000) // Update every 5 seconds
-      
-      return () => clearInterval(updateInterval)
-    }
-  }, [isExpanded, isDemoMode, repoName])
+  }, [isExpanded, repoName, repoOwner, getActiveToken, isDemoMode, onDataUpdate])
 
   const getRunStatusIcon = (run) => {
     if (run.status === 'completed') {
@@ -174,28 +167,25 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
     return filtered
   }, [runs, selectedBranch, selectedWorkflow])
 
-  // Get the latest run from filtered results to display in card
-  // Data now unified through RepoDataService for both demo and real modes
-  const displayStatus = useMemo(() => {
-    // When expanded with loaded runs, use the most recent filtered run (most accurate)
-    if (isExpanded && runs.length > 0 && filteredRuns.length > 0) {
-      const latestRun = filteredRuns[0]
-      return {
-        workflow: latestRun.name || status.workflow,
-        branch: latestRun.head_branch || status.branch,
-        status: latestRun.status,
-        conclusion: latestRun.conclusion,
-        commitMessage: latestRun.head_commit?.message?.split('\n')[0] || status.commitMessage
-      }
-    }
-    // Use status from parent (which now comes from unified service)
-    return status
-  }, [isExpanded, runs.length, runs, filteredRuns, status])
+  // Always use status from parent - it comes from unified service which already picks the best source
+  // No need to recalculate here - service handles the logic
 
   return (
     <div 
-      className={`repo-card ${getStatusClass(displayStatus)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''} ${isExpanded ? 'expanded' : ''}`}
+      className={`repo-card ${getStatusClass(status)} ${isFlashing ? 'flashing' : ''} ${isPinned ? 'pinned' : ''} ${isExpanded ? 'expanded' : ''}`}
     >
+      {status.isStale && status.dataAge && status.dataAge > 60 && (
+        <div 
+          className="repo-card__stale-badge" 
+          title={`Data is ${status.dataAge}s old (source: ${status.dataSource}). Auto-refresh enabled.`}
+          aria-label="Stale data indicator"
+        >
+          <Label variant="attention" size="small">
+            <AlertIcon size={12} />
+            {status.dataAge}s old
+          </Label>
+        </div>
+      )}
       {hasPRs && prUrl && (
         <Link
           href={prUrl}
@@ -309,7 +299,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             className={isPinned ? 'pinned' : ''}
             sx={{ color: isPinned ? 'var(--color-accent-fg)' : 'inherit' }}
           />
-          <div className="repo-card__status-icon">{getStatusIcon(displayStatus)}</div>
+          <div className="repo-card__status-icon">{getStatusIcon(status)}</div>
         </div>
       </div>
       
@@ -367,7 +357,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
                   </ActionMenu>
                 </div>
               ) : (
-                <span className="repo-card__value repo-card__value--bold">{displayStatus.workflow || 'N/A'}</span>
+                <span className="repo-card__value repo-card__value--bold">{status.workflow || 'N/A'}</span>
               )}
             </div>
             <div className="repo-card__row">
@@ -408,13 +398,13 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
                 </div>
               ) : (
                 <span className="repo-card__value">
-                  <GitBranchIcon size={11} /> {displayStatus.branch || 'N/A'}
+                  <GitBranchIcon size={11} /> {status.branch || 'N/A'}
                 </span>
               )}
             </div>
             <div className="repo-card__row">
               <span className="repo-card__label-text">Commit</span>
-              <span className="repo-card__value repo-card__value--mono">{displayStatus.commitMessage || status.commitMessage}</span>
+              <span className="repo-card__value repo-card__value--mono">{status.commitMessage || 'N/A'}</span>
             </div>
           </>
         ) : (

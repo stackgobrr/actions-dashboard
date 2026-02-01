@@ -133,6 +133,7 @@ export function Dashboard({
             getActiveToken={getActiveToken}
             selectedRepos={selectedRepos}
             isDemoMode={isDemoMode}
+            onDataUpdate={fetchAllStatuses}
           />
         )}
         

@@ -44,6 +44,31 @@
   gap: 4px !important;
 }
 
+.repo-card__stale-badge {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  z-index: 100;
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+.repo-card__stale-badge span[class*="Label"] {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-size: 11px !important;
+  padding: 2px 6px !important;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 .repo-card:hover {
   box-shadow: 0 8px 16px var(--color-shadow-medium);
   transform: translateY(-4px);

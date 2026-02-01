@@ -26,6 +26,10 @@ export class RepoDataService {
     this.lastUpdateTime = new Map()
     this.updateSequence = new Map()
     this.sequenceCounter = 0
+    
+    // Data freshness tracking - when was this data last fetched from GitHub?
+    this.lastFetchTime = new Map() // When did we last fetch this repo's data?
+    this.dataSource = new Map() // Which API was used: 'graphql', 'rest_api', or 'none'
   }
 
   /**
@@ -56,8 +60,12 @@ export class RepoDataService {
       runId: status.runId
     })
     this.lastUpdateTime.set(repoName, new Date().toISOString())
-    this.updateSequence.set(repoName, ++this.sequenceCounter)
-  }
+    this.updateSequence.set(repoName, ++this.sequenceCounter)    
+    // Track when this data was fetched (only if we don't already have REST API data)
+    if (!this.runsStorage.has(repoName) || this.runsStorage.get(repoName).length === 0) {
+      this.lastFetchTime.set(repoName, Date.now())
+      this.dataSource.set(repoName, 'graphql')
+    }  }
 
   /**
    * Add or update workflow runs for a repository
@@ -78,6 +86,10 @@ export class RepoDataService {
     this.runsStorage.set(repoName, sortedRuns)
     this.lastUpdateTime.set(repoName, new Date().toISOString())
     this.updateSequence.set(repoName, ++this.sequenceCounter)
+    
+    // Track when this data was fetched
+    this.lastFetchTime.set(repoName, Date.now())
+    this.dataSource.set(repoName, 'rest_api')
   }
 
   /**
@@ -121,40 +133,74 @@ export class RepoDataService {
   /**
    * Derive status from the latest run
    * This is the SINGLE source of truth for repo status
+   * 
+   * Priority order (most trusted first):
+   * 1. Full runs from REST API (most accurate, detailed)
+   * 2. Lightweight status from GraphQL (fast but less detail)
+   * 3. No data available
    */
   deriveStatus(repoName) {
     const runs = this.getRuns(repoName)
     const latestRun = runs.length > 0 ? runs[0] : null
+    const lightStatus = this.lightweightStatus.get(repoName)
 
-    if (!latestRun) {
-      // No runs available, check if we have lightweight status from GraphQL
-      const lightStatus = this.lightweightStatus.get(repoName)
-      if (lightStatus) {
-        return lightStatus
-      }
-      
+    // ALWAYS prefer full runs when available - they're the most accurate source
+    // Full runs come from REST API with complete details
+    if (latestRun) {
       return {
-        status: 'no_runs',
-        conclusion: null,
-        workflow: 'N/A',
-        branch: 'N/A',
-        commitMessage: 'N/A',
-        url: null,
-        updatedAt: null,
-        runId: null
+        status: latestRun.status,
+        conclusion: latestRun.conclusion,
+        workflow: latestRun.name,
+        branch: latestRun.head_branch,
+        commitMessage: latestRun.head_commit?.message?.split('\n')[0] || 'No message',
+        url: latestRun.html_url,
+        updatedAt: latestRun.created_at,
+        runId: latestRun.id,
+        dataSource: 'rest_api' // Indicator of data source
       }
     }
 
-    return {
-      status: latestRun.status,
-      conclusion: latestRun.conclusion,
-      workflow: latestRun.name,
-      branch: latestRun.head_branch,
-      commitMessage: latestRun.head_commit?.message?.split('\n')[0] || 'No message',
-      url: latestRun.html_url,
-      updatedAt: latestRun.created_at,
-      runId: latestRun.id
+    // Fall back to lightweight status from GraphQL if no full runs
+    if (lightStatus) {
+      return {
+        ...lightStatus,
+        dataSource: 'graphql' // Indicator of data source
+      }
     }
+    
+    // No data available
+    return {
+      status: 'no_runs',
+      conclusion: null,
+      workflow: 'N/A',
+      branch: 'N/A',
+      commitMessage: 'N/A',
+      url: null,
+      updatedAt: null,
+      runId: null,
+      dataSource: 'none'
+    }
+  }
+
+  /**
+   * Check if data for a repo is stale
+   * @param {string} repoName 
+   * @param {number} staleThresholdMs - Milliseconds after which data is considered stale
+   * @returns {boolean}
+   */
+  isDataStale(repoName, staleThresholdMs = 60000) { // Default 60 seconds
+    const lastFetch = this.lastFetchTime.get(repoName)
+    if (!lastFetch) return true // No fetch time = stale
+    return (Date.now() - lastFetch) > staleThresholdMs
+  }
+
+  /**
+   * Get data age in seconds
+   */
+  getDataAge(repoName) {
+    const lastFetch = this.lastFetchTime.get(repoName)
+    if (!lastFetch) return null
+    return Math.floor((Date.now() - lastFetch) / 1000)
   }
 
   /**
@@ -164,11 +210,17 @@ export class RepoDataService {
   getRepoData(repoName) {
     const metadata = this.repoMetadata.get(repoName) || {}
     const status = this.deriveStatus(repoName)
+    const dataAge = this.getDataAge(repoName)
+    const dataSource = this.dataSource.get(repoName) || 'none'
 
     return {
       ...metadata,
       ...status,
-      updateSequence: this.updateSequence.get(repoName) || 0
+      updateSequence: this.updateSequence.get(repoName) || 0,
+      // Data freshness information
+      dataAge, // Age in seconds
+      dataSource, // 'rest_api', 'graphql', or 'none'
+      isStale: this.isDataStale(repoName, 60000) // Stale after 60 seconds
     }
   }
 
@@ -188,6 +240,8 @@ export class RepoDataService {
     this.lightweightStatus.delete(repoName)
     this.lastUpdateTime.delete(repoName)
     this.updateSequence.delete(repoName)
+    this.lastFetchTime.delete(repoName)
+    this.dataSource.delete(repoName)
   }
 
   /**
@@ -199,6 +253,8 @@ export class RepoDataService {
     this.lightweightStatus.clear()
     this.lastUpdateTime.clear()
     this.updateSequence.clear()
+    this.lastFetchTime.clear()
+    this.dataSource.clear()
     this.sequenceCounter = 0
   }
 }

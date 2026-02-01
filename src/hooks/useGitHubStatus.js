@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { MOCK_REPO_STATUSES } from '../data/mockRepoStatuses'
+import { MOCK_REPO_STATUSES, MOCK_WORKFLOW_RUNS } from '../data/mockRepoStatuses'
 import { getGitHubAppCredentials } from '../services/githubAppAuth'
 import { fetchMultipleRepoStatuses as fetchRealRepoStatuses } from '../services/githubGraphQL'
 import { fetchMultipleRepoStatuses as fetchMockRepoStatuses } from '../services/mockGraphQL'
@@ -77,8 +77,39 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       ...repositories.demo.map(r => ({ ...r, category: 'demo' })),
     ]
 
-    // Use GraphQL batch fetching - fetches all repos in 1-2 API calls
+    // Use GraphQL batch fetching - fetches all repos in 1-2 API calls for metadata
     const results = await fetchFunction(allRepos, token)
+    
+    // Fetch full runs (30 runs) for all repos to ensure accurate data from the start
+    if (isDemoMode) {
+      // In demo mode, load all mock runs from MOCK_WORKFLOW_RUNS
+      allRepos.forEach(repo => {
+        const mockRuns = MOCK_WORKFLOW_RUNS[repo.name] || []
+        if (mockRuns.length > 0) {
+          repoDataService.setRuns(repo.name, mockRuns)
+        }
+      })
+    } else if (token) {
+      // In real mode, fetch runs for all repos in parallel (efficient for initial load)
+      await Promise.all(
+        allRepos.map(async (repo) => {
+          try {
+            const response = await fetch(
+              `https://api.github.com/repos/${repo.owner}/${repo.name}/actions/runs?per_page=30`,
+              { headers: { 'Authorization': `token ${token}` } }
+            )
+            if (response.ok) {
+              const data = await response.json()
+              const runs = data.workflow_runs || []
+              // Store in service - this becomes the source of truth
+              repoDataService.setRuns(repo.name, runs)
+            }
+          } catch (err) {
+            console.error(`Failed to fetch runs for ${repo.name}:`, err)
+          }
+        })
+      )
+    }
     
     // Only update repos whose data actually changed
     setRepoStatuses(prevStatuses => {
@@ -93,7 +124,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
         
         const newStatus = {
           ...status,
-          ...serviceData, // Override with service data (fresher if runs were fetched)
+          ...serviceData, // Override with service data (now has full runs!)
           category: repo?.category || 'custom',
           labels: repo?.labels || [],
         }
@@ -123,16 +154,32 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     setIsDemoMode(isDemoModeEnabled(authMethod))
   }, [authMethod])
 
+  // Calculate dynamic refresh interval based on repo statuses
+  const getDynamicRefreshInterval = () => {
+    // Check if any repos have in_progress runs
+    const hasInProgressRuns = Object.values(repoStatuses).some(
+      status => status.status === 'in_progress' || status.status === 'queued'
+    )
+    
+    // If there are in-progress runs, poll more frequently (use half the normal interval, min 1 second)
+    if (hasInProgressRuns) {
+      return Math.max(1, Math.floor(refreshInterval / 2))
+    }
+    
+    return refreshInterval
+  }
+
   useEffect(() => {
     if (!showAuthSetup && authMethod !== 'none') {
       fetchAllStatuses()
       
       if (autoRefresh) {
-        const interval = setInterval(fetchAllStatuses, refreshInterval * 1000)
+        const dynamicInterval = getDynamicRefreshInterval()
+        const interval = setInterval(fetchAllStatuses, dynamicInterval * 1000)
         return () => clearInterval(interval)
       }
     }
-  }, [showAuthSetup, authMethod, autoRefresh, refreshInterval, reposKey, isDemoMode])
+  }, [showAuthSetup, authMethod, autoRefresh, refreshInterval, reposKey, isDemoMode, repoStatuses])
 
   return {
     repoStatuses,
