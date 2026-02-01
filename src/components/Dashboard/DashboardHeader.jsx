@@ -19,6 +19,7 @@ import { FullscreenToggle } from '../UI/FullscreenToggle'
 import { RateLimitDisplay } from './RateLimitDisplay'
 import { getTopicColor } from '../../utils/statusHelpers'
 import { trackEvent } from '../../utils/analytics'
+import { REFRESH_INTERVAL_OPTIONS } from '../../constants/timing'
 import './DashboardHeader.css'
 
 export function DashboardHeader({
@@ -34,6 +35,8 @@ export function DashboardHeader({
   setSortBy,
   autoRefresh,
   setAutoRefresh,
+  refreshInterval,
+  setRefreshInterval,
   lastUpdate,
   fetchAllStatuses,
   loading,
@@ -368,7 +371,7 @@ export function DashboardHeader({
           disabled={false}
         />
         
-        <div className="d-flex flex-items-center" style={{ gap: '4px' }}>
+        <div className="d-flex flex-items-center" style={{ gap: '8px' }}>
           <Checkbox
             checked={autoRefresh}
             onChange={(e) => {
@@ -377,7 +380,34 @@ export function DashboardHeader({
               trackEvent('Auto-refresh Toggled', { enabled: newValue })
             }}
           />
-          <span className="f6">Auto-refresh (10s)</span>
+          <span className="f6">Auto-refresh</span>
+          <ActionMenu>
+            <ActionMenu.Anchor>
+              <Button 
+                size="small" 
+                trailingAction={ChevronDownIcon}
+                disabled={!autoRefresh}
+              >
+                {refreshInterval}s
+              </Button>
+            </ActionMenu.Anchor>
+            <ActionMenu.Overlay>
+              <ActionList>
+                {REFRESH_INTERVAL_OPTIONS.map(interval => (
+                  <ActionList.Item 
+                    key={interval}
+                    selected={refreshInterval === interval}
+                    onSelect={() => {
+                      setRefreshInterval(interval)
+                      trackEvent('Refresh Interval Changed', { interval })
+                    }}
+                  >
+                    {interval} second{interval !== 1 ? 's' : ''}
+                  </ActionList.Item>
+                ))}
+              </ActionList>
+            </ActionMenu.Overlay>
+          </ActionMenu>
         </div>
         
         {lastUpdate && (
