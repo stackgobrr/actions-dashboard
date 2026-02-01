@@ -37,10 +37,10 @@ export function sortRepositories(repos, sortBy) {
   switch(sortBy) {
     case 'last-run-desc':
       return entries.sort((a, b) => {
-        // Sort purely by update sequence (higher = more recent = position 0)
-        const seqA = a[1].updateSequence ?? -Infinity
-        const seqB = b[1].updateSequence ?? -Infinity
-        return seqB - seqA  // Highest sequence first
+        // Sort by actual updatedAt timestamp (most recent first)
+        const dateA = a[1].updatedAt ? new Date(a[1].updatedAt).getTime() : 0
+        const dateB = b[1].updatedAt ? new Date(b[1].updatedAt).getTime() : 0
+        return dateB - dateA  // Most recent first
       })
     case 'last-run-asc':
       return entries.sort((a, b) => {

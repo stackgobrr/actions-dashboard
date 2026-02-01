@@ -39,15 +39,12 @@ export function DashboardGrid({ repositories, getActiveToken, selectedRepos, isD
     setExpandedRepo(expandedRepo === repoName ? null : repoName)
   }
 
-  // Sort repositories: pinned first, then regular
+  // Sort repositories: pinned first, then maintain original sort order
   const sortedRepositories = useMemo(() => {
-    return [...repositories].sort(([nameA], [nameB]) => {
-      const aIsPinned = pinnedRepos.includes(nameA)
-      const bIsPinned = pinnedRepos.includes(nameB)
-      if (aIsPinned && !bIsPinned) return -1
-      if (!aIsPinned && bIsPinned) return 1
-      return 0
-    })
+    // Separate pinned and unpinned repos to preserve sort order
+    const pinned = repositories.filter(([name]) => pinnedRepos.includes(name))
+    const unpinned = repositories.filter(([name]) => !pinnedRepos.includes(name))
+    return [...pinned, ...unpinned]
   }, [repositories, pinnedRepos])
 
   // Calculate columns based on container width

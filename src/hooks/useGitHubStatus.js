@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { MOCK_REPO_STATUSES } from '../data/mockRepoStatuses'
 import { getGitHubAppCredentials } from '../services/githubAppAuth'
+import { fetchMultipleRepoStatuses } from '../services/githubGraphQL'
 
 /**
  * Check if we're in a demo-capable environment
@@ -42,10 +43,6 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
   const [isDemoMode, setIsDemoMode] = useState(isDemoModeEnabled(authMethod))
-  
-  // Track update sequence for sorting - only increment when updatedAt changes
-  const updateSequenceRef = useRef(0)
-  const lastUpdatedAtRef = useRef({}) // Store last updatedAt for each repo
 
   // Create a stable key from repositories to detect real changes
   const reposKey = JSON.stringify(
@@ -92,19 +89,6 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       
       if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
         const run = runsData.workflow_runs[0]
-        const repoKey = `${owner}/${repo.name}`
-        const currentUpdatedAt = run.updated_at
-        
-        // Only increment sequence if this is a new/changed workflow run
-        let updateSequence
-        if (lastUpdatedAtRef.current[repoKey] !== currentUpdatedAt) {
-          updateSequence = ++updateSequenceRef.current
-          lastUpdatedAtRef.current[repoKey] = currentUpdatedAt
-        } else {
-          // Keep existing sequence number if nothing changed
-          updateSequence = repoStatuses[repo.name]?.updateSequence || updateSequenceRef.current
-        }
-        
         return {
           ...result,
           status: run.status,
@@ -113,8 +97,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
           branch: run.head_branch,
           commitMessage: run.head_commit?.message?.split('\n')[0] || 'No message',
           url: run.html_url,
-          updatedAt: currentUpdatedAt,
-          updateSequence,
+          updatedAt: run.updated_at,
         }
       }
       
@@ -143,24 +126,17 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       ...repositories.demo.map(r => ({ ...r, category: 'demo' })),
     ]
 
-    // Fetch all repos in parallel for much faster loading
-    const statusPromises = allRepos.map(async (repo) => {
-      const status = await fetchRepoStatus(repo, token)
-      return { 
-        name: repo.name, 
-        status: { 
-          ...status, 
-          category: repo.category,
-          labels: repo.labels || []
-        } 
-      }
-    })
-
-    const results = await Promise.all(statusPromises)
+    // Use GraphQL batch fetching - fetches all repos in 1-2 API calls
+    const results = await fetchMultipleRepoStatuses(allRepos, token)
     
     const statuses = {}
     results.forEach(({ name, status }) => {
-      statuses[name] = status
+      const repo = allRepos.find(r => r.name === name)
+      statuses[name] = {
+        ...status,
+        category: repo?.category || 'custom',
+        labels: repo?.labels || [],
+      }
     })
 
     setRepoStatuses(statuses)
