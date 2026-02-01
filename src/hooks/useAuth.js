@@ -33,7 +33,30 @@ export function useAuth() {
   // Check authentication on mount
   useEffect(() => {
     const checkAuth = async () => {
-      // Check localStorage for auth method marker (set by OAuth callback)
+      // First check if we're handling an OAuth callback (token in URL hash)
+      const hash = window.location.hash.substring(1)
+      console.log('[useAuth] Checking hash:', hash)
+      if (hash) {
+        const params = new URLSearchParams(hash)
+        const token = params.get('token')
+        console.log('[useAuth] Token from hash:', token ? `${token.substring(0, 10)}...` : 'null')
+        
+        if (token) {
+          // Store token and mark as OAuth authentication
+          localStorage.setItem('github_token', token)
+          localStorage.setItem('auth_method', 'oauth')
+          setGithubToken(token)
+          setAuthMethod('oauth')
+          console.log('[useAuth] Set authMethod to oauth')
+          trackEvent('Dashboard Opened', { authMethod: 'oauth' })
+          
+          // Clean up URL hash
+          window.history.replaceState({}, document.title, window.location.pathname)
+          return
+        }
+      }
+      
+      // Check localStorage for auth method marker (set by OAuth callback above)
       const authMethod = localStorage.getItem('auth_method')
       
       if (authMethod === 'oauth' && localStorage.getItem('github_token')) {
