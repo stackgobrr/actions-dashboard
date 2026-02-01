@@ -65,7 +65,7 @@ async function fetchBatch(repos, token) {
                     }
                   }
                 }
-                checkSuites(first: 1) {
+                checkSuites(first: 5, orderBy: {field: CREATED_AT, direction: DESC}) {
                   nodes {
                     status
                     conclusion
@@ -127,8 +127,18 @@ async function fetchBatch(repos, token) {
         }
       }
 
-      // Extract workflow run from checkSuites
-      const checkSuite = repoData.defaultBranchRef?.target?.checkSuites?.nodes?.[0]
+      // Extract workflow run from checkSuites - get the most recent one
+      const checkSuites = repoData.defaultBranchRef?.target?.checkSuites?.nodes || []
+      
+      // Find the most recently updated checkSuite with a workflow run
+      const checkSuite = checkSuites
+        .filter(cs => cs.workflowRun)
+        .sort((a, b) => {
+          const dateA = new Date(a.updatedAt || a.createdAt)
+          const dateB = new Date(b.updatedAt || b.createdAt)
+          return dateB - dateA // Most recent first
+        })[0]
+      
       const workflowRun = checkSuite?.workflowRun
 
       const status = {
