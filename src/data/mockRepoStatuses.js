@@ -1,7 +1,11 @@
 /**
  * Mock repository data for demo mode
  * Simulates a real-world dashboard with realistic repository names and dynamic updates
+ * 
+ * Now using RepoDataService for unified data management
  */
+
+import { repoDataService } from '../services/RepoDataService'
 
 // Helper to generate random data
 const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -167,11 +171,7 @@ const initialRunCounts = {
   'analytics-dashboard': 6, 'infrastructure': 5
 };
 
-// Initialize runs storage
-const runsStorage = {};
-const lastUpdateTime = {}; // Track when each repo was last updated
-const updateSequence = {}; // Track order of updates for sorting
-let sequenceCounter = 0; // Global counter for update order
+// Tracking for live simulation
 let lastEventTime = Date.now();
 const eventInterval = 10000; // New event every 10 seconds
 
@@ -189,19 +189,14 @@ const repoActivityLevels = {
   'infrastructure': 0.005    // Very low activity (infrastructure changes are rare)
 };
 
-// Initialize all repos with base data
-repoNames.forEach((repoName, index) => {
+// Initialize all repos with base data using the service
+repoNames.forEach((repoName) => {
   const repoId = repoIds[repoName];
-  runsStorage[repoName] = generateInitialMockRuns(repoName, repoId, initialRunCounts[repoName]);
-  // Set initial update time to random time in last 5 minutes
-  lastUpdateTime[repoName] = new Date(Date.now() - random(1000, 300000)).toISOString();
-  // Initialize sequences starting from 1, in order
-  updateSequence[repoName] = index + 1;
+  const initialRuns = generateInitialMockRuns(repoName, repoId, initialRunCounts[repoName]);
+  repoDataService.setRuns(repoName, initialRuns);
 });
 
-// Set sequence counter to start after initial sequences
-sequenceCounter = repoNames.length;
-
+// Function to add a new run to a weighted random repo
 // Function to add a new run to a weighted random repo
 const addRandomEvent = (now) => {
   // Weighted selection based on activity levels
@@ -219,13 +214,9 @@ const addRandomEvent = (now) => {
   
   const repoName = selectedRepo;
   const repoId = repoIds[repoName];
-  const currentRuns = runsStorage[repoName];
+  const currentRuns = repoDataService.getRuns(repoName);
   const workflows = repoWorkflowsMap[repoName];
   const branches = getRealisticBranches(repoName);
-  
-  // Determine status based on probability
-  const statusRoll = random(0, 100);
-  let status, conclusion;
   
   // Realistic lifecycle: new runs always start as queued/pending
   const commitType = randomChoice(Object.keys(commitTemplates));
@@ -248,51 +239,40 @@ const addRandomEvent = (now) => {
     html_url: `https://github.com/acme/${repoName}/actions/runs/${Date.now() + repoId}`
   };
   
-  // Add to beginning and limit total runs to max 50
-  runsStorage[repoName] = [newRun, ...currentRuns].slice(0, 50);
-  lastUpdateTime[repoName] = new Date(now).toISOString(); // Update timestamp
-  updateSequence[repoName] = ++sequenceCounter; // Increment sequence for sorting
+  // Add via service (automatically updates timestamps and sequences)
+  repoDataService.addRun(repoName, newRun);
   
   // Progress workflow runs through their lifecycle
   // queued -> in_progress -> completed (success/failure)
   repoNames.forEach(repo => {
-    const runs = runsStorage[repo];
-    let updated = false;
+    const runs = repoDataService.getRuns(repo);
     
     runs.forEach((run, idx) => {
       // Don't update the newest run we just added
-      if (idx === 0 && run.id === newRun.id) return;
+      if (idx === 0 && repo === repoName && run.id === newRun.id) return;
       
       // Transition queued -> in_progress (70% chance per tick)
       if (run.status === 'queued' && random(0, 100) < 70) {
-        run.status = 'in_progress';
-        lastUpdateTime[repo] = new Date(now).toISOString(); // Update timestamp
-        updateSequence[repo] = ++sequenceCounter; // Increment sequence for sorting
-        updated = true;
+        repoDataService.updateRun(repo, run.id, { status: 'in_progress' });
       }
       // Transition in_progress -> completed (50% chance per tick)
       else if (run.status === 'in_progress' && random(0, 100) < 50) {
-        run.status = 'completed';
         // 85% success, 12% failure, 3% cancelled/timed_out
         const conclusionRoll = random(0, 100);
-        if (conclusionRoll < 85) run.conclusion = 'success';
-        else if (conclusionRoll < 97) run.conclusion = 'failure';
-        else run.conclusion = randomChoice(['cancelled', 'timed_out']);
+        let conclusion;
+        if (conclusionRoll < 85) conclusion = 'success';
+        else if (conclusionRoll < 97) conclusion = 'failure';
+        else conclusion = randomChoice(['cancelled', 'timed_out']);
         
-        lastUpdateTime[repo] = new Date(now).toISOString(); // Update timestamp
-        updateSequence[repo] = ++sequenceCounter; // Increment sequence for sorting
-        updated = true;
+        repoDataService.updateRun(repo, run.id, { 
+          status: 'completed', 
+          conclusion 
+        });
       }
     });
   });
   
-  // Force a storage update to trigger reactivity
   return true; // Signal that an event was added
-};
-
-// Getter function that checks if a new event should be added
-const getOrUpdateMockRuns = (repoName) => {
-  return runsStorage[repoName] || [];
 };
 
 // Start the event generation interval
@@ -310,131 +290,123 @@ const startEventGeneration = () => {
 // Auto-start when module loads
 startEventGeneration();
 
+// Export getter that reads from service
 export const MOCK_WORKFLOW_RUNS = {
-  get 'api-gateway'() { return getOrUpdateMockRuns('api-gateway') },
-  get 'frontend-app'() { return getOrUpdateMockRuns('frontend-app') },
-  get 'ml-pipeline'() { return getOrUpdateMockRuns('ml-pipeline') },
-  get 'mobile-app'() { return getOrUpdateMockRuns('mobile-app') },
-  get 'data-processor'() { return getOrUpdateMockRuns('data-processor') },
-  get 'auth-service'() { return getOrUpdateMockRuns('auth-service') },
-  get 'notification-service'() { return getOrUpdateMockRuns('notification-service') },
-  get 'payment-gateway'() { return getOrUpdateMockRuns('payment-gateway') },
-  get 'analytics-dashboard'() { return getOrUpdateMockRuns('analytics-dashboard') },
-  get 'infrastructure'() { return getOrUpdateMockRuns('infrastructure') }
+  get 'api-gateway'() { return repoDataService.getRuns('api-gateway') },
+  get 'frontend-app'() { return repoDataService.getRuns('frontend-app') },
+  get 'ml-pipeline'() { return repoDataService.getRuns('ml-pipeline') },
+  get 'mobile-app'() { return repoDataService.getRuns('mobile-app') },
+  get 'data-processor'() { return repoDataService.getRuns('data-processor') },
+  get 'auth-service'() { return repoDataService.getRuns('auth-service') },
+  get 'notification-service'() { return repoDataService.getRuns('notification-service') },
+  get 'payment-gateway'() { return repoDataService.getRuns('payment-gateway') },
+  get 'analytics-dashboard'() { return repoDataService.getRuns('analytics-dashboard') },
+  get 'infrastructure'() { return repoDataService.getRuns('infrastructure') }
 };
 
-// Helper to get latest run status for initial card display
-const getLatestRunStatus = (repoName) => {
-  // Read directly from storage to ensure we get the latest data
-  const runs = runsStorage[repoName];
-  if (!runs || runs.length === 0) {
-    return { status: 'no_runs', conclusion: null, workflow: 'N/A', branch: 'N/A', commitMessage: 'N/A' };
-  }
-  
-  // Show the most recent run (chronologically)
-  const latest = runs[0];
-  return {
-    status: latest.status,
-    conclusion: latest.conclusion,
-    workflow: latest.name,
-    branch: latest.head_branch,
-    commitMessage: latest.head_commit.message.split('\n')[0]
+// Initialize static repo metadata in the service
+const initializeRepoMetadata = () => {
+  const baseRepoData = {
+    'api-gateway': {
+      category: 'backend',
+      description: 'Core API gateway handling all service routing',
+      url: 'https://github.com/acme/api-gateway',
+      openPRCount: 3,
+      topics: ['api', 'gateway', 'microservices', 'node']
+    },
+    
+    'frontend-app': {
+      category: 'frontend',
+      description: 'Main user-facing web application',
+      url: 'https://github.com/acme/frontend-app',
+      openPRCount: 5,
+      topics: ['react', 'typescript', 'vite', 'ui']
+    },
+    
+    'ml-pipeline': {
+      category: 'data',
+      description: 'Machine learning training and inference pipeline',
+      url: 'https://github.com/acme/ml-pipeline',
+      openPRCount: 2,
+      topics: ['python', 'machine-learning', 'tensorflow', 'airflow']
+    },
+    
+    'mobile-app': {
+      category: 'mobile',
+      description: 'iOS and Android mobile application',
+      url: 'https://github.com/acme/mobile-app',
+      openPRCount: 8,
+      topics: ['react-native', 'mobile', 'ios', 'android']
+    },
+    
+    'data-processor': {
+      category: 'data',
+      description: 'High-throughput data processing service',
+      url: 'https://github.com/acme/data-processor',
+      openPRCount: 1,
+      topics: ['kafka', 'spark', 'scala', 'streaming']
+    },
+    
+    'auth-service': {
+      category: 'backend',
+      description: 'Authentication and authorization service',
+      url: 'https://github.com/acme/auth-service',
+      openPRCount: 12,
+      topics: ['oauth', 'jwt', 'security', 'golang']
+    },
+    
+    'notification-service': {
+      category: 'backend',
+      description: 'Multi-channel notification delivery system',
+      url: 'https://github.com/acme/notification-service',
+      openPRCount: 0,
+      topics: ['notifications', 'email', 'sms', 'push']
+    },
+    
+    'payment-gateway': {
+      category: 'backend',
+      description: 'Secure payment processing and billing',
+      url: 'https://github.com/acme/payment-gateway',
+      openPRCount: 4,
+      topics: ['payments', 'stripe', 'security', 'compliance']
+    },
+    
+    'analytics-dashboard': {
+      category: 'frontend',
+      description: 'Internal analytics and reporting dashboard',
+      url: 'https://github.com/acme/analytics-dashboard',
+      openPRCount: 2,
+      topics: ['analytics', 'visualization', 'd3', 'dashboard']
+    },
+    
+    'infrastructure': {
+      category: 'infrastructure',
+      description: 'Infrastructure as code and deployment configs',
+      url: 'https://github.com/acme/infrastructure',
+      openPRCount: 1,
+      topics: ['terraform', 'kubernetes', 'aws', 'devops']
+    }
   };
+
+  // Set metadata in service for each repo
+  Object.entries(baseRepoData).forEach(([repoName, metadata]) => {
+    repoDataService.setRepoMetadata(repoName, metadata);
+  });
 };
 
-// Create base repo data (static info that doesn't change)
-const baseRepoData = {
-  'api-gateway': {
-    category: 'backend',
-    description: 'Core API gateway handling all service routing',
-    url: 'https://github.com/acme/api-gateway',
-    openPRCount: 3,
-    topics: ['api', 'gateway', 'microservices', 'node']
-  },
-  
-  'frontend-app': {
-    category: 'frontend',
-    description: 'Main user-facing web application',
-    url: 'https://github.com/acme/frontend-app',
-    openPRCount: 5,
-    topics: ['react', 'typescript', 'vite', 'ui']
-  },
-  
-  'ml-pipeline': {
-    category: 'data',
-    description: 'Machine learning training and inference pipeline',
-    url: 'https://github.com/acme/ml-pipeline',
-    openPRCount: 2,
-    topics: ['python', 'machine-learning', 'tensorflow', 'airflow']
-  },
-  
-  'mobile-app': {
-    category: 'mobile',
-    description: 'iOS and Android mobile application',
-    url: 'https://github.com/acme/mobile-app',
-    openPRCount: 8,
-    topics: ['react-native', 'mobile', 'ios', 'android']
-  },
-  
-  'data-processor': {
-    category: 'data',
-    description: 'High-throughput data processing service',
-    url: 'https://github.com/acme/data-processor',
-    openPRCount: 1,
-    topics: ['kafka', 'spark', 'scala', 'streaming']
-  },
-  
-  'auth-service': {
-    category: 'backend',
-    description: 'Authentication and authorization service',
-    url: 'https://github.com/acme/auth-service',
-    openPRCount: 12,
-    topics: ['oauth', 'jwt', 'security', 'golang']
-  },
-  
-  'notification-service': {
-    category: 'backend',
-    description: 'Multi-channel notification delivery system',
-    url: 'https://github.com/acme/notification-service',
-    openPRCount: 0,
-    topics: ['notifications', 'email', 'sms', 'push']
-  },
-  
-  'payment-gateway': {
-    category: 'backend',
-    description: 'Secure payment processing and billing',
-    url: 'https://github.com/acme/payment-gateway',
-    openPRCount: 4,
-    topics: ['payments', 'stripe', 'security', 'compliance']
-  },
-  
-  'analytics-dashboard': {
-    category: 'frontend',
-    description: 'Internal analytics and reporting dashboard',
-    url: 'https://github.com/acme/analytics-dashboard',
-    openPRCount: 2,
-    topics: ['analytics', 'visualization', 'd3', 'dashboard']
-  },
-  
-  'infrastructure': {
-    category: 'infrastructure',
-    description: 'Infrastructure as code and deployment configs',
-    url: 'https://github.com/acme/infrastructure',
-    openPRCount: 1,
-    topics: ['terraform', 'kubernetes', 'aws', 'devops']
-  }
-};
+// Initialize metadata on module load
+initializeRepoMetadata();
 
-// Dynamic status object that reads latest run data
+// Export unified status getter that uses the service
 export const MOCK_REPO_STATUSES = {
-  get 'api-gateway'() { return { ...baseRepoData['api-gateway'], ...getLatestRunStatus('api-gateway'), updatedAt: lastUpdateTime['api-gateway'], updateSequence: updateSequence['api-gateway'] } },
-  get 'frontend-app'() { return { ...baseRepoData['frontend-app'], ...getLatestRunStatus('frontend-app'), updatedAt: lastUpdateTime['frontend-app'], updateSequence: updateSequence['frontend-app'] } },
-  get 'ml-pipeline'() { return { ...baseRepoData['ml-pipeline'], ...getLatestRunStatus('ml-pipeline'), updatedAt: lastUpdateTime['ml-pipeline'], updateSequence: updateSequence['ml-pipeline'] } },
-  get 'mobile-app'() { return { ...baseRepoData['mobile-app'], ...getLatestRunStatus('mobile-app'), updatedAt: lastUpdateTime['mobile-app'], updateSequence: updateSequence['mobile-app'] } },
-  get 'data-processor'() { return { ...baseRepoData['data-processor'], ...getLatestRunStatus('data-processor'), updatedAt: lastUpdateTime['data-processor'], updateSequence: updateSequence['data-processor'] } },
-  get 'auth-service'() { return { ...baseRepoData['auth-service'], ...getLatestRunStatus('auth-service'), updatedAt: lastUpdateTime['auth-service'], updateSequence: updateSequence['auth-service'] } },
-  get 'notification-service'() { return { ...baseRepoData['notification-service'], ...getLatestRunStatus('notification-service'), updatedAt: lastUpdateTime['notification-service'], updateSequence: updateSequence['notification-service'] } },
-  get 'payment-gateway'() { return { ...baseRepoData['payment-gateway'], ...getLatestRunStatus('payment-gateway'), updatedAt: lastUpdateTime['payment-gateway'], updateSequence: updateSequence['payment-gateway'] } },
-  get 'analytics-dashboard'() { return { ...baseRepoData['analytics-dashboard'], ...getLatestRunStatus('analytics-dashboard'), updatedAt: lastUpdateTime['analytics-dashboard'], updateSequence: updateSequence['analytics-dashboard'] } },
-  get 'infrastructure'() { return { ...baseRepoData['infrastructure'], ...getLatestRunStatus('infrastructure'), updatedAt: lastUpdateTime['infrastructure'], updateSequence: updateSequence['infrastructure'] } }
+  get 'api-gateway'() { return repoDataService.getRepoData('api-gateway') },
+  get 'frontend-app'() { return repoDataService.getRepoData('frontend-app') },
+  get 'ml-pipeline'() { return repoDataService.getRepoData('ml-pipeline') },
+  get 'mobile-app'() { return repoDataService.getRepoData('mobile-app') },
+  get 'data-processor'() { return repoDataService.getRepoData('data-processor') },
+  get 'auth-service'() { return repoDataService.getRepoData('auth-service') },
+  get 'notification-service'() { return repoDataService.getRepoData('notification-service') },
+  get 'payment-gateway'() { return repoDataService.getRepoData('payment-gateway') },
+  get 'analytics-dashboard'() { return repoDataService.getRepoData('analytics-dashboard') },
+  get 'infrastructure'() { return repoDataService.getRepoData('infrastructure') }
 };

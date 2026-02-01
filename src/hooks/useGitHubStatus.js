@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { MOCK_REPO_STATUSES } from '../data/mockRepoStatuses'
 import { getGitHubAppCredentials } from '../services/githubAppAuth'
-import { fetchMultipleRepoStatuses } from '../services/githubGraphQL'
+import { fetchMultipleRepoStatuses as fetchRealRepoStatuses } from '../services/githubGraphQL'
+import { fetchMultipleRepoStatuses as fetchMockRepoStatuses } from '../services/mockGraphQL'
 
 /**
  * Check if we're in a demo-capable environment
@@ -59,13 +60,11 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   }
 
   const fetchAllStatuses = async () => {
-    // Don't fetch if in demo mode
-    if (authMethod === 'demo') {
-      return
-    }
-    
     setLoading(true)
-    const token = await getActiveToken()
+    
+    // Choose the appropriate fetch function based on demo mode
+    const fetchFunction = isDemoMode ? fetchMockRepoStatuses : fetchRealRepoStatuses
+    const token = isDemoMode ? null : await getActiveToken()
     
     const allRepos = [
       ...repositories.common.map(r => ({ ...r, category: 'common' })),
@@ -78,7 +77,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     ]
 
     // Use GraphQL batch fetching - fetches all repos in 1-2 API calls
-    const results = await fetchMultipleRepoStatuses(allRepos, token)
+    const results = await fetchFunction(allRepos, token)
     
     // Only update repos whose data actually changed
     setRepoStatuses(prevStatuses => {
@@ -119,51 +118,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
   }, [authMethod])
 
   useEffect(() => {
-    // Use demo data when in demo mode (selected as auth or environment-based)
-    if (isDemoMode) {
-      // Get list of selected repo names from the repositories object
-      const selectedRepoNames = [
-        ...repositories.common.map(r => r.name),
-        ...repositories.modules.map(r => r.name),
-        ...repositories.infra.map(r => r.name),
-        ...repositories.services.map(r => r.name),
-        ...repositories.utils.map(r => r.name),
-        ...repositories.custom.map(r => r.name),
-        ...repositories.demo.map(r => r.name),
-      ]
-      
-      // Filter MOCK_REPO_STATUSES to only include selected repos
-      const filteredMockStatuses = Object.keys(MOCK_REPO_STATUSES)
-        .filter(repoName => selectedRepoNames.includes(repoName))
-        .reduce((acc, repoName) => {
-          // Create new object reference to force React to detect changes
-          acc[repoName] = { ...MOCK_REPO_STATUSES[repoName] }
-          return acc
-        }, {})
-      
-      setRepoStatuses(filteredMockStatuses)
-      setLastUpdate(new Date())
-      setLoading(false)
-      
-      // Poll for updates every 5 seconds to pick up new workflow runs
-      const updateInterval = setInterval(() => {
-        const updatedStatuses = Object.keys(MOCK_REPO_STATUSES)
-          .filter(repoName => selectedRepoNames.includes(repoName))
-          .reduce((acc, repoName) => {
-            // Create new object reference to force React to detect changes
-            acc[repoName] = { ...MOCK_REPO_STATUSES[repoName] }
-            return acc
-          }, {})
-        
-        setRepoStatuses(updatedStatuses)
-        setLastUpdate(new Date())
-      }, 5000) // Check for updates every 5 seconds
-      
-      return () => clearInterval(updateInterval)
-    }
-    
-    // Normal production flow
-    if (!showAuthSetup && authMethod !== 'none' && authMethod !== 'demo') {
+    if (!showAuthSetup && authMethod !== 'none') {
       fetchAllStatuses()
       
       if (autoRefresh) {

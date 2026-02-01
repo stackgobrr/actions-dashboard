@@ -73,14 +73,15 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       const fetchRuns = async () => {
         setLoadingRuns(true)
         try {
-          // In demo mode, use mock data
+          // In demo mode, use mock data from MOCK_WORKFLOW_RUNS
+          // This now reads directly from the same RepoDataService that provides status
           if (isDemoMode) {
             // Simulate loading delay
             await new Promise(resolve => setTimeout(resolve, 500))
-            // Use just the repo name as the key for mock data
             const mockRuns = MOCK_WORKFLOW_RUNS[repoName] || []
             setRuns([...mockRuns]) // Create new array reference
           } else {
+            // In real mode, fetch from GitHub API
             const token = getActiveToken()
             const headers = token ? { 'Authorization': `token ${token}` } : {}
             const response = await fetch(
@@ -170,19 +171,22 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
   }, [runs, selectedBranch, selectedWorkflow])
 
   // Get the latest run from filtered results to display in card
+  // NOTE: In demo mode, both 'status' prop and 'runs' come from the same RepoDataService
+  // so they are always consistent. Status is derived from the same run data we fetch here.
   const displayStatus = useMemo(() => {
-    // When expanded with loaded runs, always use our local runs data
+    // When expanded with loaded runs, use the most recent filtered run
     if (isExpanded && runs.length > 0 && filteredRuns.length > 0) {
-      // Show the most recent run based on current filters
       const latestRun = filteredRuns[0]
       return {
         workflow: latestRun.name || status.workflow,
         branch: latestRun.head_branch || status.branch,
         status: latestRun.status,
-        conclusion: latestRun.conclusion
+        conclusion: latestRun.conclusion,
+        commitMessage: latestRun.head_commit?.message?.split('\n')[0] || status.commitMessage
       }
     }
     // When collapsed or no runs loaded yet, use status from parent
+    // This is derived from the same data source in demo mode
     return status
   }, [isExpanded, runs.length, filteredRuns, status])
 
