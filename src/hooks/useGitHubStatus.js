@@ -3,6 +3,7 @@ import { MOCK_REPO_STATUSES } from '../data/mockRepoStatuses'
 import { getGitHubAppCredentials } from '../services/githubAppAuth'
 import { fetchMultipleRepoStatuses as fetchRealRepoStatuses } from '../services/githubGraphQL'
 import { fetchMultipleRepoStatuses as fetchMockRepoStatuses } from '../services/mockGraphQL'
+import { repoDataService } from '../services/RepoDataService'
 
 /**
  * Check if we're in a demo-capable environment
@@ -86,8 +87,13 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
       
       results.forEach(({ name, status }) => {
         const repo = allRepos.find(r => r.name === name)
+        
+        // Get status from unified service (uses runs if available, otherwise lightweight status)
+        const serviceData = repoDataService.getRepoData(name)
+        
         const newStatus = {
           ...status,
+          ...serviceData, // Override with service data (fresher if runs were fetched)
           category: repo?.category || 'custom',
           labels: repo?.labels || [],
         }

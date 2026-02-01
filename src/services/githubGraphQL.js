@@ -3,6 +3,8 @@
  * Replaces multiple REST API calls with a single GraphQL query
  */
 
+import { repoDataService } from './RepoDataService'
+
 /**
  * Fetch status for multiple repositories in a single GraphQL query
  * @param {Array} repos - Array of repo objects with {name, owner} properties
@@ -149,6 +151,14 @@ async function fetchBatch(repos, token) {
         topics: repoData.repositoryTopics?.nodes?.map(n => n.topic.name) || [],
       }
 
+      // Store metadata in service
+      repoDataService.setRepoMetadata(repo.name, {
+        description: status.description,
+        openPRCount: status.openPRCount,
+        topics: status.topics,
+        url: `https://github.com/${repo.owner}/${repo.name}`
+      })
+
       if (checkSuite && workflowRun) {
         // Get commit message from the commit (need to fetch separately or use CheckSuite data)
         const commitMessage = `Workflow: ${workflowRun.workflow?.name || 'Unknown'}`
@@ -162,11 +172,17 @@ async function fetchBatch(repos, token) {
         // Prioritize workflow run timestamps for accuracy - they're more reliable than checkSuite timestamps
         status.updatedAt = workflowRun.updatedAt || workflowRun.createdAt || checkSuite.updatedAt || checkSuite.createdAt
         status.runId = workflowRun.databaseId || null
+        
+        // Store lightweight status in service (will be used until full runs are fetched)
+        repoDataService.setLightweightStatus(repo.name, status)
       } else {
         status.status = 'no_runs'
         status.conclusion = null
         // Set updatedAt to null so repos without runs sort to the end
         status.updatedAt = null
+        
+        // Store in service
+        repoDataService.setLightweightStatus(repo.name, status)
       }
 
       return {

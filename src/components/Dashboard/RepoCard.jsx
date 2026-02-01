@@ -25,6 +25,7 @@ import { getStatusIcon, getStatusClass, getLabelColor, getTopicColor } from '../
 import { trackEvent } from '../../utils/analytics'
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { MOCK_WORKFLOW_RUNS } from '../../data/mockRepoStatuses'
+import { repoDataService } from '../../services/RepoDataService'
 import './RepoCard.css'
 
 export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, isExpanded, onToggleExpand, getActiveToken, isDemoMode }) {
@@ -90,7 +91,10 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
             )
             if (response.ok) {
               const data = await response.json()
-              setRuns(data.workflow_runs || [])
+              const runs = data.workflow_runs || []
+              setRuns(runs)
+              // Store in service for unified data management
+              repoDataService.setRuns(repoName, runs)
             }
           }
         } catch (err) {
@@ -168,13 +172,9 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       filtered = filtered.filter(run => run.name === selectedWorkflow)
     }
     return filtered
-  }, [runs, selectedBranch, selectedWorkflow])
-
-  // Get the latest run from filtered results to display in card
-  // NOTE: In demo mode, both 'status' prop and 'runs' come from the same RepoDataService
-  // so they are always consistent. Status is derived from the same run data we fetch here.
+  }, Data now unified through RepoDataService for both demo and real modes
   const displayStatus = useMemo(() => {
-    // When expanded with loaded runs, use the most recent filtered run
+    // When expanded with loaded runs, use the most recent filtered run (most accurate)
     if (isExpanded && runs.length > 0 && filteredRuns.length > 0) {
       const latestRun = filteredRuns[0]
       return {
@@ -185,10 +185,12 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
         commitMessage: latestRun.head_commit?.message?.split('\n')[0] || status.commitMessage
       }
     }
-    // When collapsed or no runs loaded yet, use status from parent
-    // This is derived from the same data source in demo mode
+    // Use status from parent (which now comes from unified service)
     return status
-  }, [isExpanded, runs.length, filteredRuns, status])
+  }, [isExpanded, runs.length
+    // Otherwise use status from parent
+    return status
+  }, [isExpanded, runs.length, runs, filteredRuns, status])
 
   return (
     <div 

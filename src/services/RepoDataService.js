@@ -19,6 +19,9 @@ export class RepoDataService {
     // Dynamic workflow runs (updated frequently)
     this.runsStorage = new Map()
     
+    // Lightweight status from GraphQL (for repos not yet expanded)
+    this.lightweightStatus = new Map()
+    
     // Tracking for update notifications
     this.lastUpdateTime = new Map()
     this.updateSequence = new Map()
@@ -36,6 +39,24 @@ export class RepoDataService {
       openPRCount: metadata.openPRCount || 0,
       topics: metadata.topics || []
     })
+  }
+
+  /**
+   * Set lightweight status from GraphQL (when we don't have full runs yet)
+   */
+  setLightweightStatus(repoName, status) {
+    this.lightweightStatus.set(repoName, {
+      status: status.status,
+      conclusion: status.conclusion,
+      workflow: status.workflow,
+      branch: status.branch,
+      commitMessage: status.commitMessage,
+      url: status.url,
+      updatedAt: status.updatedAt,
+      runId: status.runId
+    })
+    this.lastUpdateTime.set(repoName, new Date().toISOString())
+    this.updateSequence.set(repoName, ++this.sequenceCounter)
   }
 
   /**
@@ -106,6 +127,12 @@ export class RepoDataService {
     const latestRun = runs.length > 0 ? runs[0] : null
 
     if (!latestRun) {
+      // No runs available, check if we have lightweight status from GraphQL
+      const lightStatus = this.lightweightStatus.get(repoName)
+      if (lightStatus) {
+        return lightStatus
+      }
+      
       return {
         status: 'no_runs',
         conclusion: null,
@@ -151,16 +178,18 @@ export class RepoDataService {
   getAllRepoNames() {
     return Array.from(this.repoMetadata.keys())
   }
-
-  /**
-   * Clear all data for a repository
-   */
-  clearRepo(repoName) {
-    this.runsStorage.delete(repoName)
+ightweightStatus.delete(repoName)
     this.lastUpdateTime.delete(repoName)
     this.updateSequence.delete(repoName)
   }
 
+  /**
+   * Clear all data
+   */
+  clearAll() {
+    this.runsStorage.clear()
+    this.repoMetadata.clear()
+    this.lightweightStatus
   /**
    * Clear all data
    */
