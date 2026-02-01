@@ -58,55 +58,6 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     return
   }
 
-  const fetchRepoStatus = async (repo, token) => {
-    try {
-      const headers = token ? { 'Authorization': `token ${token}` } : {}
-      const owner = repo.owner || 'h3ow3d' // Fallback to h3ow3d for backwards compatibility
-      
-      // Fetch repository info, latest workflow runs, and open PRs in parallel
-      const [repoResponse, runsResponse, prsResponse] = await Promise.all([
-        fetch(`https://api.github.com/repos/${owner}/${repo.name}`, { headers }),
-        fetch(`https://api.github.com/repos/${owner}/${repo.name}/actions/runs?per_page=1`, { headers }),
-        fetch(`https://api.github.com/repos/${owner}/${repo.name}/pulls?state=open&per_page=100`, { headers })
-      ])
-      
-      if (!repoResponse.ok || !runsResponse.ok || !prsResponse.ok) {
-        if (repoResponse.status === 401 || runsResponse.status === 401 || prsResponse.status === 401) {
-          return { error: 'Authentication required' }
-        }
-        return { error: `HTTP ${repoResponse.status || runsResponse.status || prsResponse.status}` }
-      }
-
-      const repoData = await repoResponse.json()
-      const runsData = await runsResponse.json()
-      const prsData = await prsResponse.json()
-      
-      const result = {
-        description: repoData.description || null,
-        openPRCount: Array.isArray(prsData) ? prsData.length : 0,
-        topics: repoData.topics || []
-      }
-      
-      if (runsData.workflow_runs && runsData.workflow_runs.length > 0) {
-        const run = runsData.workflow_runs[0]
-        return {
-          ...result,
-          status: run.status,
-          conclusion: run.conclusion,
-          workflow: run.name,
-          branch: run.head_branch,
-          commitMessage: run.head_commit?.message?.split('\n')[0] || 'No message',
-          url: run.html_url,
-          updatedAt: run.updated_at,
-        }
-      }
-      
-      return { ...result, status: 'no_runs', conclusion: null }
-    } catch (error) {
-      return { error: error.message }
-    }
-  }
-
   const fetchAllStatuses = async () => {
     // Don't fetch if in demo mode
     if (authMethod === 'demo') {
