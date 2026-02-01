@@ -99,10 +99,6 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
               repoDataService.setRuns(repoName, runs)
             }
           }
-          // Notify parent that data was updated so it re-reads from service
-          if (onDataUpdate) {
-            onDataUpdate()
-          }
         } catch (err) {
           console.error('Failed to fetch runs:', err)
         } finally {
@@ -111,7 +107,7 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       }
       fetchRuns()
     }
-  }, [isExpanded, repoName, repoOwner, getActiveToken, isDemoMode, onDataUpdate])
+  }, [isExpanded, repoName, repoOwner, getActiveToken, isDemoMode])
 
   const getRunStatusIcon = (run) => {
     if (run.status === 'completed') {

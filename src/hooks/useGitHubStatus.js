@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { MOCK_REPO_STATUSES, MOCK_WORKFLOW_RUNS } from '../data/mockRepoStatuses'
 import { getGitHubAppCredentials } from '../services/githubAppAuth'
 import { fetchMultipleRepoStatuses as fetchRealRepoStatuses } from '../services/githubGraphQL'
@@ -60,7 +60,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     return
   }
 
-  const fetchAllStatuses = async () => {
+  const fetchAllStatuses = useCallback(async () => {
     setLoading(true)
     
     // Choose the appropriate fetch function based on demo mode
@@ -80,36 +80,16 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     // Use GraphQL batch fetching - fetches all repos in 1-2 API calls for metadata
     const results = await fetchFunction(allRepos, token)
     
-    // Fetch full runs (30 runs) for all repos to ensure accurate data from the start
+    // In demo mode, preload all mock runs
     if (isDemoMode) {
-      // In demo mode, load all mock runs from MOCK_WORKFLOW_RUNS
       allRepos.forEach(repo => {
         const mockRuns = MOCK_WORKFLOW_RUNS[repo.name] || []
         if (mockRuns.length > 0) {
           repoDataService.setRuns(repo.name, mockRuns)
         }
       })
-    } else if (token) {
-      // In real mode, fetch runs for all repos in parallel (efficient for initial load)
-      await Promise.all(
-        allRepos.map(async (repo) => {
-          try {
-            const response = await fetch(
-              `https://api.github.com/repos/${repo.owner}/${repo.name}/actions/runs?per_page=30`,
-              { headers: { 'Authorization': `token ${token}` } }
-            )
-            if (response.ok) {
-              const data = await response.json()
-              const runs = data.workflow_runs || []
-              // Store in service - this becomes the source of truth
-              repoDataService.setRuns(repo.name, runs)
-            }
-          } catch (err) {
-            console.error(`Failed to fetch runs for ${repo.name}:`, err)
-          }
-        })
-      )
     }
+    // In real mode, runs are fetched lazily when cards are expanded (see RepoCard component)
     
     // Only update repos whose data actually changed
     setRepoStatuses(prevStatuses => {
@@ -147,7 +127,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
     
     setLastUpdate(new Date())
     setLoading(false)
-  }
+  }, [isDemoMode, repositories, getActiveToken])
 
   // Update demo mode when authMethod changes
   useEffect(() => {
@@ -179,7 +159,7 @@ export function useGitHubStatus(repositories, getActiveToken, authMethod, showAu
         return () => clearInterval(interval)
       }
     }
-  }, [showAuthSetup, authMethod, autoRefresh, refreshInterval, reposKey, isDemoMode, repoStatuses])
+  }, [showAuthSetup, authMethod, autoRefresh, refreshInterval, reposKey, isDemoMode, fetchAllStatuses])
 
   return {
     repoStatuses,
