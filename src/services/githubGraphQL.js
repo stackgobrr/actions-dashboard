@@ -67,6 +67,10 @@ async function fetchBatch(repos, token) {
                 }
                 checkSuites(first: 1) {
                   nodes {
+                    status
+                    conclusion
+                    updatedAt
+                    createdAt
                     workflowRun {
                       workflow {
                         name
@@ -76,13 +80,9 @@ async function fetchBatch(repos, token) {
                       url
                       updatedAt
                       createdAt
-                      status
-                      conclusion
-                      headBranch: headRefName
-                      headCommit {
-                        message
-                        committedDate
-                      }
+                    }
+                    headBranch: branch {
+                      name
                     }
                   }
                 }
@@ -128,7 +128,8 @@ async function fetchBatch(repos, token) {
       }
 
       // Extract workflow run from checkSuites
-      const workflowRun = repoData.defaultBranchRef?.target?.checkSuites?.nodes?.[0]?.workflowRun
+      const checkSuite = repoData.defaultBranchRef?.target?.checkSuites?.nodes?.[0]
+      const workflowRun = checkSuite?.workflowRun
 
       const status = {
         description: repoData.description || null,
@@ -136,14 +137,17 @@ async function fetchBatch(repos, token) {
         topics: repoData.repositoryTopics?.nodes?.map(n => n.topic.name) || [],
       }
 
-      if (workflowRun) {
-        status.status = workflowRun.status?.toLowerCase() || 'unknown'
-        status.conclusion = workflowRun.conclusion?.toLowerCase() || null
+      if (checkSuite && workflowRun) {
+        // Get commit message from the commit (need to fetch separately or use CheckSuite data)
+        const commitMessage = `Workflow: ${workflowRun.workflow?.name || 'Unknown'}`
+        
+        status.status = checkSuite.status?.toLowerCase() || 'unknown'
+        status.conclusion = checkSuite.conclusion?.toLowerCase() || null
         status.workflow = workflowRun.workflow?.name || 'Unknown Workflow'
-        status.branch = workflowRun.headBranch || 'unknown'
-        status.commitMessage = workflowRun.headCommit?.message?.split('\n')[0] || 'No message'
+        status.branch = checkSuite.headBranch?.name || 'unknown'
+        status.commitMessage = commitMessage
         status.url = workflowRun.url || `https://github.com/${repo.owner}/${repo.name}/actions`
-        status.updatedAt = workflowRun.updatedAt || workflowRun.createdAt
+        status.updatedAt = checkSuite.updatedAt || workflowRun.updatedAt || checkSuite.createdAt
       } else {
         status.status = 'no_runs'
         status.conclusion = null
