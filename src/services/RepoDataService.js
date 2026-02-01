@@ -178,7 +178,14 @@ export class RepoDataService {
   getAllRepoNames() {
     return Array.from(this.repoMetadata.keys())
   }
-ightweightStatus.delete(repoName)
+
+  /**
+   * Remove data for a specific repository
+   */
+  removeRepo(repoName) {
+    this.runsStorage.delete(repoName)
+    this.repoMetadata.delete(repoName)
+    this.lightweightStatus.delete(repoName)
     this.lastUpdateTime.delete(repoName)
     this.updateSequence.delete(repoName)
   }
@@ -189,13 +196,7 @@ ightweightStatus.delete(repoName)
   clearAll() {
     this.runsStorage.clear()
     this.repoMetadata.clear()
-    this.lightweightStatus
-  /**
-   * Clear all data
-   */
-  clearAll() {
-    this.runsStorage.clear()
-    this.repoMetadata.clear()
+    this.lightweightStatus.clear()
     this.lastUpdateTime.clear()
     this.updateSequence.clear()
     this.sequenceCounter = 0

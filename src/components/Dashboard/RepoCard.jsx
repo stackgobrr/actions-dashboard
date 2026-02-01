@@ -172,7 +172,10 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       filtered = filtered.filter(run => run.name === selectedWorkflow)
     }
     return filtered
-  }, Data now unified through RepoDataService for both demo and real modes
+  }, [runs, selectedBranch, selectedWorkflow])
+
+  // Get the latest run from filtered results to display in card
+  // Data now unified through RepoDataService for both demo and real modes
   const displayStatus = useMemo(() => {
     // When expanded with loaded runs, use the most recent filtered run (most accurate)
     if (isExpanded && runs.length > 0 && filteredRuns.length > 0) {
@@ -186,9 +189,6 @@ export function RepoCard({ repoName, repoOwner, status, onTogglePin, isPinned, i
       }
     }
     // Use status from parent (which now comes from unified service)
-    return status
-  }, [isExpanded, runs.length
-    // Otherwise use status from parent
     return status
   }, [isExpanded, runs.length, runs, filteredRuns, status])
 
