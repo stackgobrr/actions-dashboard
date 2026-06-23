@@ -27,14 +27,43 @@ export const getGitHubAppCredentials = () => {
   }
 }
 
-// Check if GitHub App is configured
+// Check if GitHub App is configured (client-side credentials in localStorage)
 export const isGitHubAppConfigured = () => {
   const { appId, privateKey, installationId } = getGitHubAppCredentials()
   return !!(appId && privateKey && installationId)
 }
 
+/**
+ * Fetch an installation token via the server-side token proxy (/api/token).
+ * This is used when the user is authenticated via OAuth (session cookie) and
+ * the GitHub App private key is stored server-side.
+ *
+ * @returns {Promise<{token: string, expiresAt: string}>}
+ */
+const fetchTokenFromProxy = async () => {
+  const res = await fetch('/api/token', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' }
+  })
+  if (!res.ok) {
+    throw new Error(`Token proxy returned ${res.status}`)
+  }
+  return res.json()
+}
+
 // Generate installation access token
 export const generateInstallationToken = async () => {
+  // If user is authenticated via OAuth cookie, use the server-side token proxy
+  const authMethod = localStorage.getItem('auth_method')
+  if (authMethod === 'oauth' || (!localStorage.getItem(GITHUB_APP_PRIVATE_KEY_KEY) && authMethod !== 'github-app')) {
+    const { token, expiresAt } = await fetchTokenFromProxy()
+    const expiryMs = new Date(expiresAt).getTime()
+    localStorage.setItem(GITHUB_APP_TOKEN_KEY, token)
+    localStorage.setItem(GITHUB_APP_TOKEN_EXPIRY_KEY, expiryMs.toString())
+    return token
+  }
+
   const { appId, privateKey, installationId } = getGitHubAppCredentials()
   
   if (!appId || !privateKey || !installationId) {
@@ -142,3 +171,4 @@ export const getAppInstallationInfo = async () => {
     return null
   }
 }
+

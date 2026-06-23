@@ -64,3 +64,36 @@ output "oauth_client_secret_secret_name" {
   description = "Name of the Secrets Manager secret for OAuth client secret (use in workflows)"
   value       = aws_secretsmanager_secret.secrets["oauth_client_secret"].name
 }
+
+# Aurora Serverless v2
+output "aurora_cluster_arn" {
+  description = "ARN of the Aurora Serverless v2 cluster (use for RDS Data API)"
+  value       = aws_rds_cluster.aurora.arn
+}
+
+output "aurora_cluster_endpoint" {
+  description = "Writer endpoint of the Aurora cluster"
+  value       = aws_rds_cluster.aurora.endpoint
+  sensitive   = true
+}
+
+output "aurora_db_credentials_secret_arn" {
+  description = "ARN of the Secrets Manager secret holding Aurora credentials"
+  value       = aws_secretsmanager_secret.db_credentials.arn
+}
+
+output "jwt_secret_arn" {
+  description = "ARN of the Secrets Manager secret holding the JWT signing secret"
+  value       = aws_secretsmanager_secret.jwt_secret.arn
+}
+
+# DynamoDB
+output "dynamodb_events_table_name" {
+  description = "Name of the DynamoDB webhook events table"
+  value       = aws_dynamodb_table.webhook_events.name
+}
+
+output "dynamodb_events_stream_arn" {
+  description = "ARN of the DynamoDB Stream for the webhook events table"
+  value       = aws_dynamodb_table.webhook_events.stream_arn
+}

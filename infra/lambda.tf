@@ -10,6 +10,26 @@ locals {
       name        = var.environment != "prod" ? "${var.environment}-${var.oauth_client_secret_secret_name}" : var.oauth_client_secret_secret_name
       description = "OAuth client secret for Actions Dashboard"
     }
+    app_private_key = {
+      name        = var.environment != "prod" ? "${var.environment}-${var.app_private_key_secret_name}" : var.app_private_key_secret_name
+      description = "GitHub App private key (PEM) for Actions Dashboard"
+    }
+    webhook_secret = {
+      name        = var.environment != "prod" ? "${var.environment}-${var.webhook_secret_secret_name}" : var.webhook_secret_secret_name
+      description = "GitHub webhook HMAC secret for Actions Dashboard"
+    }
+  }
+
+  # Common environment variables shared across all data-plane Lambdas
+  common_env = {
+    AURORA_CLUSTER_ARN   = aws_rds_cluster.aurora.arn
+    AURORA_SECRET_ARN    = aws_secretsmanager_secret.db_credentials.arn
+    AURORA_DATABASE_NAME = local.aurora_database_name
+    DYNAMODB_EVENTS_TABLE = aws_dynamodb_table.webhook_events.name
+    JWT_SECRET_ARN       = aws_secretsmanager_secret.jwt_secret.arn
+    ALLOWED_ORIGIN       = local.base_url
+    AWS_REGION_NAME      = var.aws_region
+    ENVIRONMENT          = var.environment
   }
 
   # Lambda function runtime settings and environment variables
@@ -17,34 +37,76 @@ locals {
     oauth_start = {
       timeout     = 10
       memory_size = 128
-      environment = merge({
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
-        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "${local.base_url}/api/oauth/callback",
-        AWS_REGION_NAME                               = var.aws_region,
+      environment = {
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_id"].name
+        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI          = "${local.base_url}/api/oauth/callback"
+        AWS_REGION_NAME                               = var.aws_region
         ENVIRONMENT                                   = var.environment
-      }, {})
+      }
     }
     oauth_callback = {
+      timeout     = 15
+      memory_size = 256
+      environment = merge(local.common_env, {
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name
+        ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name
+        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI              = "${local.base_url}/api/oauth/callback"
+      })
+    }
+    profile = {
       timeout     = 10
-      memory_size = 128
-      environment = merge({
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_ID_SECRET_NAME     = aws_secretsmanager_secret.secrets["oauth_client_id"].name,
-        ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET_SECRET_NAME = aws_secretsmanager_secret.secrets["oauth_client_secret"].name,
-        ACTIONS_DASHBOARD_OAUTH_REDIRECT_URI              = "${local.base_url}/api/oauth/callback",
-        AWS_REGION_NAME                                   = var.aws_region,
-        ENVIRONMENT                                       = var.environment
-      }, {})
+      memory_size = 256
+      environment = local.common_env
+    }
+    groups = {
+      timeout     = 10
+      memory_size = 256
+      environment = local.common_env
+    }
+    webhook_receiver = {
+      timeout     = 10
+      memory_size = 256
+      environment = merge(local.common_env, {
+        GITHUB_WEBHOOK_SECRET_ARN = aws_secretsmanager_secret.secrets["webhook_secret"].arn
+      })
+    }
+    token_proxy = {
+      timeout     = 15
+      memory_size = 256
+      environment = merge(local.common_env, {
+        GITHUB_APP_ID             = var.actions_dashboard_app_id
+        GITHUB_APP_PRIVATE_KEY_ARN = aws_secretsmanager_secret.secrets["app_private_key"].arn
+      })
+    }
+    event_stream = {
+      timeout     = 60
+      memory_size = 256
+      environment = local.common_env
     }
   }
 
   # Lambda Function URL configurations
-  # No CORS needed - these only return redirects, not data consumed by JavaScript
   function_url_configs = {
     oauth_start = {
       invoke_mode = "BUFFERED"
     }
     oauth_callback = {
       invoke_mode = "BUFFERED"
+    }
+    profile = {
+      invoke_mode = "BUFFERED"
+    }
+    groups = {
+      invoke_mode = "BUFFERED"
+    }
+    webhook_receiver = {
+      invoke_mode = "BUFFERED"
+    }
+    token_proxy = {
+      invoke_mode = "BUFFERED"
+    }
+    event_stream = {
+      invoke_mode = "RESPONSE_STREAM"
     }
   }
 
@@ -72,6 +134,8 @@ resource "aws_secretsmanager_secret_version" "secrets" {
   secret_string = lookup({
     oauth_client_id     = var.oauth_client_id
     oauth_client_secret = var.oauth_client_secret
+    app_private_key     = var.app_private_key
+    webhook_secret      = var.webhook_secret
   }, each.key)
 }
 
@@ -99,7 +163,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_execution.name
 }
 
-# IAM Policy for Secrets Manager access
+# IAM Policy for Secrets Manager access (all secrets)
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role_policy" "lambda_secrets_access" {
@@ -110,12 +174,63 @@ resource "aws_iam_role_policy" "lambda_secrets_access" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "SecretsManagerAccess"
+        Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+        Effect = "Allow"
+        Resource = concat(
+          [for secret in aws_secretsmanager_secret.secrets : secret.arn],
+          [aws_secretsmanager_secret.db_credentials.arn, aws_secretsmanager_secret.jwt_secret.arn]
+        )
+      }
+    ]
+  })
+}
+
+# IAM Policy for RDS Data API access (Aurora Serverless v2)
+resource "aws_iam_role_policy" "lambda_rds_data_access" {
+  name = "${local.resource_prefix}-lambda-rds-data-access"
+  role = aws_iam_role.lambda_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "RDSDataAPIAccess"
+        Action = ["rds-data:ExecuteStatement", "rds-data:BatchExecuteStatement", "rds-data:BeginTransaction", "rds-data:CommitTransaction", "rds-data:RollbackTransaction"]
+        Effect = "Allow"
+        Resource = [aws_rds_cluster.aurora.arn]
+      }
+    ]
+  })
+}
+
+# IAM Policy for DynamoDB access (webhook events table)
+resource "aws_iam_role_policy" "lambda_dynamodb_access" {
+  name = "${local.resource_prefix}-lambda-dynamodb-access"
+  role = aws_iam_role.lambda_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "DynamoDBEventTableAccess"
         Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:ConditionCheckItem",
+          "dynamodb:DescribeTable",
+          "dynamodb:DescribeStream",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams"
         ]
         Effect   = "Allow"
-        Resource = [for secret in aws_secretsmanager_secret.secrets : secret.arn]
+        Resource = [
+          aws_dynamodb_table.webhook_events.arn,
+          "${aws_dynamodb_table.webhook_events.arn}/index/*",
+          "${aws_dynamodb_table.webhook_events.arn}/stream/*"
+        ]
       }
     ]
   })

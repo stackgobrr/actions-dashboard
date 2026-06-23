@@ -1,0 +1,1 @@
+{"name":"token-proxy","version":"1.0.0","type":"module","dependencies":{"@aws-sdk/client-secrets-manager":"^3.0.0","@aws-sdk/client-rds-data":"^3.0.0","@octokit/auth-app":"^8.0.0","jose":"^5.0.0"}}
