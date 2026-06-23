@@ -159,9 +159,10 @@ export const handler = awslambda.streamifyResponse(async (event, responseStream)
 
           stream.write(
             `data: ${JSON.stringify({
-              type: item.event_type,
+              event_type: item.event_type,
               repo: item.repo_full_name,
               action: item.action,
+              received_at: item.received_at,
               payload,
             })}\n\n`,
           );

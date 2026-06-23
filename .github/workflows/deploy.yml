@@ -128,7 +128,7 @@ jobs:
     if: |
       always() &&
       needs.test.result == 'success' &&
-      (needs.build-lambdas.result == 'success' || needs.build-lambdas.result == 'skipped') &&
+      needs.build-lambdas.result != 'failure' &&
       needs.setup.outputs.infra_changed == 'true'
     runs-on: ubuntu-latest
     environment: ${{ needs.setup.outputs.environment }}

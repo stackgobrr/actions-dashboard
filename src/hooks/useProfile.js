@@ -69,7 +69,9 @@ export function useProfile(authenticated) {
    * @param {{ settings?: object, selected_repos?: Array }} updates
    */
   const updateProfile = useCallback(async (updates) => {
-    const optimistic = { ...profile, ...updates }
+    // Capture the current value synchronously before the optimistic update
+    const previousProfile = profile
+    const optimistic = { ...previousProfile, ...updates }
     setProfile(optimistic)
     persistCache(optimistic)
 
@@ -89,9 +91,9 @@ export function useProfile(authenticated) {
       trackEvent('Profile Updated', { keys: Object.keys(updates) })
     } catch (err) {
       logger.error('[useProfile] updateProfile error:', err)
-      // Roll back optimistic update on failure
-      setProfile(profile)
-      persistCache(profile)
+      // Roll back to the state captured before the optimistic update
+      setProfile(previousProfile)
+      persistCache(previousProfile)
       setError(err.message)
     }
   }, [profile, persistCache])

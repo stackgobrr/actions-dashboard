@@ -102,7 +102,7 @@ export function useEventStream(enabled, onEvent) {
     openStream()
 
     return () => closeStream()
-  }, [enabled, openStream, closeStream])
+  }, [enabled]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return { connected, error }
 }

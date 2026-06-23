@@ -91,17 +91,6 @@ function App() {
     }
   }, [profile])
 
-  // Real-time SSE event stream — enabled for OAuth session users
-  const handleStreamEvent = useCallback((event) => {
-    // Trigger a targeted re-fetch when a workflow_run or check_suite event arrives.
-    // A full refetch is simpler and correct; a more surgical update can be done later.
-    if (['workflow_run', 'check_suite', 'check_run', 'workflow_job'].includes(event.event_type)) {
-      fetchAllStatuses()
-    }
-  }, []) // fetchAllStatuses captured via closure after it's defined below
-
-  const { connected: streamConnected } = useEventStream(isOAuthSession, handleStreamEvent)
-
   // Track when auth has finished initializing
   useEffect(() => {
     if (auth.authMethod !== 'none' || !hasInitialAuth) {
@@ -138,7 +127,7 @@ function App() {
       }
     } else if (auth.authMethod !== 'none' && auth.authMethod !== 'demo') {
       // For OAuth sessions, profile hook hydrates repos — only fall back to localStorage if no profile yet
-      if (!profile?.selected_repos) {
+      if (!isOAuthSession || !profile?.selected_repos) {
         const savedRepos = localStorage.getItem('selectedRepos')
         if (savedRepos) {
           setSelectedRepos(JSON.parse(savedRepos))
@@ -174,6 +163,16 @@ function App() {
     autoRefresh,
     refreshInterval
   )
+
+  // Real-time SSE event stream — enabled for OAuth session users only.
+  // Defined here so fetchAllStatuses is already in scope.
+  const handleStreamEvent = useCallback((event) => {
+    if (['workflow_run', 'check_suite', 'check_run', 'workflow_job'].includes(event.event_type)) {
+      fetchAllStatuses()
+    }
+  }, [fetchAllStatuses])
+
+  const { connected: streamConnected } = useEventStream(isOAuthSession, handleStreamEvent)
 
   const { rateLimit, loading: rateLimitLoading, error: rateLimitError } = useRateLimit(
     auth.getActiveToken,
