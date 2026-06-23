@@ -1,9 +1,9 @@
 # CloudFront cache policies and origins for Lambda Function URLs
 
-# Create cache policy for API requests (no caching)
+# Create cache policy for public API requests (OAuth redirects — no caching, no cookie forwarding)
 resource "aws_cloudfront_cache_policy" "lambda_api" {
   name        = "${local.resource_prefix}-lambda-api"
-  comment     = "No caching for API requests"
+  comment     = "No caching for public API requests (OAuth redirects)"
   default_ttl = 0
   max_ttl     = 0
   min_ttl     = 0
@@ -19,6 +19,35 @@ resource "aws_cloudfront_cache_policy" "lambda_api" {
 
     query_strings_config {
       query_string_behavior = "none"
+    }
+
+    enable_accept_encoding_brotli = false
+    enable_accept_encoding_gzip   = false
+  }
+}
+
+# Cache policy for authenticated API requests — forwards session cookie, no caching
+resource "aws_cloudfront_cache_policy" "lambda_api_auth" {
+  name        = "${local.resource_prefix}-lambda-api-auth"
+  comment     = "No caching for authenticated API requests; forwards session cookie"
+  default_ttl = 0
+  max_ttl     = 0
+  min_ttl     = 0
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "whitelist"
+      cookies {
+        items = ["session"]
+      }
+    }
+
+    headers_config {
+      header_behavior = "none"
+    }
+
+    query_strings_config {
+      query_string_behavior = "all"
     }
 
     enable_accept_encoding_brotli = false
@@ -76,3 +105,7 @@ resource "aws_cloudfront_response_headers_policy" "lambda_api" {
   }
 }
 
+# Authenticated Lambda paths that need the session cookie forwarded
+locals {
+  auth_lambda_paths = toset(["profile", "groups", "token_proxy", "event_stream"])
+}

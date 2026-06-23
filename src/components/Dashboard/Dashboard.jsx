@@ -40,7 +40,8 @@ export function Dashboard({
   rateLimit,
   rateLimitLoading,
   rateLimitError,
-  getActiveToken
+  getActiveToken,
+  streamConnected
 }) {
   // Collect all unique topics from all repositories
   const allTopics = [...new Set(
@@ -120,6 +121,7 @@ export function Dashboard({
             rateLimit={rateLimit}
             rateLimitLoading={rateLimitLoading}
             rateLimitError={rateLimitError}
+            streamConnected={streamConnected}
           />
         )}
 

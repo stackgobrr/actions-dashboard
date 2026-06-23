@@ -8,4 +8,7 @@ locals {
 
   # Resource naming prefix (project-environment)
   resource_prefix = "${var.project_name}-${var.environment}"
+
+  # Aurora database name
+  aurora_database_name = "actions_dashboard"
 }

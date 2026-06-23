@@ -5,10 +5,15 @@ locals {
     key => replace(replace(aws_lambda_function_url.lambda[key].function_url, "https://", ""), "/", "")
   }
 
-  # Map OAuth Lambda functions to their CloudFront path patterns
+  # Map all Lambda functions to their CloudFront path patterns
   lambda_path_patterns = {
-    oauth_start    = "/api/oauth/start"
-    oauth_callback = "/api/oauth/callback"
+    oauth_start      = "/api/oauth/start"
+    oauth_callback   = "/api/oauth/callback"
+    profile          = "/api/profile"
+    groups           = "/api/groups*"
+    webhook_receiver = "/api/webhooks/github"
+    token_proxy      = "/api/token"
+    event_stream     = "/api/events/stream"
   }
 }
 
@@ -34,11 +39,12 @@ module "frontend" {
   ]
 
   # Add cache behaviors for API routes
+  # Authenticated paths use the session-cookie-forwarding cache policy
   additional_cache_behaviors = [
     for key, path in local.lambda_path_patterns : {
       path_pattern               = path
       target_origin_id           = "lambda-${key}"
-      cache_policy_id            = aws_cloudfront_cache_policy.lambda_api.id
+      cache_policy_id            = contains(tolist(local.auth_lambda_paths), key) ? aws_cloudfront_cache_policy.lambda_api_auth.id : aws_cloudfront_cache_policy.lambda_api.id
       origin_request_policy_id   = aws_cloudfront_origin_request_policy.lambda_api.id
       response_headers_policy_id = aws_cloudfront_response_headers_policy.lambda_api.id
     }

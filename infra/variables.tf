@@ -86,3 +86,52 @@ variable "oauth_client_secret" {
   type        = string
   sensitive   = true
 }
+
+# GitHub App
+variable "actions_dashboard_app_id" {
+  description = "GitHub App ID for Actions Dashboard"
+  type        = string
+  default     = ""
+}
+
+variable "app_private_key" {
+  description = "GitHub App private key (PEM)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "webhook_secret" {
+  description = "GitHub webhook HMAC secret"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+# Database & JWT
+variable "db_password" {
+  description = "Master password for Aurora Serverless v2 cluster"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "jwt_secret" {
+  description = "Secret string used to sign JWT session tokens (min 32 chars)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+# Secrets Manager secret names for new secrets
+variable "app_private_key_secret_name" {
+  description = "Secrets Manager secret name for GitHub App private key"
+  type        = string
+  default     = "actions-dashboard/github-app-private-key"
+}
+
+variable "webhook_secret_secret_name" {
+  description = "Secrets Manager secret name for GitHub webhook secret"
+  type        = string
+  default     = "actions-dashboard/webhook-secret"
+}

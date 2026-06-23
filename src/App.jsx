@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import { Dashboard } from './components/Dashboard/Dashboard'
@@ -13,6 +13,8 @@ import { useGitHubStatus } from './hooks/useGitHubStatus'
 import { useTheme } from './hooks/useTheme'
 import { useAuth } from './hooks/useAuth'
 import { useRateLimit } from './hooks/useRateLimit'
+import { useProfile } from './hooks/useProfile'
+import { useEventStream } from './hooks/useEventStream'
 import { REPOSITORIES } from './constants'
 import { MOCK_REPO_STATUSES } from './data/mockRepoStatuses'
 import { logger } from './utils/logger'
@@ -78,16 +80,16 @@ function App() {
   const auth = useAuth()
   const [authInitialized, setAuthInitialized] = useState(false)
 
-  // Debug logging
+  // Profile persistence — active only when signed in via OAuth cookie session
+  const isOAuthSession = auth.authMethod === 'oauth'
+  const { profile, fetchProfile, updateProfile } = useProfile(isOAuthSession)
+
+  // Sync profile → selectedRepos when profile loads (OAuth session only)
   useEffect(() => {
-    console.log('[App Debug]', {
-      showLanding,
-      authMethod: auth.authMethod,
-      showAuthSetup: auth.showAuthSetup,
-      hasInitialAuth,
-      authInitialized
-    })
-  }, [showLanding, auth.authMethod, auth.showAuthSetup, hasInitialAuth, authInitialized])
+    if (profile?.selected_repos && profile.selected_repos.length > 0) {
+      setSelectedRepos(profile.selected_repos)
+    }
+  }, [profile])
 
   // Track when auth has finished initializing
   useEffect(() => {
@@ -99,13 +101,10 @@ function App() {
   // Sync landing page visibility with auth state
   useEffect(() => {
     if (auth.showAuthSetup) {
-      // When auth setup is requested, hide landing page to show auth setup
       setShowLanding(false)
     } else if (auth.authMethod === 'none') {
-      // No auth and no setup requested - show landing page
       setShowLanding(true)
     } else {
-      // Has auth - hide landing page
       setShowLanding(false)
     }
   }, [auth.authMethod, auth.showAuthSetup])
@@ -113,12 +112,10 @@ function App() {
   // Clear and reinitialize repos when switching auth methods to prevent mixing demo/real repos
   useEffect(() => {
     if (auth.authMethod === 'demo') {
-      // Switching to demo mode - load demo repos from demoRepos storage
       const savedDemoRepos = localStorage.getItem('demoRepos')
       if (savedDemoRepos) {
         setSelectedRepos(JSON.parse(savedDemoRepos))
       } else {
-        // Initialize with all demo repositories
         const demoRepos = Object.keys(MOCK_REPO_STATUSES).map(repoName => ({
           name: repoName,
           owner: 'demo',
@@ -129,21 +126,22 @@ function App() {
         localStorage.setItem('demoRepos', JSON.stringify(demoRepos))
       }
     } else if (auth.authMethod !== 'none' && auth.authMethod !== 'demo') {
-      // Switching to authenticated mode (PAT or GitHub App) - load from selectedRepos storage
-      const savedRepos = localStorage.getItem('selectedRepos')
-      if (savedRepos) {
-        setSelectedRepos(JSON.parse(savedRepos))
-      } else {
-        // Load default real repositories
-        const defaultRepos = [
-          ...REPOSITORIES.common.map(r => ({ ...r, category: 'common' })),
-          ...REPOSITORIES.modules.map(r => ({ ...r, category: 'modules' })),
-          ...REPOSITORIES.infra.map(r => ({ ...r, category: 'infra' })),
-          ...REPOSITORIES.services.map(r => ({ ...r, category: 'services' })),
-          ...REPOSITORIES.utils.map(r => ({ ...r, category: 'utils' }))
-        ]
-        setSelectedRepos(defaultRepos)
-        localStorage.setItem('selectedRepos', JSON.stringify(defaultRepos))
+      // For OAuth sessions, profile hook hydrates repos — only fall back to localStorage if no profile yet
+      if (!isOAuthSession || !profile?.selected_repos) {
+        const savedRepos = localStorage.getItem('selectedRepos')
+        if (savedRepos) {
+          setSelectedRepos(JSON.parse(savedRepos))
+        } else {
+          const defaultRepos = [
+            ...REPOSITORIES.common.map(r => ({ ...r, category: 'common' })),
+            ...REPOSITORIES.modules.map(r => ({ ...r, category: 'modules' })),
+            ...REPOSITORIES.infra.map(r => ({ ...r, category: 'infra' })),
+            ...REPOSITORIES.services.map(r => ({ ...r, category: 'services' })),
+            ...REPOSITORIES.utils.map(r => ({ ...r, category: 'utils' }))
+          ]
+          setSelectedRepos(defaultRepos)
+          localStorage.setItem('selectedRepos', JSON.stringify(defaultRepos))
+        }
       }
     }
   }, [auth.authMethod])
@@ -166,6 +164,16 @@ function App() {
     refreshInterval
   )
 
+  // Real-time SSE event stream — enabled for OAuth session users only.
+  // Defined here so fetchAllStatuses is already in scope.
+  const handleStreamEvent = useCallback((event) => {
+    if (['workflow_run', 'check_suite', 'check_run', 'workflow_job'].includes(event.event_type)) {
+      fetchAllStatuses()
+    }
+  }, [fetchAllStatuses])
+
+  const { connected: streamConnected } = useEventStream(isOAuthSession, handleStreamEvent)
+
   const { rateLimit, loading: rateLimitLoading, error: rateLimitError } = useRateLimit(
     auth.getActiveToken,
     auth.authMethod,
@@ -174,9 +182,12 @@ function App() {
 
   const handleSaveRepos = (repos) => {
     setSelectedRepos(repos)
-    // Save to appropriate storage key based on auth method
     const storageKey = auth.authMethod === 'demo' ? 'demoRepos' : 'selectedRepos'
     localStorage.setItem(storageKey, JSON.stringify(repos))
+    // Also persist to server profile for OAuth sessions
+    if (isOAuthSession) {
+      updateProfile({ selected_repos: repos })
+    }
   }
 
   const handleGetStarted = () => {
@@ -361,6 +372,7 @@ function App() {
                   rateLimitLoading={rateLimitLoading}
                   rateLimitError={rateLimitError}
                   getActiveToken={auth.getActiveToken}
+                  streamConnected={streamConnected}
                 />
                 {showSettings && (
                   <Settings

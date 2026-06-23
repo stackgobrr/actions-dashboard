@@ -11,7 +11,8 @@ import { logger } from '../utils/logger'
 import { trackEvent } from '../utils/analytics'
 
 /**
- * Hook to manage authentication state for both GitHub App and PAT methods
+ * Hook to manage authentication state for PAT, GitHub App, OAuth (cookie session),
+ * and demo modes.
  * @returns {Object} Authentication state and methods
  */
 export function useAuth() {
@@ -33,37 +34,21 @@ export function useAuth() {
   // Check authentication on mount
   useEffect(() => {
     const checkAuth = async () => {
-      // First check if we're handling an OAuth callback (token in URL hash)
-      const hash = window.location.hash.substring(1)
-      console.log('[useAuth] Checking hash:', hash)
-      if (hash) {
-        const params = new URLSearchParams(hash)
-        const token = params.get('token')
-        console.log('[useAuth] Token from hash:', token ? `${token.substring(0, 10)}...` : 'null')
-        
-        if (token) {
-          // Store token and mark as OAuth authentication
-          localStorage.setItem('github_token', token)
-          localStorage.setItem('auth_method', 'oauth')
-          setGithubToken(token)
+      // Try OAuth session cookie first — probe /api/profile (lightweight check)
+      // A 200 means the session cookie is valid; 401 means no active session.
+      try {
+        const res = await fetch('/api/profile', { credentials: 'include' })
+        if (res.ok) {
           setAuthMethod('oauth')
-          console.log('[useAuth] Set authMethod to oauth')
           trackEvent('Dashboard Opened', { authMethod: 'oauth' })
-          
-          // Clean up URL hash
-          window.history.replaceState({}, document.title, window.location.pathname)
           return
         }
+      } catch {
+        // Network error — fall through to legacy checks
       }
-      
-      // Check localStorage for auth method marker (set by OAuth callback above)
-      const authMethod = localStorage.getItem('auth_method')
-      
-      if (authMethod === 'oauth' && localStorage.getItem('github_token')) {
-        setGithubToken(localStorage.getItem('github_token'))
-        setAuthMethod('oauth')
-        trackEvent('Dashboard Opened', { authMethod: 'oauth' })
-      } else if (isGitHubAppConfigured()) {
+
+      // Legacy: PAT stored in localStorage (pre-cookie era)
+      if (isGitHubAppConfigured()) {
         setAuthMethod('github-app')
         try {
           const info = await getAppInstallationInfo()
@@ -71,41 +56,61 @@ export function useAuth() {
         } catch (err) {
           logger.error('Failed to get app info:', err)
         }
-      } else if (localStorage.getItem('github_token')) {
-        setGithubToken(localStorage.getItem('github_token'))
-        setAuthMethod('pat')
-      } else if (localStorage.getItem('demo_mode') === 'true') {
-        setAuthMethod('demo')
+        return
       }
-      // If no auth is found, don't set showAuthSetup - let the landing page show
+
+      if (localStorage.getItem('github_token')) {
+        setGithubToken(localStorage.getItem('github_token'))
+        const method = localStorage.getItem('auth_method') === 'oauth' ? 'oauth' : 'pat'
+        setAuthMethod(method)
+        trackEvent('Dashboard Opened', { authMethod: method })
+        return
+      }
+
+      if (localStorage.getItem('demo_mode') === 'true') {
+        setAuthMethod('demo')
+        return
+      }
+
+      // No auth found — landing page will show
     }
     checkAuth()
   }, [])
 
   /**
-   * Gets the currently active authentication token
-   * @returns {string|null} The active token (PAT, OAuth, or GitHub App token) or null if none exists
+   * Gets the currently active authentication token.
+   * For OAuth session-cookie auth, returns null — the cookie is sent automatically
+   * by the browser for /api/* calls and GitHub API calls use the token stored
+   * server-side; PAT/GitHub-App flows still return the token directly.
+   * @returns {Promise<string|null>}
    */
-  const getActiveToken = useCallback(() => {
+  const getActiveToken = useCallback(async () => {
     if (authMethod === 'github-app') {
       return getGitHubAppToken()
     }
-    return githubToken
+    if (authMethod === 'oauth' && !githubToken) {
+      // Fetch the GitHub token from the profile API for direct GitHub API calls
+      try {
+        const res = await fetch('/api/profile', { credentials: 'include' })
+        if (res.ok) {
+          const profile = await res.json()
+          return profile.github_token || null
+        }
+      } catch {
+        return null
+      }
+    }
+    return githubToken || null
   }, [authMethod, githubToken])
 
   /**
-   * Validates and saves a Personal Access Token
-   * Tests the token by making an API call to GitHub before storing it
-   * @async
-   * @throws {Error} When network request fails
-   * @returns {Promise<void>}
+   * Validates and saves a Personal Access Token.
    */
   const saveToken = async () => {
     setPatError('')
     setIsValidatingPat(true)
     
     try {
-      // Test the token by making a simple API call to GitHub
       const response = await fetch('https://api.github.com/user', {
         headers: {
           'Authorization': `token ${githubToken}`,
@@ -125,7 +130,6 @@ export function useAuth() {
         return
       }
 
-      // Token is valid
       trackEvent('Dashboard Opened', { authMethod: 'pat' })
       localStorage.setItem('github_token', githubToken)
       setAuthMethod('pat')
@@ -139,10 +143,9 @@ export function useAuth() {
   }
 
   /**
-   * Clears the stored PAT and resets authentication state
+   * Clears the stored PAT and resets authentication state.
    */
   const clearToken = () => {
-    // Clear all possible auth tokens
     localStorage.removeItem('github_token')
     localStorage.removeItem('auth_method')
     localStorage.removeItem('github_app_id')
@@ -156,20 +159,23 @@ export function useAuth() {
   }
 
   /**
-   * Handles logout for all authentication methods
-   * Clears all credentials and returns to landing page
+   * Handles logout for all authentication methods.
    */
   const handleLogout = () => {
-    // Track logout event with auth method
     trackEvent('User Signed Out', { authMethod })
     
-    // Clear all possible auth tokens
+    // Clear localStorage (legacy PAT/GitHub-App storage)
     localStorage.removeItem('github_token')
     localStorage.removeItem('auth_method')
     localStorage.removeItem('github_app_id')
     localStorage.removeItem('github_app_private_key')
     localStorage.removeItem('github_app_installation_id')
     localStorage.removeItem('demo_mode')
+    localStorage.removeItem('profile_cache')
+    localStorage.removeItem('profile_cache_version')
+
+    // For OAuth cookie sessions, the cookie will expire naturally (httpOnly, so we
+    // cannot clear it from JS). A server-side logout endpoint can be added later.
     setGithubToken('')
     setAuthMethod('none')
     setAppInfo(null)
@@ -180,14 +186,11 @@ export function useAuth() {
     trackEvent('Demo Mode Started')
     localStorage.setItem('demo_mode', 'true')
     setAuthMethod('demo')
-    setShowAuthSetup(false) // Hide auth setup to show dashboard
+    setShowAuthSetup(false)
   }
 
   /**
-   * Validates and saves GitHub App credentials
-   * Tests the credentials by generating a token before storing
-   * @async
-   * @returns {Promise<void>}
+   * Validates and saves GitHub App credentials.
    */
   const handleGitHubAppSetup = async () => {
     setAppFormError('')
@@ -214,11 +217,9 @@ export function useAuth() {
       setShowGitHubAppForm(false)
       setShowAuthSetup(false)
       
-      // Get app info
       const info = await getAppInstallationInfo()
       setAppInfo(info)
       
-      // Clear form
       setAppId('')
       setPrivateKey('')
       setInstallationId('')

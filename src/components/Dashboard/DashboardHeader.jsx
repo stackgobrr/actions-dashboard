@@ -54,7 +54,8 @@ export function DashboardHeader({
   showRateLimit,
   rateLimit,
   rateLimitLoading,
-  rateLimitError
+  rateLimitError,
+  streamConnected
 }) {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark'
@@ -129,6 +130,16 @@ export function DashboardHeader({
                 }
               >
                 {isDemoMode ? "Demo Mode" : "Live Mode"}
+              </Label>
+            )}
+            {streamConnected && (
+              <Label
+                variant="success"
+                size="small"
+                title="Real-time event stream connected"
+                sx={{ fontVariantNumeric: 'tabular-nums' }}
+              >
+                ● live
               </Label>
             )}
           </h1>

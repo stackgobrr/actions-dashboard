@@ -26,6 +26,7 @@ jobs:
       tfvars_env: ${{ steps.env.outputs.tfvars_env }}
       infra_changed: ${{ steps.changes.outputs.infra }}
       frontend_changed: ${{ steps.changes.outputs.frontend }}
+      lambdas_changed: ${{ steps.changes.outputs.lambdas }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,6 +40,7 @@ jobs:
             # Manual triggers or tags - run everything
             echo "infra=true" >> "$GITHUB_OUTPUT"
             echo "frontend=true" >> "$GITHUB_OUTPUT"
+            echo "lambdas=true" >> "$GITHUB_OUTPUT"
           else
             # Check for changes in specific paths
             if git diff --name-only HEAD~1 HEAD | grep -q '^infra/'; then
@@ -51,6 +53,12 @@ jobs:
               echo "frontend=true" >> "$GITHUB_OUTPUT"
             else
               echo "frontend=false" >> "$GITHUB_OUTPUT"
+            fi
+
+            if git diff --name-only HEAD~1 HEAD | grep -q '^lambdas/'; then
+              echo "lambdas=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "lambdas=false" >> "$GITHUB_OUTPUT"
             fi
           fi
       
@@ -78,9 +86,50 @@ jobs:
       - name: Run Component Tests
         uses: ./.github/actions/react-component-test
 
+  build-lambdas:
+    name: Build & Upload Lambdas
+    needs: [setup, test]
+    if: needs.setup.outputs.lambdas_changed == 'true' || needs.setup.outputs.infra_changed == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: stackgobrr/common-github-actions/actions/aws-configure@main
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          auth-method: 'static'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Build and upload Lambda packages
+        run: |
+          chmod +x lambdas/build.sh
+          bash lambdas/build.sh
+        env:
+          LAMBDA_S3_BUCKET: ${{ vars.LAMBDA_S3_BUCKET_NAME }}
+          COMMIT_SHA: ${{ github.sha }}
+          MANIFEST_KEY: manifests/lambda-manifest.json
+
   deploy-infrastructure:
     name: Deploy Infrastructure
-    needs: [setup, test]
+    needs: [setup, test, build-lambdas]
+    if: |
+      always() &&
+      needs.test.result == 'success' &&
+      needs.build-lambdas.result != 'failure' &&
+      needs.setup.outputs.infra_changed == 'true'
     runs-on: ubuntu-latest
     environment: ${{ needs.setup.outputs.environment }}
     permissions:
@@ -136,6 +185,8 @@ jobs:
           TF_VAR_oauth_client_id: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_ID }}
           TF_VAR_oauth_client_secret: ${{ secrets.ACTIONS_DASHBOARD_OAUTH_CLIENT_SECRET }}
           TF_VAR_lambda_artifacts_bucket: ${{ vars.LAMBDA_S3_BUCKET_NAME }}
+          TF_VAR_db_password: ${{ secrets.ACTIONS_DASHBOARD_DB_PASSWORD }}
+          TF_VAR_jwt_secret: ${{ secrets.ACTIONS_DASHBOARD_JWT_SECRET }}
 
       - name: Terraform Init (for outputs only)
         if: needs.setup.outputs.infra_changed != 'true'
